@@ -1,0 +1,678 @@
+﻿@model IEnumerable<PROTOTIPO.Models.IncidenciaMantenimiento>
+
+@{
+    ViewData["Title"] = "Mantenimiento";
+
+    var total = Model.Count();
+    var pendientes = Model.Count(x => x.Estado == "Pendiente");
+    var enProceso = Model.Count(x => x.Estado == "En Proceso");
+    var resueltas = Model.Count(x => x.Estado == "Resuelta");
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.2rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-gac-primary:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    /* ── STAT CARDS ── */
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.4rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+            background: var(--gac-primary);
+        }
+
+        .stat-card.sc-warning::after {
+            background: var(--gac-warning);
+        }
+
+        .stat-card.sc-info::after {
+            background: var(--gac-primary);
+        }
+
+        .stat-card.sc-success::after {
+            background: var(--gac-success);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15,22,35,.07);
+        }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        margin-bottom: .85rem;
+    }
+
+    .ic-blue {
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+    }
+
+    .ic-amber {
+        background: rgba(245,158,11,.1);
+        color: #d97706;
+    }
+
+    .ic-blue2 {
+        background: rgba(37,140,251,.08);
+        color: #1d77d4;
+    }
+
+    .ic-green {
+        background: rgba(34,197,94,.1);
+        color: #16a34a;
+    }
+
+    .sc-label {
+        font-size: .77rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .sc-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+    }
+
+    /* ── TABLE CARD ── */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-card-head {
+        padding: 1rem 1.4rem;
+        border-bottom: 1px solid var(--gac-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .tc-title {
+        font-weight: 700;
+        font-size: .95rem;
+        color: var(--gac-navy);
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: 0;
+    }
+
+        .tc-title i {
+            color: var(--gac-primary);
+        }
+
+    .tc-count {
+        font-size: .75rem;
+        font-weight: 600;
+        color: #64748b;
+        background: var(--gac-surface);
+        border: 1px solid var(--gac-border);
+        border-radius: 20px;
+        padding: 3px 11px;
+    }
+
+    .inc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .inc-table thead {
+            background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        }
+
+            .inc-table thead th {
+                font-size: .73rem;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: rgba(255,255,255,.7);
+                font-weight: 700;
+                padding: .9rem 1.1rem;
+                border: none;
+                white-space: nowrap;
+            }
+
+                .inc-table thead th.center {
+                    text-align: center;
+                }
+
+        .inc-table tbody td {
+            padding: .85rem 1.1rem;
+            color: #334155;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f4f9;
+            font-size: .9rem;
+        }
+
+        .inc-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inc-table tbody tr {
+            transition: background .15s ease;
+        }
+
+            .inc-table tbody tr:hover {
+                background: #fafcff;
+            }
+
+    .desc-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        max-width: 220px;
+        line-height: 1.45;
+        color: var(--gac-navy);
+        font-weight: 500;
+    }
+
+    .unit-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(15,22,35,.05);
+        border-radius: 50px;
+        padding: .3rem .75rem;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    .user-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(37,140,251,.12);
+        color: var(--gac-primary);
+        font-size: .68rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--gac-navy);
+        font-size: .88rem;
+    }
+
+    .date-cell {
+        font-size: .83rem;
+        color: #64748b;
+        white-space: nowrap;
+    }
+
+    .date-none {
+        font-size: .78rem;
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    /* ── BADGES ── */
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        font-size: .73rem;
+        padding: .35rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+        .badge-estado .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .badge-pendiente {
+        background: rgba(245,158,11,.12);
+        color: #b45309;
+    }
+
+        .badge-pendiente .dot {
+            background: #f59e0b;
+        }
+
+    .badge-proceso {
+        background: rgba(37,140,251,.1);
+        color: #1a5fb4;
+    }
+
+        .badge-proceso .dot {
+            background: var(--gac-primary);
+        }
+
+    .badge-resuelta {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+        .badge-resuelta .dot {
+            background: var(--gac-success);
+        }
+
+    .badge-otro {
+        background: rgba(15,22,35,.07);
+        color: var(--gac-navy);
+    }
+
+        .badge-otro .dot {
+            background: #94a3b8;
+        }
+
+    /* ── ACTION BUTTONS ── */
+    .actions-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .btn-tbl {
+        border-radius: 8px;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: .32rem .7rem;
+        transition: all .15s ease;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-tbl-edit {
+        border: 1.5px solid var(--gac-warning);
+        color: #b45309;
+        background: transparent;
+    }
+
+        .btn-tbl-edit:hover {
+            background: var(--gac-warning);
+            color: #fff;
+            border-color: var(--gac-warning);
+        }
+
+        .btn-tbl-edit.disabled {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+    .btn-tbl-info {
+        border: 1.5px solid var(--gac-primary);
+        color: var(--gac-primary);
+        background: transparent;
+    }
+
+        .btn-tbl-info:hover {
+            background: var(--gac-primary);
+            color: #fff;
+        }
+
+    .btn-tbl-danger {
+        border: 1.5px solid #fca5a5;
+        color: var(--gac-danger);
+        background: transparent;
+    }
+
+        .btn-tbl-danger:hover {
+            background: var(--gac-danger);
+            color: #fff;
+            border-color: var(--gac-danger);
+        }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+        padding: 3.5rem;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: .75rem;
+            opacity: .4;
+            display: block;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: .9rem;
+        }
+
+    @@media (max-width: 700px) {
+        .inc-table th:nth-child(4),
+        .inc-table td:nth-child(4),
+        .inc-table th:nth-child(6),
+        .inc-table td:nth-child(6) {
+            display: none;
+        }
+    }
+</style>
+
+<div class="mnt-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3><i class="bi bi-tools me-2" style="opacity:.8;"></i>Módulo de Mantenimiento</h3>
+                <p>Gestión de incidencias y solicitudes técnicas del condominio</p>
+            </div>
+            <a asp-action="Create" class="btn-gac btn-gac-primary">
+                <i class="bi bi-plus-lg"></i>
+                Nueva Incidencia
+            </a>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="sc-icon ic-blue">
+                        <i class="bi bi-clipboard-data"></i>
+                    </div>
+                    <div class="sc-label">Total</div>
+                    <div class="sc-value">@total</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-card sc-warning">
+                    <div class="sc-icon ic-amber">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <div class="sc-label">Pendientes</div>
+                    <div class="sc-value">@pendientes</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-card sc-info">
+                    <div class="sc-icon ic-blue2">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </div>
+                    <div class="sc-label">En Proceso</div>
+                    <div class="sc-value">@enProceso</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-card sc-success">
+                    <div class="sc-icon ic-green">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="sc-label">Resueltas</div>
+                    <div class="sc-value">@resueltas</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TABLE CARD -->
+        <div class="table-card">
+
+            <div class="table-card-head">
+                <h2 class="tc-title">
+                    <i class="bi bi-list-ul"></i>
+                    Incidencias registradas
+                </h2>
+                <span class="tc-count">@total registros</span>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+                    <i class="bi bi-tools"></i>
+                    <p>No hay incidencias registradas.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="inc-table">
+
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Solicitud</th>
+                                <th>Cierre</th>
+                                <th>Unidad</th>
+                                <th>Usuario</th>
+                                <th class="center">Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <span class="desc-text">@item.Descripcion</span>
+                                    </td>
+
+                                    <td>
+                                        @if (item.Estado == "Pendiente")
+                                        {
+                                            <span class="badge-estado badge-pendiente">
+                                                <span class="dot"></span>Pendiente
+                                            </span>
+                                        }
+                                        else if (item.Estado == "En Proceso")
+                                        {
+                                            <span class="badge-estado badge-proceso">
+                                                <span class="dot"></span>En Proceso
+                                            </span>
+                                        }
+                                        else if (item.Estado == "Resuelta")
+                                        {
+                                            <span class="badge-estado badge-resuelta">
+                                                <span class="dot"></span>Resuelta
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-estado badge-otro">
+                                                <span class="dot"></span>@item.Estado
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (item.FechaSolicitud.HasValue)
+                                        {
+                                            <span class="date-cell">
+                                                <i class="bi bi-calendar3 me-1" style="opacity:.5;font-size:.75rem;"></i>
+                                                @item.FechaSolicitud.Value.ToString("dd/MM/yyyy")
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="date-none">—</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (item.FechaCierre.HasValue)
+                                        {
+                                            <span class="date-cell">
+                                                <i class="bi bi-calendar-check me-1" style="opacity:.5;font-size:.75rem;"></i>
+                                                @item.FechaCierre.Value.ToString("dd/MM/yyyy")
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-estado badge-pendiente">
+                                                <span class="dot"></span>Pendiente
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <span class="unit-pill">
+                                            <i class="bi bi-door-open" style="font-size:.8rem;"></i>
+                                            @item.IdUnidadNavigation.Numero
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="user-chip">
+                                            <div class="user-avatar">
+                                                @(
+                                                    ((item.IdUsuarioNavigation?.Nombre?.FirstOrDefault().ToString() ?? "") +
+                                                     (item.IdUsuarioNavigation?.Apellido?.FirstOrDefault().ToString() ?? ""))
+                                                    .ToUpper()
+                                                )
+                                            </div>
+                                            <span class="user-name"> @item.IdUsuarioNavigation?.Nombre @item.IdUsuarioNavigation?.Apellido</span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="actions-wrap">
+                                            <a asp-action="Edit"
+                                               asp-route-id="@item.IdIncidencia"
+                                               class="btn-tbl btn-tbl-edit @(item.Estado == "Resuelta" ? "disabled" : "")"
+                                               title="Editar">
+                                                <i class="bi bi-pencil"></i>Editar
+                                            </a>
+                                            <a asp-action="Details"
+                                               asp-route-id="@item.IdIncidencia"
+                                               class="btn-tbl btn-tbl-info"
+                                               title="Detalles">
+                                                <i class="bi bi-eye"></i>Ver
+                                            </a>
+                                            
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>

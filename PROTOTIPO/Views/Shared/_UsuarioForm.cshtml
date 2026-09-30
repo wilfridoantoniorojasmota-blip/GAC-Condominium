@@ -1,0 +1,475 @@
+@model PROTOTIPO.Models.Usuario
+
+<!-- Partial: Usuario form fields (no form tag) -->
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<!-- ============================================================
+     TIPO DE CLIENTE
+============================================================ -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+
+        <label asp-for="TipoCliente" class="form-label">
+            Tipo de cliente
+        </label>
+
+        <select asp-for="TipoCliente"
+                class="form-select custom-select"
+                id="tipoClienteUsuario">
+
+            <option value="">Seleccione un tipo</option>
+            <option value="Dominicano">Dominicano</option>
+            <option value="Extranjero">Extranjero</option>
+            <option value="Juridico">Jurídico</option>
+
+        </select>
+
+        <span asp-validation-for="TipoCliente"
+              class="text-danger"></span>
+
+    </div>
+</div>
+
+
+<!-- ============================================================
+     NOMBRE Y APELLIDO
+============================================================ -->
+<div class="row">
+
+    <div class="col-md-6 mb-4">
+
+        <label asp-for="Nombre" class="form-label"></label>
+
+        <div class="input-box">
+            <i class="fa-solid fa-user"></i>
+
+            <input asp-for="Nombre"
+                   class="form-control custom-input"
+                   placeholder="Nombre completo" />
+
+            <span asp-validation-for="Nombre"
+                  class="text-danger"></span>
+        </div>
+
+    </div>
+
+
+    <div class="col-md-6 mb-4">
+
+        <label asp-for="Apellido" class="form-label"></label>
+
+        <div class="input-box">
+            <i class="fa-solid fa-user-tag"></i>
+
+            <input asp-for="Apellido"
+                   class="form-control custom-input"
+                   placeholder="Apellido" />
+
+            <span asp-validation-for="Apellido"
+                  class="text-danger"></span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     EMAIL + IDENTIFICACIÓN
+============================================================ -->
+<div class="row">
+
+    <div class="col-md-6 mb-4">
+
+        <label asp-for="Email" class="form-label"></label>
+
+        <div class="input-box">
+            <i class="fa-solid fa-envelope"></i>
+
+            <input asp-for="Email"
+                   type="email"
+                   class="form-control custom-input"
+                   placeholder="correo@ejemplo.com" />
+
+            <span asp-validation-for="Email"
+                  class="text-danger"></span>
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         CÉDULA
+    ========================================================= -->
+    <div class="col-md-6 mb-4"
+         id="campoCedula"
+         style="display:none;">
+
+        <label asp-for="Cedula"
+               class="form-label">
+            Cédula
+        </label>
+
+        <div class="input-box">
+
+            <i class="fa-solid fa-id-card"></i>
+
+            <input asp-for="Cedula"
+                   id="Cedula"
+                   class="form-control custom-input"
+                   placeholder="000-0000000-0" />
+
+            <span asp-validation-for="Cedula"
+                  class="text-danger"></span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         PASAPORTE
+    ========================================================= -->
+    <div class="col-md-6 mb-4"
+         id="campoPasaporte"
+         style="display:none;">
+
+        <label asp-for="Pasaporte"
+               class="form-label">
+            Pasaporte
+        </label>
+
+        <div class="input-box">
+
+            <i class="fa-solid fa-passport"></i>
+
+            <input asp-for="Pasaporte"
+                   id="Pasaporte"
+                   class="form-control custom-input"
+                   placeholder="Ej. AAA123456" />
+
+            <span asp-validation-for="Pasaporte"
+                  class="text-danger"></span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         NACIONALIDAD
+    ========================================================= -->
+    <div class="col-md-6 mb-4"
+         id="campoNacionalidad"
+         style="display:none;">
+
+        <label asp-for="Nacionalidad"
+               class="form-label">
+            Nacionalidad
+        </label>
+
+        <div class="input-box">
+
+            <i class="fa-solid fa-globe"></i>
+
+            <input asp-for="Nacionalidad"
+                   id="Nacionalidad"
+                   class="form-control custom-input"
+                   placeholder="Ej. España" />
+
+            <span asp-validation-for="Nacionalidad"
+                  class="text-danger"></span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         RNC
+    ========================================================= -->
+    <div class="col-md-6 mb-4"
+         id="campoRnc"
+         style="display:none;">
+
+        <label asp-for="RNC"
+               class="form-label">
+            RNC
+        </label>
+
+        <div class="input-box">
+
+            <i class="fa-solid fa-building"></i>
+
+            <input asp-for="RNC"
+                   id="RNC"
+                   class="form-control custom-input"
+                   placeholder="101-00000-0" />
+
+            <span asp-validation-for="RNC"
+                  class="text-danger"></span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         NOMBRE EMPRESA
+    ========================================================= -->
+    <div class="col-md-6 mb-4"
+         id="campoNombreEmpresa"
+         style="display:none;">
+
+        <label asp-for="NombreEmpresa"
+               class="form-label">
+            Nombre de la empresa
+        </label>
+
+        <div class="input-box">
+
+            <i class="fa-solid fa-building"></i>
+
+            <input asp-for="NombreEmpresa"
+                   id="NombreEmpresa"
+                   class="form-control custom-input"
+                   placeholder="Nombre de la empresa" />
+
+            <span asp-validation-for="NombreEmpresa"
+                  class="text-danger"></span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         PERSONA DE CONTACTO
+    ========================================================= -->
+    <div class="col-md-6 mb-4"
+         id="campoPersonaAlojada"
+         style="display:none;">
+
+        <label asp-for="PersonaAlojada"
+               class="form-label">
+            Persona alojada
+        </label>
+
+        <div class="input-box">
+
+            <i class="fa-solid fa-user-tie"></i>
+
+            <input asp-for="PersonaAlojada"
+                   id="PersonaAlojada"
+                   class="form-control custom-input"
+                   placeholder="Nombre de la persona alojada" />
+
+            <span asp-validation-for="PersonaAlojada"
+                  class="text-danger"></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     TELÉFONO + PASSWORD
+============================================================ -->
+<div class="row">
+
+    <div class="col-md-6 mb-4">
+
+        <label asp-for="Telefono" class="form-label"></label>
+
+        <div class="input-box">
+
+            <i class="fa-solid fa-phone"></i>
+
+            <input asp-for="Telefono"
+                   class="form-control custom-input"
+                   placeholder="809-000-0000" />
+
+            <span asp-validation-for="Telefono"
+                  class="text-danger"></span>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-6 mb-4">
+
+        <label asp-for="Password" class="form-label"></label>
+
+        <div class="input-box input-box--password">
+
+            <i class="fa-solid fa-lock"></i>
+
+            <input asp-for="Password"
+                   type="password"
+                   class="form-control custom-input pwd-input"
+                   placeholder="********" />
+
+            <button type="button"
+                    class="pwd-toggle"
+                    title="Mostrar/ocultar contraseña">
+
+                <i class="fa-solid fa-eye"></i>
+
+            </button>
+
+            <span asp-validation-for="Password"
+                  class="text-danger"></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     ROL + CONDOMINIO
+============================================================ -->
+<div class="row">
+
+    <div class="col-md-6 mb-4">
+
+        <label asp-for="IdRol" class="form-label"></label>
+
+        <select asp-for="IdRol"
+                class="form-select custom-select"
+                asp-items="ViewBag.IdRol">
+
+            <option value="">
+                Seleccione un rol
+            </option>
+
+        </select>
+
+        <span asp-validation-for="IdRol"
+              class="text-danger"></span>
+
+    </div>
+
+
+    <div class="col-md-6 mb-4">
+
+        <label asp-for="IdCondominio"
+               class="form-label"></label>
+
+        <select asp-for="IdCondominio"
+                class="form-select custom-select"
+                asp-items="ViewBag.IdCondominio">
+
+            <option value="">
+                Seleccione un condominio
+            </option>
+
+        </select>
+
+        <span asp-validation-for="IdCondominio"
+              class="text-danger"></span>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     SCRIPT — CAMPOS SEGÚN TIPO DE CLIENTE
+============================================================ -->
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const tipoCliente =
+            document.getElementById("tipoClienteUsuario");
+
+        const campoCedula =
+            document.getElementById("campoCedula");
+
+        const campoPasaporte =
+            document.getElementById("campoPasaporte");
+
+        const campoNacionalidad =
+            document.getElementById("campoNacionalidad");
+
+        const campoRnc =
+            document.getElementById("campoRnc");
+
+        const campoNombreEmpresa =
+            document.getElementById("campoNombreEmpresa");
+
+        const campoPersonaContacto =
+            document.getElementById("campoPersonaContacto");
+
+
+        function actualizarCamposCliente() {
+
+            if (!tipoCliente) return;
+
+
+            const tipo = tipoCliente.value;
+
+
+            // Ocultar todos los campos
+            campoCedula.style.display = "none";
+            campoPasaporte.style.display = "none";
+            campoNacionalidad.style.display = "none";
+            campoRnc.style.display = "none";
+            campoNombreEmpresa.style.display = "none";
+            campoPersonaContacto.style.display = "none";
+
+
+            // --------------------------------------------
+            // DOMINICANO
+            // --------------------------------------------
+            if (tipo === "Dominicano") {
+
+                campoCedula.style.display = "";
+
+            }
+
+
+            // --------------------------------------------
+            // EXTRANJERO
+            // --------------------------------------------
+            else if (tipo === "Extranjero") {
+
+                campoPasaporte.style.display = "";
+                campoNacionalidad.style.display = "";
+
+            }
+
+
+            // --------------------------------------------
+            // JURÍDICO
+            // --------------------------------------------
+            else if (tipo === "Juridico") {
+
+                campoRnc.style.display = "";
+                campoNombreEmpresa.style.display = "";
+                campoPersonaContacto.style.display = "";
+
+            }
+
+        }
+
+
+        // Cuando el usuario cambia el tipo
+        tipoCliente?.addEventListener(
+            "change",
+            actualizarCamposCliente
+        );
+
+
+        // Estado inicial
+        actualizarCamposCliente();
+
+    });
+
+</script>

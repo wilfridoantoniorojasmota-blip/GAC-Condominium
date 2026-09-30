@@ -1,0 +1,722 @@
+﻿@model IEnumerable<PROTOTIPO.Models.Documento>
+
+@{
+    ViewData["Title"] = "Documentos";
+
+    var total = Model.Count();
+
+    var deContratos = Model.Count(d => d.IdContrato != null);
+
+    var deUnidad = Model.Count(d =>
+        d.IdUnidad != null &&
+        d.IdContrato == null);
+
+    var deCondominio = Model.Count(d =>
+        d.IdUnidad == null &&
+        d.IdContrato == null);
+}
+
+<div class="mnt-page">
+    <div class="container-fluid py-4 px-3 px-md-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3><i class="bi bi-folder2-open me-2"></i>Documentos</h3>
+                <p>Archivos disponibles para tu unidad o condominio</p>
+            </div>
+
+            <a asp-action="Create" class="btn-gac btn-gac-primary">
+                <i class="bi bi-cloud-upload"></i>
+                Subir documento
+            </a>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="row g-3 mb-3">
+
+            <div class="col-6 col-md-4">
+                <div class="stat-card sc-info">
+                    <div class="sc-icon ic-blue"><i class="bi bi-files"></i></div>
+                    <div class="sc-label">Total de documentos</div>
+                    <div class="sc-value">@total</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4">
+                <div class="stat-card sc-warning">
+                    <div class="sc-icon ic-amber"><i class="bi bi-house-door"></i></div>
+                    <div class="sc-label">De mi unidad</div>
+                    <div class="sc-value">@deUnidad</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="stat-card sc-success">
+                    <div class="sc-icon ic-green">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+
+                    <div class="sc-label">
+                        Mi contrato
+                    </div>
+
+                    <div class="sc-value">
+                        @deContratos
+                    </div>
+                </div>
+            </div>
+
+          
+
+        </div>
+
+        <!-- TABLE CARD -->
+        <div class="table-card">
+
+            <div class="table-card-head">
+                <p class="tc-title"><i class="bi bi-table"></i> Listado de documentos</p>
+                <span class="tc-count">@total documento@(total == 1 ? "" : "s")</span>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+                    <i class="bi bi-folder-x"></i>
+                    <p>No hay documentos disponibles todavía.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="inc-table">
+                        <thead>
+                            <tr>
+                                <th>Documento</th>
+                                <th>Tipo</th>
+                                <th>Origen</th>
+                                <th>Fecha de subida</th>
+                                <th class="center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                bool esContrato = item.IdContrato != null;
+                                bool esUnidad = item.IdUnidad != null && !esContrato;
+                                bool esCondominio = !esContrato && !esUnidad;
+
+                                <tr>
+                                    <td>
+                                        <div class="user-chip">
+                                            <div class="user-avatar"><i class="bi bi-file-earmark-text"></i></div>
+                                            <span class="desc-text">@item.Nombre</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="unit-pill">@item.Tipo</span>
+                                    </td>
+                                    <td>
+                                        @if (esContrato)
+                                        {
+                                            <span class="badge-estado badge-activo">
+                                                <span class="dot"></span>
+                                                Mi contrato
+                                            </span>
+                                        }
+                                        else if (esUnidad)
+                                        {
+                                            <span class="badge-estado badge-proceso">
+                                                <span class="dot"></span>
+                                                Mi unidad
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-estado badge-otro">
+                                                <span class="dot"></span>
+                                                Condominio
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.FechaSubida != null)
+                                        {
+                                            <span class="date-cell">
+                                                <i class="bi bi-calendar me-1"></i>@item.FechaSubida?.ToString("dd/MM/yyyy")
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="date-none">Sin fecha</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="actions-wrap">
+
+                                            <a href="@item.Archivo" target="_blank" class="btn-tbl btn-tbl-info" title="Ver documento">
+                                                <i class="bi bi-eye"></i> Ver
+                                            </a>
+
+                                            <a asp-action="Descargar" asp-route-id="@item.IdDocumento" class="btn-tbl btn-tbl-info" title="Descargar">
+                                                <i class="bi bi-download"></i> Descargar
+                                            </a>
+
+                                            <a asp-action="Edit"
+                                               asp-route-id="@item.IdDocumento"
+                                               class="btn-tbl btn-tbl-edit @(esUnidad ? "" : "disabled")"
+                                               title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                                <span class="d-none d-md-inline">Editar</span>
+                                            </a>
+
+                                            <button type="button"
+                                                    class="btn-tbl btn-tbl-danger @(esUnidad ? "" : "disabled")
+                                                    title="Eliminar"
+                                                    onclick="confirmarEliminar(@item.IdDocumento)">
+                                                <i class="bi bi-trash"></i>
+                                                <span class="d-none d-md-inline">Eliminar</span>
+                                            </button>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="eliminarModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius:16px; overflow:hidden; box-shadow:0 20px 45px rgba(15,22,35,.25);">
+
+            <div class="modal-header" style="background:linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%); color:#fff; border-bottom:none;">
+                <h5 class="modal-title" style="font-weight:700;">
+                    <i class="bi bi-exclamation-octagon me-2"></i>
+                    Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" style="color:#334155; font-size:.9rem;">
+                ¿Seguro que deseas eliminar este documento? Esta acción no se puede deshacer.
+
+                <div class="mt-3 mb-0" style="background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3); color:#b45309; border-radius:10px; padding:.8rem 1rem; font-size:.85rem; display:flex; gap:.5rem;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span><strong>No puedes eliminar documentos cargados por la administración.</strong></span>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="border-top:1px solid var(--gac-border);">
+
+                <button class="btn-gac" style="background:var(--gac-surface); color:#64748b; border:1px solid var(--gac-border);" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <form id="formEliminar" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit" class="btn-gac" style="background:var(--gac-danger); color:#fff;">
+                        <i class="bi bi-trash"></i>
+                        Eliminar
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.2rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-gac-primary:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    /* ── STAT CARDS ── */
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.4rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+            background: var(--gac-primary);
+        }
+
+        .stat-card.sc-warning::after {
+            background: var(--gac-warning);
+        }
+
+        .stat-card.sc-info::after {
+            background: var(--gac-primary);
+        }
+
+        .stat-card.sc-success::after {
+            background: var(--gac-success);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15,22,35,.07);
+        }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        margin-bottom: .85rem;
+    }
+
+    .ic-blue {
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+    }
+
+    .ic-amber {
+        background: rgba(245,158,11,.1);
+        color: #d97706;
+    }
+
+    .ic-blue2 {
+        background: rgba(37,140,251,.08);
+        color: #1d77d4;
+    }
+
+    .ic-green {
+        background: rgba(34,197,94,.1);
+        color: #16a34a;
+    }
+
+    .sc-label {
+        font-size: .77rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .sc-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+    }
+
+    /* ── TABLE CARD ── */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-card-head {
+        padding: 1rem 1.4rem;
+        border-bottom: 1px solid var(--gac-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .tc-title {
+        font-weight: 700;
+        font-size: .95rem;
+        color: var(--gac-navy);
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: 0;
+    }
+
+        .tc-title i {
+            color: var(--gac-primary);
+        }
+
+    .tc-count {
+        font-size: .75rem;
+        font-weight: 600;
+        color: #64748b;
+        background: var(--gac-surface);
+        border: 1px solid var(--gac-border);
+        border-radius: 20px;
+        padding: 3px 11px;
+    }
+
+    .inc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .inc-table thead {
+            background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        }
+
+            .inc-table thead th {
+                font-size: .73rem;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: rgba(255,255,255,.7);
+                font-weight: 700;
+                padding: .9rem 1.1rem;
+                border: none;
+                white-space: nowrap;
+            }
+
+                .inc-table thead th.center {
+                    text-align: center;
+                }
+
+        .inc-table tbody td {
+            padding: .85rem 1.1rem;
+            color: #334155;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f4f9;
+            font-size: .9rem;
+        }
+
+        .inc-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inc-table tbody tr {
+            transition: background .15s ease;
+        }
+
+            .inc-table tbody tr:hover {
+                background: #fafcff;
+            }
+
+    .desc-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        max-width: 220px;
+        line-height: 1.45;
+        color: var(--gac-navy);
+        font-weight: 500;
+    }
+
+    .unit-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(15,22,35,.05);
+        border-radius: 50px;
+        padding: .3rem .75rem;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    .user-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(37,140,251,.12);
+        color: var(--gac-primary);
+        font-size: .68rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--gac-navy);
+        font-size: .88rem;
+    }
+
+    .date-cell {
+        font-size: .83rem;
+        color: #64748b;
+        white-space: nowrap;
+    }
+
+    .date-none {
+        font-size: .78rem;
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    /* ── BADGES ── */
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        font-size: .73rem;
+        padding: .35rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+        .badge-estado .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .badge-pendiente {
+        background: rgba(245,158,11,.12);
+        color: #b45309;
+    }
+
+        .badge-pendiente .dot {
+            background: #f59e0b;
+        }
+
+    .badge-proceso {
+        background: rgba(37,140,251,.1);
+        color: #1a5fb4;
+    }
+
+        .badge-proceso .dot {
+            background: var(--gac-primary);
+        }
+
+    .badge-resuelta {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+        .badge-resuelta .dot {
+            background: var(--gac-success);
+        }
+
+    .badge-otro {
+        background: rgba(15,22,35,.07);
+        color: var(--gac-navy);
+    }
+
+        .badge-otro .dot {
+            background: #94a3b8;
+        }
+
+    /* ── ACTION BUTTONS ── */
+    .actions-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-tbl-edit i,
+    .btn-tbl-danger i {
+        font-size: .95rem;
+    }
+
+    .btn-tbl {
+        border-radius: 8px;
+        font-size: .78rem;
+        font-weight: 700;
+        padding: .4rem .75rem;
+        transition: all .15s ease;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-width: 34px;
+        line-height: 1;
+    }
+
+    .btn-tbl-edit {
+        border: 1.5px solid var(--gac-warning);
+        color: #b45309;
+        background: rgba(245,158,11,.14);
+    }
+
+        .btn-tbl-edit:hover {
+            background: var(--gac-warning);
+            color: #fff;
+            border-color: var(--gac-warning);
+            box-shadow: 0 3px 10px rgba(245,158,11,.35);
+        }
+
+        .btn-tbl-edit.disabled {
+            background: var(--gac-surface);
+            border-color: var(--gac-border);
+            color: #b7c0cf;
+            opacity: 1;
+            pointer-events: none;
+        }
+
+    .btn-tbl-info {
+        border: 1.5px solid var(--gac-primary);
+        color: var(--gac-primary);
+        background: rgba(37,140,251,.1);
+    }
+
+        .btn-tbl-info:hover {
+            background: var(--gac-primary);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(37,140,251,.35);
+        }
+
+    .btn-tbl-danger {
+        border: 1.5px solid var(--gac-danger);
+        color: var(--gac-danger);
+        background: rgba(239,68,68,.1);
+    }
+
+        .btn-tbl-danger:hover {
+            background: var(--gac-danger);
+            color: #fff;
+            border-color: var(--gac-danger);
+            box-shadow: 0 3px 10px rgba(239,68,68,.35);
+        }
+
+        .btn-tbl-danger.disabled {
+            background: var(--gac-surface);
+            border-color: var(--gac-border);
+            color: #b7c0cf;
+            opacity: 1;
+            pointer-events: none;
+        }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+        padding: 3.5rem;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: .75rem;
+            opacity: .4;
+            display: block;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: .9rem;
+        }
+
+    @@media (max-width: 700px) {
+        .inc-table th:nth-child(4),
+        .inc-table td:nth-child(4) {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    function confirmarEliminar(id) {
+
+        document.getElementById("formEliminar").action =
+            "/DocumentoInquilino/Delete/" + id;
+
+        var modal = new bootstrap.Modal(
+            document.getElementById("eliminarModal"));
+
+        modal.show();
+    }
+</script>

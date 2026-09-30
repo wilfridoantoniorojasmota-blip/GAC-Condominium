@@ -1,0 +1,757 @@
+﻿@using PROTOTIPO.Models.ViewModel
+@model LoginVM
+
+@{
+    Layout = null;
+}
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acceso | GAC Condominium</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+            :root {
+                --gac-navy: #10213f;
+                --gac-blue: #1f6feb;
+                --gac-cyan: #16b8d8;
+                --gac-ink: #172033;
+                --gac-muted: #68758b;
+                --gac-line: #dce4ef;
+                --gac-success: #13a36f;
+                /* THEME (dinámico - JS sobreescribe estas variables) */
+                --theme-primary: var(--gac-blue);
+                --theme-secondary: var(--gac-cyan);
+                --theme-soft-bg: #eaf3ff;
+                --theme-soft-border: #cfe2ff;
+                --theme-soft-text: #1550a8;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                min-height: 100%;
+            }
+
+            body {
+                margin: 0;
+                font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                color: var(--gac-ink);
+                background: linear-gradient(125deg, rgba(16, 33, 63, .96), rgba(20, 64, 124, .92) 46%, rgba(22, 184, 216, .85)), url("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1800&q=80") center/cover fixed;
+                transition: background .4s ease;
+            }
+
+                body[data-role="inquilino"] {
+                    background: linear-gradient(125deg, rgba(8, 41, 28, .96), rgba(12, 92, 60, .92) 46%, rgba(22, 216, 150, .8)), url("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1800&q=80") center/cover fixed;
+                }
+
+            .login-shell {
+                min-height: 100vh;
+                padding: 28px;
+            }
+
+            .login-frame {
+                width: min(1120px, 100%);
+                min-height: 680px;
+                overflow: hidden;
+                background: rgba(255, 255, 255, .94);
+                border: 1px solid rgba(255, 255, 255, .48);
+                border-radius: 28px;
+                box-shadow: 0 28px 80px rgba(8, 20, 43, .34);
+                backdrop-filter: blur(18px);
+            }
+
+            .brand-panel {
+                position: relative;
+                min-height: 680px;
+                padding: 42px;
+                color: #fff;
+                background: linear-gradient(155deg, rgba(10, 27, 58, .94), rgba(15, 74, 135, .88)), url("https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80") center/cover;
+                transition: background .4s ease;
+            }
+
+            body[data-role="inquilino"] .brand-panel {
+                background: linear-gradient(155deg, rgba(6, 36, 24, .94), rgba(13, 99, 64, .88)), url("https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80") center/cover;
+            }
+
+            .brand-content {
+                position: relative;
+                z-index: 1;
+                min-height: 100%;
+            }
+
+            .brand-logo {
+                width: 58px;
+                height: 58px;
+                border-radius: 18px;
+                display: grid;
+                place-items: center;
+                background: rgba(255, 255, 255, .13);
+                border: 1px solid rgba(255, 255, 255, .18);
+            }
+
+                .brand-logo img {
+                    max-width: 38px;
+                    max-height: 38px;
+                    object-fit: contain;
+                }
+
+            .brand-kicker {
+                color: rgba(255, 255, 255, .76);
+                font-size: .82rem;
+                font-weight: 700;
+                letter-spacing: .14em;
+                text-transform: uppercase;
+            }
+
+            .brand-title {
+                max-width: 520px;
+                font-size: clamp(2.15rem, 5vw, 4.4rem);
+                line-height: .98;
+                font-weight: 800;
+                letter-spacing: 0;
+            }
+
+            .brand-text {
+                max-width: 470px;
+                color: rgba(255, 255, 255, .78);
+                font-size: 1.03rem;
+                line-height: 1.7;
+            }
+
+            .status-strip {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .status-item {
+                min-height: 92px;
+                padding: 16px;
+                border-radius: 16px;
+                background: rgba(255, 255, 255, .12);
+                border: 1px solid rgba(255, 255, 255, .18);
+            }
+
+                .status-item i {
+                    color: #7ee7ff;
+                    transition: color .3s ease;
+                }
+
+            body[data-role="inquilino"] .status-item i {
+                color: #6ef7c9;
+            }
+
+            .status-number {
+                display: block;
+                margin-top: 8px;
+                font-weight: 800;
+                font-size: 1.18rem;
+            }
+
+            .status-label {
+                display: block;
+                margin-top: 2px;
+                color: rgba(255, 255, 255, .7);
+                font-size: .78rem;
+            }
+
+            .form-panel {
+                min-height: 680px;
+                padding: clamp(28px, 5vw, 58px);
+                background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(246,249,253,.98));
+            }
+
+            .form-card {
+                width: min(430px, 100%);
+            }
+
+            .mobile-logo img {
+                height: 44px;
+                object-fit: contain;
+            }
+
+            /* ── ROLE SWITCH ── */
+            .role-switch {
+                display: flex;
+                position: relative;
+                background: #eef2f8;
+                border: 1px solid var(--gac-line);
+                border-radius: 14px;
+                padding: 5px;
+                margin-bottom: 1.75rem;
+            }
+
+                .role-switch input {
+                    position: absolute;
+                    opacity: 0;
+                    pointer-events: none;
+                }
+
+                .role-switch label {
+                    position: relative;
+                    z-index: 1;
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 11px 12px;
+                    border-radius: 10px;
+                    font-size: .9rem;
+                    font-weight: 700;
+                    color: var(--gac-muted);
+                    cursor: pointer;
+                    transition: color .25s ease;
+                    user-select: none;
+                }
+
+                    .role-switch label i {
+                        font-size: .95rem;
+                    }
+
+                .role-switch .switch-thumb {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    width: calc(50% - 5px);
+                    height: calc(100% - 10px);
+                    border-radius: 10px;
+                    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+                    box-shadow: 0 8px 18px rgba(31, 111, 235, .25);
+                    transition: transform .3s cubic-bezier(.4,0,.2,1), background .35s ease, box-shadow .35s ease;
+                }
+
+            body[data-role="inquilino"] .switch-thumb {
+                transform: translateX(100%);
+                box-shadow: 0 8px 18px rgba(22, 163, 74, .28);
+            }
+
+            #roleAdmin:checked ~ label[for="roleAdmin"],
+            #roleInquilino:checked ~ .switch-thumb ~ label[for="roleInquilino"] {
+                color: #fff;
+            }
+
+            .role-switch label[for="roleAdmin"] {
+                color: #fff;
+            }
+
+            body[data-role="inquilino"] .role-switch label[for="roleAdmin"] {
+                color: var(--gac-muted);
+            }
+
+            body[data-role="inquilino"] .role-switch label[for="roleInquilino"] {
+                color: #fff;
+            }
+
+            .badge-soft {
+                width: fit-content;
+                color: var(--theme-soft-text);
+                background: var(--theme-soft-bg);
+                border: 1px solid var(--theme-soft-border);
+                border-radius: 999px;
+                padding: 8px 12px;
+                font-size: .78rem;
+                font-weight: 700;
+                transition: all .3s ease;
+            }
+
+            .login-title {
+                font-size: clamp(1.7rem, 3vw, 2.15rem);
+                font-weight: 800;
+                color: var(--gac-navy);
+            }
+
+            .login-subtitle {
+                color: var(--gac-muted);
+                line-height: 1.65;
+            }
+
+            .form-label {
+                margin-bottom: 8px;
+                color: #2c3a52;
+                font-size: .9rem;
+                font-weight: 700;
+            }
+
+            .input-group-text {
+                width: 48px;
+                justify-content: center;
+                color: #71809a;
+                background: #fff;
+                border-color: var(--gac-line);
+                border-radius: 14px 0 0 14px;
+                transition: color .3s ease;
+            }
+
+            .form-control {
+                min-height: 52px;
+                border-color: var(--gac-line);
+                color: var(--gac-ink);
+                font-weight: 500;
+            }
+
+                .form-control::placeholder {
+                    color: #a2adbd;
+                    font-weight: 400;
+                }
+
+                .form-control:focus {
+                    border-color: var(--theme-primary);
+                    box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--theme-primary) 13%, transparent);
+                }
+
+            .password-toggle {
+                width: 52px;
+                min-height: 52px;
+                color: #71809a;
+                border-color: var(--gac-line);
+                border-radius: 0 14px 14px 0;
+                background: #fff;
+            }
+
+                .password-toggle:hover,
+                .password-toggle:focus {
+                    color: var(--theme-primary);
+                    background: #f8fbff;
+                }
+
+            .form-check-input:checked {
+                background-color: var(--theme-primary);
+                border-color: var(--theme-primary);
+            }
+
+            .forgot-link {
+                color: var(--theme-primary);
+                font-size: .92rem;
+                font-weight: 700;
+                text-decoration: none;
+                transition: color .3s ease;
+            }
+
+                .forgot-link:hover {
+                    text-decoration: underline;
+                    filter: brightness(.85);
+                }
+
+            .btn-login {
+                min-height: 54px;
+                border: 0;
+                border-radius: 14px;
+                background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+                box-shadow: 0 16px 28px color-mix(in srgb, var(--theme-primary) 26%, transparent);
+                font-weight: 800;
+                transition: background .35s ease, box-shadow .35s ease, transform .2s ease;
+            }
+
+                .btn-login:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 20px 34px color-mix(in srgb, var(--theme-primary) 32%, transparent);
+                }
+
+            .security-note {
+                border: 1px solid #dbe8f8;
+                border-radius: 16px;
+                background: #f7fbff;
+                color: #526176;
+                font-size: .86rem;
+                line-height: 1.55;
+                transition: all .3s ease;
+            }
+
+                .security-note i {
+                    color: var(--gac-success);
+                    transition: color .3s ease;
+                }
+
+            body[data-role="inquilino"] .security-note {
+                border-color: #d6f5e6;
+                background: #f4fdf8;
+            }
+
+                body[data-role="inquilino"] .security-note i {
+                    color: var(--gac-green);
+                }
+
+            .alert,
+            .validation-summary-errors {
+                border-radius: 14px;
+            }
+
+            .validation-summary-errors {
+                margin-bottom: 1rem;
+                padding: 12px 14px;
+                border: 1px solid #f1b7bd;
+                color: #9f1c2d;
+                background: #fff5f6;
+                font-size: .9rem;
+            }
+
+            .field-validation-error {
+                display: block;
+                margin-top: 7px;
+                color: #b42335;
+                font-size: .82rem;
+                font-weight: 600;
+            }
+
+            .footer-copy {
+                color: #8995a8;
+                font-size: .82rem;
+            }
+
+            @@media (max-width: 991.98px) {
+                .login-shell {
+                    padding: 18px;
+                }
+
+                .login-frame,
+                .form-panel {
+                    min-height: auto;
+                    border-radius: 22px;
+                }
+
+                .brand-panel {
+                    display: none;
+                }
+            }
+
+            @@media (max-width: 575.98px) {
+                .login-shell {
+                    padding: 0;
+                    align-items: stretch !important;
+                }
+
+                .login-frame {
+                    min-height: 100vh;
+                    border: 0;
+                    border-radius: 0;
+                    box-shadow: none;
+                }
+
+                .form-panel {
+                    min-height: 100vh;
+                    padding: 28px 20px;
+                }
+
+                .d-xs-column {
+                    flex-direction: column;
+                    align-items: flex-start !important;
+                    gap: 12px !important;
+                }
+            }
+
+            .btn-back-home {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 18px;
+                border-radius: 50px;
+                background: #ffffff;
+                color: #2563eb;
+                text-decoration: none;
+                font-weight: 600;
+                border: 1px solid rgba(37,99,235,.15);
+                box-shadow: 0 8px 25px rgba(0,0,0,.08);
+                transition: .25s ease;
+            }
+
+            .home-premium-btn {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                width: max-content;
+                padding: 14px 22px;
+                border-radius: 18px;
+                text-decoration: none;
+                background: linear-gradient(135deg,#2563eb,#3b82f6);
+                color: #fff;
+                box-shadow: 0 15px 35px rgba(37,99,235,.25);
+                transition: .3s;
+            }
+
+            .login-back-link {
+                position: absolute;
+                top: 24px;
+                left: 24px;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 14px;
+                color: #475569;
+                background: rgba(255, 255, 255, 0.9);
+                border: 1px solid rgba(37, 99, 235, 0.12);
+                border-radius: 999px;
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+                transition: all .25s ease;
+            }
+
+                .login-back-link i {
+                    font-size: 15px;
+                    color: #2563eb;
+                    transition: transform .25s ease;
+                }
+
+                .login-back-link:hover {
+                    color: #2563eb;
+                    background: #fff;
+                    border-color: rgba(37, 99, 235, 0.25);
+                    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+                    transform: translateY(-2px);
+                }
+
+                    .login-back-link:hover i {
+                        transform: translateX(-3px);
+                    }
+    </style>
+</head>
+<a asp-controller="Condominios"
+   asp-action="Bienvenida"
+   class="login-back-link">
+    <i class="bi bi-arrow-left"></i>
+    Inicio
+</a>
+<body data-role="admin">
+    <main class="login-shell d-flex align-items-center justify-content-center">
+        <section class="login-frame">
+            <div class="row g-0">
+                <aside class="col-lg-6 brand-panel">
+                    <div class="brand-content d-flex flex-column justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="brand-logo">
+                                <img src="/source/logo.png" alt="GAC Condominium">
+                            </div>
+                            <div>
+                                <div class="fw-bold fs-5">GAC Condominium</div>
+                                <div class="text-white-50 small">Administraci&oacute;n residencial</div>
+                            </div>
+                        </div>
+
+                        <div class="py-5">
+                            <div class="brand-kicker mb-3" id="brandKicker">Panel privado</div>
+                            <h1 class="brand-title mb-4" id="brandTitle">Gestiona tu condominio con claridad.</h1>
+                            <p class="brand-text mb-0" id="brandText">
+                                Accede al centro de control para administrar residentes, pagos, novedades y servicios desde un entorno seguro y moderno.
+                            </p>
+                        </div>
+
+                        <div class="status-strip">
+                            <div class="status-item">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span class="status-number">Seguro</span>
+                                <span class="status-label">Acceso protegido</span>
+                            </div>
+                            <div class="status-item">
+                                <i class="fa-solid fa-building-user"></i>
+                                <span class="status-number">24/7</span>
+                                <span class="status-label">Disponibilidad</span>
+                            </div>
+                            <div class="status-item">
+                                <i class="fa-solid fa-chart-line"></i>
+                                <span class="status-number">Control</span>
+                                <span class="status-label">Operaciones al d&iacute;a</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <section class="col-lg-6 form-panel d-flex align-items-center justify-content-center">
+                    <div class="form-card">
+                        <div class="mobile-logo d-lg-none text-center mb-4">
+                            <img src="/source/logo.png" alt="GAC Condominium">
+                        </div>
+
+                        <!-- ROLE SWITCH -->
+                        <div class="role-switch" role="radiogroup" aria-label="Tipo de usuario">
+                            <input type="radio" name="roleSwitch" id="roleAdmin" checked>
+                            <input type="radio" name="roleSwitch" id="roleInquilino">
+                            <div class="switch-thumb"></div>
+                            <label for="roleAdmin">
+                                <i class="fa-solid fa-user-gear"></i>
+                                Administrador
+                            </label>
+                            <label for="roleInquilino">
+                                <i class="fa-solid fa-house-user"></i>
+                                Inquilino
+                            </label>
+                        </div>
+
+                        <div class="badge-soft d-inline-flex align-items-center gap-2 mb-4" id="systemBadge">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Sistema administrativo
+                        </div>
+
+                        <h2 class="login-title mb-2" id="loginTitle">Bienvenido de vuelta</h2>
+                        <p class="login-subtitle mb-4" id="loginSubtitle">
+                            Ingresa tus credenciales para continuar con la gesti&oacute;n de GAC Condominium.
+                        </p>
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>@ViewBag.Error</span>
+                            </div>
+                        }
+
+                        <form asp-action="Login" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="tipoUsuario" id="tipoUsuario" value="Administrador" />
+                            <div asp-validation-summary="ModelOnly"></div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="Email">Correo electr&oacute;nico</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fa-regular fa-envelope"></i>
+                                    </span>
+                                    <input asp-for="Email" id="Email" type="email" class="form-control"
+                                           placeholder="correo@ejemplo.com" autocomplete="email" />
+                                </div>
+                                <span asp-validation-for="Email"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="Password">Contrase&ntilde;a</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fa-solid fa-lock"></i>
+                                    </span>
+                                    <input asp-for="Password" id="Password" type="password"
+                                           class="form-control border-end-0"
+                                           placeholder="Tu contrase&ntilde;a"
+                                           autocomplete="current-password" />
+                                    <button type="button" class="btn password-toggle" id="togglePw"
+                                            aria-label="Mostrar contrase&ntilde;a" aria-pressed="false">
+                                        <i class="fa-regular fa-eye" id="togglePwIcon"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="Password"></span>
+                            </div>
+
+                            <div class="d-flex d-xs-column align-items-center justify-content-between gap-3 mb-4">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Mantener sesi&oacute;n iniciada</label>
+                                </div>
+                                <a href="#" class="forgot-link">Olvid&eacute; mi contrase&ntilde;a</a>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-login w-100 d-inline-flex align-items-center justify-content-center gap-2">
+                                <span>Iniciar sesi&oacute;n</span>
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                            </button>
+                        </form>
+
+                        <div class="security-note d-flex align-items-start gap-3 p-3 mt-4">
+                            <i class="fa-solid fa-lock mt-1"></i>
+                            <span>Tu acceso est&aacute; protegido. Cierra sesi&oacute;n al terminar si usas un equipo compartido.</span>
+                        </div>
+
+                        <div class="footer-copy text-center mt-4">
+                            &copy; 2026 GAC Condominium. Todos los derechos reservados.
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        const toggleButton = document.getElementById('togglePw');
+        const passwordInput = document.getElementById('Password');
+        const toggleIcon = document.getElementById('togglePwIcon');
+
+        toggleButton.addEventListener('click', function () {
+        const isHidden = passwordInput.type === 'password';
+
+        passwordInput.type = isHidden ? 'text' : 'password';
+        toggleButton.setAttribute('aria-label', isHidden ? 'Ocultar contrasena' : 'Mostrar contrasena');
+        toggleButton.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+        toggleIcon.className = isHidden ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+        });
+
+        // ── ROLE SWITCH ──
+        const body = document.body;
+        const roleAdmin = document.getElementById('roleAdmin');
+        const roleInquilino = document.getElementById('roleInquilino');
+        const tipoUsuario = document.getElementById('tipoUsuario');
+
+        const brandKicker = document.getElementById('brandKicker');
+        const brandTitle = document.getElementById('brandTitle');
+        const brandText = document.getElementById('brandText');
+        const systemBadge = document.getElementById('systemBadge');
+        const loginTitle = document.getElementById('loginTitle');
+        const loginSubtitle = document.getElementById('loginSubtitle');
+
+        const content = {
+        admin: {
+        kicker: 'Panel privado',
+        title: 'Gestiona tu condominio con claridad.',
+        text: 'Accede al centro de control para administrar residentes, pagos, novedades y servicios desde un entorno seguro y moderno.',
+        badge: '<i class="fa-solid fa-circle-check"></i> Sistema administrativo',
+        loginTitle: 'Bienvenido de vuelta',
+        loginSubtitle: 'Ingresa tus credenciales para continuar con la gesti&oacute;n de GAC Condominium.',
+        themePrimary: '#1f6feb',
+        themeSecondary: '#16b8d8',
+        softBg: '#eaf3ff',
+        softBorder: '#cfe2ff',
+        softText: '#1550a8'
+        },
+        inquilino: {
+        kicker: 'Portal del residente',
+        title: 'Tu hogar, tus pagos y avisos en un solo lugar.',
+        text: 'Consulta tu estado de cuenta, reporta incidencias y mantente al d&iacute;a con los avisos de tu condominio.',
+        badge: '<i class="fa-solid fa-circle-check"></i> Portal de inquilinos',
+        loginTitle: 'Bienvenido a tu portal',
+        loginSubtitle: 'Ingresa tus credenciales para acceder a la informaci&oacute;n de tu unidad.',
+        themePrimary: '#16a34a',
+        themeSecondary: '#34d399',
+        softBg: '#eafbf1',
+        softBorder: '#bfecd2',
+        softText: '#15803d'
+        }
+        };
+
+        function applyRole(role) {
+        const c = content[role];
+        body.setAttribute('data-role', role === 'admin' ? 'admin' : 'inquilino');
+        tipoUsuario.value = role === 'admin' ? 'Administrador' : 'Inquilino';
+
+        brandKicker.textContent = c.kicker;
+        brandTitle.textContent = c.title;
+        brandText.innerHTML = c.text;
+        systemBadge.innerHTML = c.badge;
+        loginTitle.textContent = c.loginTitle;
+        loginSubtitle.innerHTML = c.loginSubtitle;
+
+        document.documentElement.style.setProperty('--theme-primary', c.themePrimary);
+        document.documentElement.style.setProperty('--theme-secondary', c.themeSecondary);
+        document.documentElement.style.setProperty('--theme-soft-bg', c.softBg);
+        document.documentElement.style.setProperty('--theme-soft-border', c.softBorder);
+        document.documentElement.style.setProperty('--theme-soft-text', c.softText);
+        }
+
+        roleAdmin.addEventListener('change', () => applyRole('admin'));
+        roleInquilino.addEventListener('change', () => applyRole('inquilino'));
+    </script>
+</body>
+</html>

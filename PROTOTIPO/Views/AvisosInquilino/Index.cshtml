@@ -1,0 +1,352 @@
+﻿@model IEnumerable<PROTOTIPO.Models.Aviso>
+
+@{
+    ViewData["Title"] = "Avisos";
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+    }
+
+    .avisos-page {
+        background: #f4f6fb;
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15, 22, 35, 0.15);
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 0;
+        }
+
+    /* AVISO CARD */
+    .aviso-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #eef1f6;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+        .aviso-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gac-primary);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .aviso-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(15, 22, 35, 0.08);
+            border-color: transparent;
+        }
+
+            .aviso-card:hover::before {
+                opacity: 1;
+            }
+
+        .aviso-card .card-body {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+    .aviso-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(37, 140, 251, 0.1);
+        color: var(--gac-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .aviso-card h5 {
+        font-weight: 700;
+        color: var(--gac-navy);
+        margin-bottom: 0.6rem;
+        line-height: 1.35;
+    }
+
+    .aviso-contenido {
+        color: #64748b;
+        font-size: 0.92rem;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    .aviso-fecha {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: #94a3b8;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0.9rem 1.5rem;
+        border-top: 1px solid #f1f4f9;
+    }
+
+    .aviso-card .card-footer {
+        background: #fafbfd;
+        border-top: 1px solid #eef1f6;
+        padding: 1.1rem 1.5rem;
+    }
+
+    .btn-gac-outline {
+        border: 1.5px solid var(--gac-primary);
+        color: var(--gac-primary);
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-gac-outline:hover {
+            background: var(--gac-primary);
+            color: #fff;
+        }
+
+    /* EMPTY STATE */
+    .empty-state {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px dashed #d8e0ee;
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+    }
+
+        .empty-state i {
+            font-size: 2.75rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h5 {
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+</style>
+
+<div class="avisos-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header d-flex justify-content-between align-items-center">
+
+            <div>
+                <h3 class="mb-1">
+                    Avisos del Condominio
+                </h3>
+
+                <p>
+                    Información importante y comunicaciones
+                </p>
+            </div>
+
+
+            @if (ViewBag.NoLeidos > 0)
+            {
+                <div class="aviso-counter">
+                    <i class="fa-solid fa-bell"></i>
+                    @ViewBag.NoLeidos nuevos
+                </div>
+            }
+
+        </div>
+
+
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+
+                <i class="fa-regular fa-bell"></i>
+
+                <h5>
+                    No hay avisos disponibles
+                </h5>
+
+            </div>
+        }
+        else
+        {
+
+            <div class="row g-3">
+
+                @foreach (var item in Model)
+                {
+
+                    <div class="col-12 col-md-6 col-lg-4">
+
+                        <div class="aviso-card @(item.Leido ? "" : "aviso-nuevo")">
+
+
+                            <div class="card-body">
+
+
+                                <div class="d-flex justify-content-between align-items-start">
+
+
+                                    <div class="aviso-icon">
+
+                                        @if (item.TipoAviso == "Contrato")
+                                        {
+                                            <i class="fa-solid fa-file-contract"></i>
+                                        }
+                                        else if (item.TipoAviso == "Mantenimiento")
+                                        {
+                                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fa-solid fa-bullhorn"></i>
+                                        }
+
+                                    </div>
+
+
+
+                                    @if (!item.Leido)
+                                    {
+                                        <span class="badge bg-danger">
+                                            Nuevo
+                                        </span>
+                                    }
+
+
+                                </div>
+
+
+
+
+                                <h5>
+                                    @item.Titulo
+                                </h5>
+
+
+
+                                <p class="aviso-contenido">
+
+                                    @(item.Contenido?.Length > 100
+                                        ? item.Contenido.Substring(0, 100) + "..."
+                                        : item.Contenido)
+
+                                </p>
+
+
+
+                                @if (item.TipoAviso != null)
+                                {
+                                    <small class="text-muted">
+
+                                        <i class="fa-solid fa-robot"></i>
+
+                                        @item.TipoAviso
+
+                                    </small>
+                                }
+
+
+
+                            </div>
+
+
+
+
+
+                            <div class="aviso-fecha">
+
+                                <i class="fa-regular fa-calendar"></i>
+
+                                @(item.FechaPublicacion.HasValue
+                                        ? item.FechaPublicacion.Value.ToString("dd/MM/yyyy")
+                                        : "")
+
+                            </div>
+
+
+
+
+
+                            <div class="card-footer">
+
+
+                                <a asp-action="Details"
+                                   asp-route-id="@item.IdAviso"
+                                   class="btn btn-gac-outline w-100 mb-2">
+
+                                    Ver detalle
+
+                                </a>
+
+
+
+                                @if (!item.Leido)
+                                {
+
+                                    <form asp-action="MarcarLeido"
+                                          method="post">
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.IdAviso" />
+
+
+                                        <button type="submit"
+                                                class="btn btn-success w-100">
+
+                                            <i class="fa-solid fa-check"></i>
+
+                                            Marcar como leído
+
+                                        </button>
+
+                                    </form>
+
+                                }
+
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+        }
+
+
+    </div>
+</div>

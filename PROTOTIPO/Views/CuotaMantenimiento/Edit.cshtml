@@ -1,0 +1,687 @@
+﻿@model PROTOTIPO.Models.CuotaMantenimiento
+
+@{
+    ViewData["Title"] = "Editar Cuota";
+
+    var esPagado = Model.Estado == "Pagado";
+}
+
+<style>
+    :root {
+        --ink: #0c1220;
+        --ink-soft: #3d4a5c;
+        --ink-muted: #7a8799;
+        --surface: #f4f6fb;
+        --surface-2: #ffffff;
+        --border: #e4e9f0;
+        --accent: #1a56e8;
+        --accent-light: #eff4ff;
+        --teal: #0fd4b0;
+        --warn: #d97706;
+        --warn-soft: #fffbeb;
+        --warn-bdr: #fde68a;
+        --success: #15803d;
+        --success-soft: #f0fdf6;
+        --success-bdr: #bbf7d0;
+        --r-lg: 14px;
+        --r-xl: 20px;
+        --r-2xl: 26px;
+        --r-pill: 999px;
+        --shadow-sm: 0 2px 8px rgba(12,18,32,.07);
+        --ease: .22s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    .cedit-page {
+        max-width: 700px;
+        margin: 36px auto;
+        padding: 0 24px 64px;
+    }
+
+    /* ── Breadcrumb ── */
+    .cedit-bc {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .78rem;
+        font-weight: 500;
+        color: var(--ink-muted);
+        margin-bottom: 26px;
+    }
+
+        .cedit-bc a {
+            color: var(--ink-muted);
+            text-decoration: none;
+            transition: color var(--ease);
+        }
+
+            .cedit-bc a:hover {
+                color: var(--accent);
+            }
+
+    /* ── Header ── */
+    .cedit-hd {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .cedit-hd-ico {
+        width: 52px;
+        height: 52px;
+        border-radius: 15px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+        box-shadow: 0 6px 20px rgba(26,86,232,.32);
+    }
+
+    .cedit-hd-title {
+        font-family: var(--font-d);
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -.035em;
+        color: var(--ink);
+        margin: 0 0 3px;
+    }
+
+    .cedit-hd-sub {
+        font-size: .84rem;
+        color: var(--ink-muted);
+        margin: 0;
+    }
+
+    /* ── Card ── */
+    .cedit-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-2xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    /* ── Band ── */
+    .cedit-band {
+        background: var(--ink);
+        padding: 20px 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .cedit-band::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        .cedit-band::after {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(26,86,232,.22) 0%, transparent 68%);
+            top: -70px;
+            right: -40px;
+            pointer-events: none;
+        }
+
+    .cedit-band-ico {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(26,86,232,.25);
+        border: 1px solid rgba(26,86,232,.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #93c5fd;
+        font-size: 1rem;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cedit-band-title {
+        font-family: var(--font-d);
+        font-size: .95rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cedit-band-sub {
+        font-size: .72rem;
+        color: rgba(255,255,255,.4);
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ── Body ── */
+    .cedit-body {
+        padding: 28px 28px 8px;
+    }
+
+    /* ── Estado badge pill (top of body) ── */
+    .cedit-estado-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 24px;
+        padding: 14px 18px;
+        border-radius: var(--r-xl);
+        border: 1px solid;
+    }
+
+        .cedit-estado-bar.pendiente {
+            background: var(--warn-soft);
+            border-color: var(--warn-bdr);
+        }
+
+        .cedit-estado-bar.pagado {
+            background: var(--success-soft);
+            border-color: var(--success-bdr);
+        }
+
+    .cedit-estado-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .8rem;
+        font-weight: 700;
+    }
+
+        .cedit-estado-label i {
+            font-size: .95rem;
+        }
+
+    .pendiente .cedit-estado-label {
+        color: var(--warn);
+    }
+
+    .pagado .cedit-estado-label {
+        color: var(--success);
+    }
+
+    .cedit-estado-hint {
+        font-size: .75rem;
+        color: var(--ink-muted);
+    }
+
+    /* ── Grid ── */
+    .cedit-grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    .cedit-grid-1 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    /* ── Field ── */
+    .cedit-field {
+    }
+
+    .cf-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        margin-bottom: 8px;
+    }
+
+        .cf-label i {
+            color: var(--accent);
+            font-size: .82rem;
+        }
+
+        .cf-label .req {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #ef4444;
+            display: inline-block;
+            margin-left: 2px;
+        }
+
+    .cf-wrap {
+        position: relative;
+    }
+
+    .cf-input,
+    .cf-select {
+        width: 100%;
+        padding: 11px 14px 11px 40px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-lg);
+        font-family: var(--font-b);
+        font-size: .875rem;
+        color: var(--ink);
+        background: var(--surface);
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+        transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+    }
+
+        .cf-input:focus, .cf-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(26,86,232,.11);
+            background: #fff;
+        }
+
+        .cf-input::placeholder {
+            color: #b8c4d0;
+        }
+
+    .cf-ico {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #c0cad6;
+        font-size: .88rem;
+        pointer-events: none;
+        transition: color var(--ease);
+    }
+
+    .cf-wrap:focus-within .cf-ico {
+        color: var(--accent);
+    }
+
+    /* Select arrow */
+    .cf-sel-wrap {
+        position: relative;
+    }
+
+        .cf-sel-wrap::after {
+            content: '\F282';
+            font-family: 'bootstrap-icons';
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-muted);
+            pointer-events: none;
+            font-size: .82rem;
+        }
+
+    .cf-select {
+        padding-right: 36px;
+        cursor: pointer;
+    }
+
+    /* Estado select: colored options indicator */
+    .estado-select-pendiente {
+        color: var(--warn);
+    }
+
+    .estado-select-pagado {
+        color: var(--success);
+    }
+
+    /* Hint */
+    .cf-hint {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .72rem;
+        color: var(--ink-muted);
+        margin-top: 6px;
+    }
+
+        .cf-hint i {
+            color: var(--teal);
+            font-size: .78rem;
+        }
+
+    /* ── Footer ── */
+    .cedit-footer {
+        background: #f8fafc;
+        border-top: 1px solid var(--border);
+        padding: 18px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-cedit-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: var(--r-lg);
+        border: 1.5px solid var(--border);
+        background: transparent;
+        color: var(--ink-soft);
+        text-decoration: none;
+        transition: var(--ease);
+    }
+
+        .btn-cedit-cancel:hover {
+            background: var(--surface-2);
+            border-color: #c8d2de;
+            color: var(--ink);
+        }
+
+    .btn-cedit-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 700;
+        padding: 10px 26px;
+        border-radius: var(--r-lg);
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: var(--ease);
+        box-shadow: 0 4px 14px rgba(26,86,232,.35);
+    }
+
+        .btn-cedit-save:hover {
+            background: #1447d0;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26,86,232,.45);
+        }
+
+        .btn-cedit-save:active {
+            transform: translateY(0);
+        }
+
+        .btn-cedit-save .cedit-spin {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: cedit-rot .7s linear infinite;
+        }
+
+        .btn-cedit-save.loading .cedit-lbl,
+        .btn-cedit-save.loading .cedit-ico {
+            display: none;
+        }
+
+        .btn-cedit-save.loading .cedit-spin {
+            display: block;
+        }
+
+    @@keyframes cedit-rot {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    span[data-valmsg-for],
+    .field-validation-error,
+    .field-validation-valid,
+    .text-danger {
+        display: none !important;
+    }
+
+    @@media (max-width: 767px) {
+        .cedit-grid-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 575px) {
+        .cedit-page {
+            padding: 0 16px 48px;
+        }
+
+        .cedit-band, .cedit-body {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .cedit-footer {
+            padding: 16px 20px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-cedit-cancel, .btn-cedit-save {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="cedit-page">
+
+    <!-- Breadcrumb -->
+    <div class="cedit-bc">
+        <a asp-action="Index"><i class="bi bi-receipt"></i> Cuotas</a>
+        <i class="bi bi-chevron-right" style="font-size:.65rem;"></i>
+        <span>Editar cuota</span>
+    </div>
+
+    <!-- Header -->
+    <div class="cedit-hd">
+        <div class="cedit-hd-ico"><i class="bi bi-pencil-fill"></i></div>
+        <div>
+            <h1 class="cedit-hd-title">Editar Cuota de Mantenimiento</h1>
+            <p class="cedit-hd-sub">Modifica los datos de esta cuota registrada en el sistema.</p>
+        </div>
+    </div>
+
+    <!-- Card -->
+    <div class="cedit-card">
+
+        <!-- Band -->
+        <div class="cedit-band">
+            <div class="cedit-band-ico"><i class="bi bi-receipt-cutoff"></i></div>
+            <div>
+                <div class="cedit-band-title">Datos de la cuota</div>
+                <div class="cedit-band-sub">Actualiza los campos que necesites modificar</div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form asp-action="Edit" id="cEditForm">
+            <input type="hidden" asp-for="IdCuota" />
+
+            <div class="cedit-body">
+
+                <!-- Estado actual badge -->
+                <div class="cedit-estado-bar @(esPagado ? "pagado" : "pendiente")">
+                    <div class="cedit-estado-label">
+                        @if (esPagado)
+                        {
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Estado actual: Pagado</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-hourglass-split"></i>
+                            <span>Estado actual: Pendiente</span>
+                        }
+                    </div>
+                    <span class="cedit-estado-hint">Puedes cambiar el estado abajo</span>
+                </div>
+
+                <!-- Fila 1: Unidad, Periodo, Monto -->
+                <div class="cedit-grid-3">
+
+                    <!-- Unidad -->
+                    <div class="cedit-field">
+                        <label class="cf-label">
+                            <i class="bi bi-building"></i>
+                            Unidad <span class="req"></span>
+                        </label>
+                        <div class="cf-sel-wrap cf-wrap">
+                            <select asp-for="IdUnidad"
+                                    class="cf-select"
+                                    asp-items="ViewBag.IdUnidad"
+                                    style="padding-left:40px;">
+                                <option value="">— Seleccionar —</option>
+                            </select>
+                            <i class="bi bi-buildings cf-ico"></i>
+                        </div>
+                    </div>
+
+                    <!-- Periodo -->
+                    <div class="cedit-field">
+                        <label class="cf-label">
+                            <i class="bi bi-calendar-month"></i>
+                            Período <span class="req"></span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Periodo"
+                                   class="cf-input"
+                                   placeholder="2026-01"
+                                   maxlength="7"
+                                   id="periodoInput"
+                                   autocomplete="off">
+                            <i class="bi bi-calendar3 cf-ico"></i>
+                        </div>
+                        <div class="cf-hint">
+                            <i class="bi bi-info-circle-fill"></i>
+                            Formato: AAAA-MM
+                        </div>
+                    </div>
+
+                    <!-- Monto -->
+                    <div class="cedit-field">
+                        <label class="cf-label">
+                            <i class="bi bi-cash-coin"></i>
+                            Monto (RD$) <span class="req"></span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Monto"
+                                   type="number"
+                                   step="0.01"
+                                   min="0"
+                                   class="cf-input"
+                                   placeholder="0.00"
+                                   id="montoInput">
+                            <i class="bi bi-currency-dollar cf-ico"></i>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Fila 2: Estado (ancho completo para darle énfasis) -->
+                <div class="cedit-field" style="margin-bottom: 8px;">
+                    <label class="cf-label">
+                        <i class="bi bi-toggle-on"></i>
+                        Estado de pago <span class="req"></span>
+                    </label>
+                    <div class="cf-sel-wrap cf-wrap" style="max-width: 220px;">
+                        <select asp-for="Estado"
+                                class="cf-select"
+                                id="estadoSelect"
+                                style="padding-left:40px;">
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Pagado">Pagado</option>
+                        </select>
+                        <i class="bi bi-circle-half cf-ico" id="estadoIco"></i>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--border);margin:0;">
+
+            <!-- Footer -->
+            <div class="cedit-footer">
+                <a asp-action="Index" class="btn-cedit-cancel">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn-cedit-save" id="btnCEdit">
+                    <i class="cedit-ico bi bi-floppy-fill"></i>
+                    <span class="cedit-lbl">Guardar cambios</span>
+                    <div class="cedit-spin"></div>
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            /* ── Periodo auto-format ── */
+            var periodoEl = document.getElementById('periodoInput');
+            if (periodoEl) {
+                periodoEl.addEventListener('input', function () {
+                    var v = this.value.replace(/\D/g, '').slice(0, 6);
+                    if (v.length > 4) v = v.slice(0, 4) + '-' + v.slice(4);
+                    this.value = v;
+                });
+            }
+
+            /* ── Estado select: cambiar color del ícono ── */
+            var estadoSel = document.getElementById('estadoSelect');
+            var estadoIco = document.getElementById('estadoIco');
+            var estadoBar = document.querySelector('.cedit-estado-bar');
+
+            function actualizarEstadoUI() {
+                if (!estadoSel) return;
+                var val = estadoSel.value;
+                if (val === 'Pagado') {
+                    if (estadoIco) { estadoIco.className = 'bi bi-check-circle-fill cf-ico'; estadoIco.style.color = '#15803d'; }
+                    if (estadoBar) { estadoBar.className = 'cedit-estado-bar pagado'; }
+                } else {
+                    if (estadoIco) { estadoIco.className = 'bi bi-hourglass-split cf-ico'; estadoIco.style.color = '#d97706'; }
+                    if (estadoBar) { estadoBar.className = 'cedit-estado-bar pendiente'; }
+                }
+            }
+
+            if (estadoSel) {
+                estadoSel.addEventListener('change', actualizarEstadoUI);
+                actualizarEstadoUI(); // init
+            }
+
+            /* ── Submit loader ── */
+            var form = document.getElementById('cEditForm');
+            var btn  = document.getElementById('btnCEdit');
+            if (form) {
+                form.addEventListener('submit', function () {
+                    setTimeout(function () {
+                        btn.classList.add('loading');
+                        btn.disabled = true;
+                    }, 0);
+                });
+            }
+        })();
+    </script>
+}

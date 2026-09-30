@@ -1,0 +1,553 @@
+@model PROTOTIPO.Models.UnidadHabitacional
+
+@{
+    var imgUrl = Model.ImagenUnidads?.FirstOrDefault()?.Url;
+
+    if (string.IsNullOrEmpty(imgUrl))
+        imgUrl = Url.Content("~/img/placeholder-unidad.jpg");
+
+    string badgeClass = Model.Estado?.ToLower() switch
+    {
+        "disponible" => "od-badge--dis",
+        "ocupada" => "od-badge--ocu",
+        "proceso" => "od-badge--pro",
+        _ => "od-badge--def"
+    };
+}
+
+<div class="offcanvas offcanvas-end od-offcanvas"
+     tabindex="-1"
+     id="assignOffcanvas">
+
+    <!-- ── HEADER ── -->
+    <div class="od-header">
+
+        <div class="od-title">
+            Unidad @Model.Numero
+        </div>
+
+        <button type="button"
+                class="od-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <div class="offcanvas-body od-body">
+
+        <!-- ── IMAGEN ── -->
+        <div class="od-img-wrap">
+
+            <img src="@Url.Content(imgUrl)"
+                 alt="Unidad @Model.Numero"
+                 class="od-img" />
+
+            <div class="od-img-overlay"></div>
+
+            <div class="od-img-badge">
+                <i class="fa-solid fa-building me-1"></i>
+                @Model.Numero
+            </div>
+
+            <div class="od-estado @badgeClass">
+                <span class="od-dot"></span>
+                @Model.Estado
+            </div>
+
+        </div>
+
+
+        <!-- ── FORMULARIO ── -->
+        <form id="assignForm"
+              method="post"
+              action="@Url.Action("Assign", "UnidadHabitacionals", new { id = Model.IdUnidad })">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="id"
+                   value="@Model.IdUnidad" />
+
+
+            <p class="od-section-label">
+                Asignar contrato de alquiler
+            </p>
+
+
+            <div class="od-info-grid">
+
+                <!-- ── SELECT CONTRATO ── -->
+                <div class="od-chip od-chip--full">
+
+                    <span class="od-chip-lbl">
+                        Contrato de alquiler
+                    </span>
+
+                    <div class="od-form-wrap">
+
+                        <i class="fa-solid fa-file-contract od-form-ico me-2"></i>
+
+                        <!-- data-role permite que Index.cshtml lo encuentre
+                             tras insertar con innerHTML -->
+                        <select name="IdContrato"
+                                id="IdContrato"
+                                data-role="select-contrato"
+                                class="od-form-control">
+
+                            <option value="">
+                                — Seleccionar contrato —
+                            </option>
+
+                            @foreach (var contrato in (List<SelectListItem>)ViewData["Contratos"])
+                            {
+                                <option value="@contrato.Value">
+                                    @contrato.Text
+                                </option>
+                            }
+
+                        </select>
+
+                        <i class="fa-solid fa-chevron-down od-form-arrow"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ── DETALLE DEL CONTRATO ── -->
+                <div id="contratoDetalle"
+                     data-role="contrato-detalle"
+                     class="od-chip od-chip--full mt-3"
+                     style="display:none;">
+
+                    <span class="od-chip-lbl">
+                        Detalles del contrato
+                    </span>
+
+
+                    <div class="od-details">
+
+                        <!-- INQUILINO / RESPONSABLE -->
+                        <p id="filaNombre">
+                            <i class="fa-solid fa-user me-2"></i>
+                            <strong id="inquilinoLabel">Inquilino:</strong>
+                            <span data-field="nombre" id="detalleNombre"></span>
+                        </p>
+
+                        <!-- PERSONA ALOJADA (SOLO JURÍDICO) -->
+                        <p id="filaPersonaAlojada" style="display:none;">
+                            <i class="fa-solid fa-house-user me-2"></i>
+                            <strong>Persona alojada:</strong>
+                            <span data-field="personaAlojada" id="detallePersonaAlojada"></span>
+                        </p>
+
+                        <!-- EMPRESA (SOLO JURÍDICO) -->
+                        <p id="filaNombreEmpresa" style="display:none;">
+                            <i class="fa-solid fa-building me-2"></i>
+                            <strong>Empresa:</strong>
+                            <span data-field="nombreEmpresa" id="detalleNombreEmpresa"></span>
+                        </p>
+
+                        <!-- DOCUMENTO -->
+                        <p id="identificacionDetalle">
+                            <i class="fa-solid fa-id-card me-2"></i>
+                            <strong id="identificacionLabel">Identificación:</strong>
+                            <span data-field="identificacion" id="detalleIdentificacion"></span>
+                        </p>
+
+                        <!-- TELÉFONO -->
+                        <p>
+                            <i class="fa-solid fa-phone me-2"></i>
+                            <strong>Teléfono:</strong>
+                            <span data-field="telefono" id="detalleTelefono"></span>
+                        </p>
+
+                        <!-- FECHA INICIO -->
+                        <p>
+                            <i class="fa-solid fa-calendar me-2"></i>
+                            <strong>Inicio:</strong>
+                            <span data-field="fechaInicio" id="detalleInicio"></span>
+                        </p>
+
+                        <!-- FECHA FIN -->
+                        <p>
+                            <i class="fa-solid fa-calendar-check me-2"></i>
+                            <strong>Fin:</strong>
+                            <span data-field="fechaFin" id="detalleFin"></span>
+                        </p>
+
+                        <!-- MENSUALIDAD -->
+                        <p>
+                            <i class="fa-solid fa-dollar-sign me-2"></i>
+                            <strong>Mensualidad:</strong>
+                            RD$ <span data-field="renta" id="detalleRenta"></span>
+                        </p>
+
+                        <!-- ESTADO -->
+                        <p>
+                            <i class="fa-solid fa-circle-info me-2"></i>
+                            <strong>Estado:</strong>
+                            <span data-field="estado" id="detalleEstado"></span>
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ── FOOTER ── -->
+            <div class="od-footer mt-4">
+
+                <button type="button"
+                        class="od-foot-btn od-foot-btn--cancel"
+                        data-bs-dismiss="offcanvas">
+                    <i class="fa-solid fa-xmark me-1"></i>
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        class="od-foot-btn od-foot-btn--assign">
+                    <i class="fa-solid fa-user-check me-1"></i>
+                    Asignar contrato
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+<style>
+
+    /* ── OFFCANVAS BASE ── */
+    .od-offcanvas {
+        width: 420px !important;
+        font-family: 'Outfit', sans-serif;
+        border-left: 1px solid #e8edf6 !important;
+        box-shadow: -8px 0 40px rgba(15, 23, 42, .12) !important;
+    }
+
+    /* ── HEADER ── */
+    .od-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 24px 0;
+    }
+
+    .od-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 22px;
+        color: #0f172a;
+        font-weight: 400;
+    }
+
+    .od-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #f8faff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 15px;
+        color: #64748b;
+        transition: .2s ease;
+    }
+
+        .od-close:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+    /* ── BODY ── */
+    .od-body {
+        padding: 0 24px 16px !important;
+        overflow-y: auto;
+    }
+
+    /* ── IMAGEN ── */
+    .od-img-wrap {
+        position: relative;
+        margin: 18px 0 0;
+        height: 200px;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .od-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .od-img-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 35%, rgba(15,23,42,.62) 100%);
+    }
+
+    .od-img-badge {
+        position: absolute;
+        bottom: 13px;
+        left: 13px;
+        background: rgba(255,255,255,.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,.3);
+        color: #fff;
+        padding: 6px 13px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .od-estado {
+        position: absolute;
+        bottom: 13px;
+        right: 13px;
+        padding: 6px 12px;
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .od-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+    }
+
+    .od-badge--dis {
+        background: rgba(34,197,94,.18);
+        border: 1px solid rgba(34,197,94,.3);
+        color: #86efac;
+    }
+
+    .od-badge--ocu {
+        background: rgba(239,68,68,.18);
+        border: 1px solid rgba(239,68,68,.3);
+        color: #fca5a5;
+    }
+
+    .od-badge--pro {
+        background: rgba(245,158,11,.18);
+        border: 1px solid rgba(245,158,11,.3);
+        color: #fcd34d;
+    }
+
+    .od-badge--def {
+        background: rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+    }
+
+    /* ── SECTION LABEL ── */
+    .od-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin: 22px 0 12px;
+    }
+
+    /* ── INFO GRID ── */
+    .od-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    /* ── CHIP ── */
+    .od-chip {
+        background: #f8faff;
+        border: 1px solid #e8edf6;
+        border-radius: 14px;
+        padding: 13px 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .od-chip--full {
+        grid-column: 1 / -1;
+    }
+
+    .od-chip-lbl {
+        font-size: 10px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        font-weight: 500;
+    }
+
+    .od-chip-lbl-opt {
+        font-size: 9px;
+        color: #cbd5e1;
+        text-transform: none;
+        letter-spacing: 0;
+        font-weight: 400;
+    }
+
+    /* ── CONTROLES DE FORMULARIO ── */
+    .od-form-wrap {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 9px 12px;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .od-form-wrap:focus-within {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+        }
+
+    .od-form-ico {
+        font-size: 13px;
+        color: #94a3b8;
+        flex-shrink: 0;
+        transition: color .2s ease;
+    }
+
+    .od-form-wrap:focus-within .od-form-ico {
+        color: #2563eb;
+    }
+
+    .od-form-control {
+        width: 100%;
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 13px !important;
+        color: #0f172a !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
+        .od-form-control::placeholder {
+            color: #cbd5e1 !important;
+        }
+
+    /* Flecha del select */
+    .od-form-arrow {
+        font-size: 11px;
+        color: #cbd5e1;
+        flex-shrink: 0;
+        pointer-events: none;
+    }
+
+    select.od-form-control {
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+    }
+
+    /* ── FOOTER ── */
+    .od-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 20px 0 8px;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 6px;
+    }
+
+    .od-foot-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 13px;
+        border-radius: 13px;
+        font-family: 'Outfit', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: transform .2s ease, background .2s ease, color .2s ease;
+    }
+
+        .od-foot-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .od-foot-btn--cancel {
+        background: #f8faff;
+        color: #64748b;
+        border-color: #e2e8f0;
+    }
+
+        .od-foot-btn--cancel:hover {
+            background: #f1f5f9;
+            color: #475569;
+            border-color: #cbd5e1;
+        }
+
+    .od-foot-btn--assign {
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        color: #ffffff;
+        border-color: transparent;
+        box-shadow: 0 6px 18px rgba(37, 99, 235, .22);
+    }
+
+        .od-foot-btn--assign:hover {
+            box-shadow: 0 10px 24px rgba(37, 99, 235, .32);
+            color: #ffffff;
+        }
+
+    /* ── RESPONSIVE ── */
+    @@media (max-width: 480px) {
+        .od-offcanvas {
+            width: 100vw !important;
+        }
+    }
+
+</style>
+
+<!--
+    ═══════════════════════════════════════════════════════════════════
+    NOTA IMPORTANTE — NO agregar <script> en este partial.
+
+    Este archivo se inserta en el DOM mediante:
+        wrapper.innerHTML = html;
+        document.body.appendChild(wrapper);
+    (ver Index.cshtml, función loadAndShow)
+
+    Cuando el HTML se inserta así, el navegador NUNCA ejecuta los
+    <script> que vengan dentro de ese HTML. Es el comportamiento
+    estándar del DOM (no un bug). Por eso toda la lógica JS de:
+      - cambio de contrato (#IdContrato -> autocompletar detalle)
+      - envío del formulario (#assignForm)
+    vive en Index.cshtml, DENTRO del bloque que llama a loadAndShow,
+    justo después de insertar este partial en el offcanvas.
+
+    Si necesitas modificar el comportamiento del select o del submit,
+    edítalo en Index.cshtml, no aquí.
+    ═══════════════════════════════════════════════════════════════════
+-->

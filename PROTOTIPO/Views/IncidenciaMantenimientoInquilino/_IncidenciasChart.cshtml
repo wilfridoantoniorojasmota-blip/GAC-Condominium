@@ -1,0 +1,89 @@
+﻿@model IEnumerable<dynamic>
+
+<div style="height: 240px; width: 100%; position: relative;">
+    <canvas class="incidenciasChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+    const incidenciasData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+
+    const incCanvas = document.querySelector('.incidenciasChart');
+
+    if (incCanvas && incidenciasData && incidenciasData.length) {
+
+    const ctx = incCanvas.getContext('2d');
+
+    // Gradiente azul GAC para el relleno del área
+    const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+    gradient.addColorStop(0,   'rgba(37, 140, 251, 0.28)');
+    gradient.addColorStop(1,   'rgba(37, 140, 251, 0.00)');
+
+    new Chart(incCanvas, {
+    type: 'line',
+    data: {
+    labels: incidenciasData.map(x => x.Mes),
+    datasets: [{
+    label: 'Incidencias',
+    data: incidenciasData.map(x => x.Total),
+    borderColor: '#258cfb',
+    backgroundColor: gradient,
+    borderWidth: 3,
+    fill: true,
+    tension: 0.4,
+    pointRadius: 4,
+    pointBackgroundColor: '#ffffff',
+    pointBorderColor: '#258cfb',
+    pointBorderWidth: 2,
+    pointHoverRadius: 6,
+    pointHoverBackgroundColor: '#258cfb',
+    pointHoverBorderColor: '#ffffff',
+    pointHoverBorderWidth: 2
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+    legend: { display: false },
+    tooltip: {
+    backgroundColor: '#0f172a',
+    titleColor: '#fff',
+    bodyColor: '#fff',
+    padding: 12,
+    cornerRadius: 10,
+    displayColors: false,
+    titleFont: { family: 'Outfit', weight: '600', size: 12 },
+    bodyFont: { family: 'Outfit', size: 12 },
+    callbacks: {
+    label: ctx => ` ${ctx.parsed.y} incidencia${ctx.parsed.y !== 1 ? 's' : ''}`
+    }
+    }
+    },
+    scales: {
+    x: {
+    grid: { display: false },
+    border: { display: false },
+    ticks: {
+    color: '#94a3b8',
+    font: { family: 'Outfit', size: 11.5, weight: '500' }
+    }
+    },
+    y: {
+    beginAtZero: true,
+    grid: { color: '#f1f5f9' },
+    border: { display: false },
+    ticks: {
+    precision: 0,
+    color: '#94a3b8',
+    font: { family: 'Outfit', size: 11 },
+    padding: 8
+    }
+    }
+    }
+    }
+    });
+    }
+</script>

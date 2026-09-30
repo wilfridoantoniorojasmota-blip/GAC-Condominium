@@ -1,0 +1,126 @@
+﻿@model PROTOTIPO.Models.ReservaAreaComun
+
+
+@{
+    ViewData["Title"] = "Reservar Área Común";
+}
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">Reservar Área Común</h3>
+        <p class="text-muted mb-0">
+            Selecciona la fecha y horario para tu reserva
+        </p>
+    </div>
+
+    <div class="alert alert-info border-0 mb-4">
+        <i class="fa-solid fa-location-dot me-2"></i>
+        Área seleccionada:
+        <strong>@ViewBag.AreaNombre</strong>
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <!-- ALERTAS -->
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
+                        </div>
+                    }
+
+                    <form asp-action="Create" method="post">
+
+                        <!-- ID AREA -->
+                        <input type="hidden" name="areaId" value="@Model.IdArea" />
+
+                        <!-- FECHA -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Fecha de reserva</label>
+                            <input type="date"
+                                   name="fecha"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                   class="form-control form-control-lg"
+                                   required />
+                        </div>
+
+                        <div class="row">
+
+                            <!-- HORA INICIO -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Hora inicio</label>
+                                <input type="time"
+                                       name="horaInicio"
+                                       class="form-control form-control-lg"
+                                       required />
+                            </div>
+
+                            <!-- HORA FIN -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Hora fin</label>
+                                <input type="time"
+                                       name="horaFin"
+                                       class="form-control form-control-lg"
+                                       required />
+                            </div>
+
+                        </div>
+
+                        <!-- RESUMEN -->
+                        <div class="alert alert-light border mb-4">
+                            <strong>Importante:</strong>
+                            Las reservas están sujetas a disponibilidad.
+                            No se permiten conflictos de horario.
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary px-4">
+                                Confirmar Reserva
+                            </button>
+
+                        </div>
+
+                    </form>
+                    @if (ViewBag.Reservas != null)
+                    {
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h6>Reservas existentes</h6>
+
+                                @foreach (var r in ViewBag.Reservas)
+                                {
+                                    <div>
+                                        @r.Fecha -
+                                        @r.HoraInicio -
+                                        @r.HoraFin
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,233 @@
+﻿@model PROTOTIPO.Models.ReservaAreaComun
+
+@{
+    ViewData["Title"] = "Nueva Reserva";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-success text-white">
+
+                    <h3 class="mb-0">
+                        Reservar Área Común
+                    </h3>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4">
+
+                    <form asp-action="Create">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger">
+                        </div>
+
+                        <div class="row">
+
+                            <!-- AREA -->
+                            <div class="col-md-6 mb-3">
+
+                                <label asp-for="IdArea"
+                                       class="form-label fw-semibold">
+                                    Área Común
+                                </label>
+
+                                <select asp-for="IdArea"
+                                        class="form-select"
+                                        asp-items="ViewBag.IdArea">
+                                </select>
+
+                            </div>
+
+                            <!-- USUARIO -->
+                            <div class="col-md-6 mb-3">
+
+                                <label asp-for="IdUsuario"
+                                       class="form-label fw-semibold">
+                                    Usuario
+                                </label>
+
+                                <select asp-for="IdUsuario"
+                                        class="form-select"
+                                        asp-items="ViewBag.IdUsuario">
+                                </select>
+
+                            </div>
+
+                            <!-- FECHA -->
+                            <div class="col-md-4 mb-3">
+
+                                <label asp-for="Fecha"
+                                       class="form-label fw-semibold">
+                                    Fecha
+                                </label>
+
+                                <input asp-for="Fecha"
+                                       type="date"
+                                       class="form-control" />
+
+                                <small id="fechaInfo" class="text-muted d-block mt-1"></small>
+
+                                <span asp-validation-for="Fecha"
+                                      class="text-danger"></span>
+
+                            </div>
+                    <!-- EXISTENTES: mostrar reservas ya registradas para el área/fecha seleccionada -->
+                    <div class="mt-4">
+                        <h5>Reservas existentes</h5>
+                        <div id="reservasList">
+                            <em>Seleccione área y fecha para ver reservas existentes.</em>
+                        </div>
+                    </div>
+
+
+                            <!-- HORA INICIO -->
+                            <div class="col-md-4 mb-3">
+
+                                <label asp-for="HoraInicio"
+                                       class="form-label fw-semibold">
+                                    Hora Inicio
+                                </label>
+
+                                <input asp-for="HoraInicio"
+                                       type="time"
+                                       class="form-control" />
+
+                                <span asp-validation-for="HoraInicio"
+                                      class="text-danger"></span>
+
+                            </div>
+
+                            <!-- HORA FIN -->
+                            <div class="col-md-4 mb-4">
+
+                                <label asp-for="HoraFin"
+                                       class="form-label fw-semibold">
+                                    Hora Fin
+                                </label>
+
+                                <input asp-for="HoraFin"
+                                       type="time"
+                                       class="form-control" />
+
+                                <span asp-validation-for="HoraFin"
+                                      class="text-danger"></span>
+
+                            </div>
+
+                            <!-- ESTADO -->
+                            <div class="col-12 mb-4">
+
+                                <label asp-for="Estado"
+                                       class="form-label fw-semibold">
+                                    Estado
+                                </label>
+
+                                <select asp-for="Estado"
+                                        class="form-select">
+
+                                    <option value="Pendiente">
+                                        Pendiente
+                                    </option>
+
+                                    <option value="Aprobada">
+                                        Aprobada
+                                    </option>
+
+                                    <option value="Rechazada">
+                                        Rechazada
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Index"
+                                   class="btn btn-outline-secondary">
+                                Volver
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Guardar Reserva
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        (function(){
+            const areaSelect = document.querySelector('[asp-for="IdArea"]') || document.querySelector('#IdArea');
+            const fechaInput = document.querySelector('[asp-for="Fecha"]') || document.querySelector('#Fecha');
+            const reservasList = document.getElementById('reservasList');
+            const fechaInfo = document.getElementById('fechaInfo');
+
+            async function loadReservas(){
+                const idArea = areaSelect ? areaSelect.value : null;
+                const fecha = fechaInput ? fechaInput.value : null;
+
+                if(!idArea || !fecha){
+                    reservasList.innerHTML = '<em>Seleccione área y fecha para ver reservas existentes.</em>';
+                    fechaInfo.textContent = '';
+                    return;
+                }
+
+                // Convertir fecha ISO a DateOnly compatible: enviamos como YYYY-MM-DD y controller espera DateOnly
+                const url = `/ReservaAreaComuns/GetReservasByAreaAndFecha?idArea=${encodeURIComponent(idArea)}&fecha=${encodeURIComponent(fecha)}`;
+                try{
+                    const resp = await fetch(url);
+                    if(!resp.ok) throw new Error('Error fetching');
+                    const data = await resp.json();
+                    if(data.length === 0){
+                        reservasList.innerHTML = '<div class="text-success">No hay reservas para esta fecha.</div>';
+                        fechaInfo.textContent = '';
+                    } else {
+                        let html = '<ul class="list-group">';
+                        data.forEach(r => {
+                            const hi = r.horaInicio || r.HoraInicio || '';
+                            const hf = r.horaFin || r.HoraFin || '';
+                            html += `<li class="list-group-item">${hi} - ${hf} (${r.estado || r.Estado || 'N/A'})</li>`;
+                        });
+                        html += '</ul>';
+                        reservasList.innerHTML = html;
+                        fechaInfo.textContent = 'Esta fecha ya tiene reservas para el área seleccionada.';
+                    }
+                }catch(e){
+                    reservasList.innerHTML = '<div class="text-danger">No se pudieron cargar las reservas.</div>';
+                }
+            }
+
+            if(areaSelect) areaSelect.addEventListener('change', loadReservas);
+            if(fechaInput) fechaInput.addEventListener('change', loadReservas);
+        })();
+    </script>
+}

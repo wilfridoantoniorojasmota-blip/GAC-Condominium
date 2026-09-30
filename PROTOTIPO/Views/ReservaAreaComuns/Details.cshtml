@@ -1,0 +1,123 @@
+﻿@model PROTOTIPO.Models.ReservaAreaComun
+
+@{
+    ViewData["Title"] = "Detalle de Reserva";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Detalle de Reserva</h4>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4">
+
+                    <div class="row g-3">
+
+                        <!-- ÁREA -->
+                        <div class="col-md-6">
+                            <label class="text-muted">Área Común</label>
+                            <div class="fw-semibold">
+                                @Model.IdAreaNavigation?.Nombre
+                            </div>
+                        </div>
+
+                        <!-- USUARIO -->
+                        <div class="col-md-6">
+                            <label class="text-muted">Usuario</label>
+                            <div class="fw-semibold">
+                                @Model.IdUsuarioNavigation?.Nombre
+                            </div>
+                        </div>
+
+                        <!-- FECHA -->
+                        <div class="col-md-4">
+                            <label class="text-muted">Fecha</label>
+                            <div class="fw-semibold">
+                                @Model.Fecha
+                            </div>
+                        </div>
+
+                        <!-- HORA INICIO -->
+                        <div class="col-md-4">
+                            <label class="text-muted">Hora Inicio</label>
+                            <div class="fw-semibold">
+                                @Model.HoraInicio
+                            </div>
+                        </div>
+
+                        <!-- HORA FIN -->
+                        <div class="col-md-4">
+                            <label class="text-muted">Hora Fin</label>
+                            <div class="fw-semibold">
+                                @Model.HoraFin
+                            </div>
+                        </div>
+
+                        <!-- ESTADO -->
+                        <div class="col-12">
+                            <label class="text-muted">Estado</label>
+                            <div>
+                                @if (Model.Estado == "Pendiente")
+                                {
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                }
+                                else if (Model.Estado == "Aprobada")
+                                {
+                                    <span class="badge bg-success">Aprobada</span>
+                                }
+                                else if (Model.Estado == "Rechazada")
+                                {
+                                    <span class="badge bg-danger">Rechazada</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @Model.Estado
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="card-footer bg-light d-flex justify-content-between">
+
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+
+                    <div class="d-flex gap-2">
+
+                        <a asp-action="Edit"
+                               asp-route-id="@Model.IdReserva"
+                               class="btn btn-warning">
+                            Editar
+                        </a>
+
+                        <a asp-action="Delete"
+                               asp-route-id="@Model.IdReserva"
+                               class="btn btn-danger">
+                            Eliminar
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

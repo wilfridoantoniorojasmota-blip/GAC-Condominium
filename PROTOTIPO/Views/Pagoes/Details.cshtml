@@ -1,0 +1,427 @@
+﻿@model PROTOTIPO.Models.Pago
+
+@{
+    ViewData["Title"] = "Detalle del Pago";
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+        --gac-muted: #64748b;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+    }
+
+    .detail-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header .ph-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-header .ph-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(37,140,251,.2);
+            color: #60a8fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0 0 2px;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    .btn-back {
+        border: 1.5px solid rgba(255,255,255,.25);
+        background: rgba(255,255,255,.08);
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.2rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,.16);
+            color: #fff;
+            border-color: rgba(255,255,255,.45);
+        }
+
+    /* MONTO HERO */
+    .monto-hero {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.75rem 2rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        box-shadow: 0 4px 16px rgba(15,22,35,.04);
+    }
+
+        .monto-hero .mh-label {
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: .3rem;
+        }
+
+        .monto-hero .mh-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--gac-navy);
+            letter-spacing: -.03em;
+            line-height: 1;
+        }
+
+        .monto-hero .mh-right {
+            display: flex;
+            gap: .6rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+    /* BADGES */
+    .badge-estado {
+        font-weight: 700;
+        font-size: .85rem;
+        padding: .5rem 1.1rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+    }
+
+    .badge-pagado {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+    .badge-pendiente {
+        background: rgba(245,158,11,.12);
+        color: #b45309;
+    }
+
+    .badge-atrasado {
+        background: rgba(239,68,68,.12);
+        color: #b91c1c;
+    }
+
+    .badge-cancelado {
+        background: rgba(100,116,139,.1);
+        color: #475569;
+    }
+
+    .badge-otro {
+        background: rgba(15,22,35,.08);
+        color: var(--gac-navy);
+    }
+
+    .tipo-badge {
+        font-size: .82rem;
+        font-weight: 700;
+        padding: .45rem 1rem;
+        border-radius: 50px;
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary-dark);
+    }
+
+    /* DETAIL CARD */
+    .detail-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,22,35,.04);
+        margin-bottom: 1rem;
+    }
+
+    .detail-card-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--gac-border);
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #94a3b8;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .detail-card-header i {
+            color: var(--gac-primary);
+        }
+
+    /* DETAIL ROW */
+    .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f1f4f9;
+        transition: background .15s ease;
+    }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row:hover {
+            background: #fafcff;
+        }
+
+        .detail-row .dr-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(37,140,251,.08);
+            color: var(--gac-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            flex-shrink: 0;
+        }
+
+        .detail-row .dr-label {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .detail-row .dr-value {
+            font-size: .95rem;
+            font-weight: 600;
+            color: var(--gac-navy);
+        }
+
+    /* ACTION FOOTER */
+    .action-footer {
+        display: flex;
+        gap: .75rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+
+    .btn-edit {
+        background: var(--gac-warning);
+        border: none;
+        color: #fff;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: .65rem 1.5rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        text-decoration: none;
+    }
+
+        .btn-edit:hover {
+            background: #d97706;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245,158,11,.35);
+        }
+
+    .btn-list {
+        border: 1.5px solid #e2e8f0;
+        background: #fff;
+        color: var(--gac-muted);
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.25rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        text-decoration: none;
+    }
+
+        .btn-list:hover {
+            border-color: var(--gac-primary);
+            color: var(--gac-primary);
+        }
+</style>
+
+<div class="detail-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div class="ph-left">
+                <div class="ph-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+                <div>
+                    <h3>Detalle del Pago</h3>
+                    <p>Información completa del registro</p>
+                </div>
+            </div>
+            <a asp-action="Index" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                Volver
+            </a>
+        </div>
+
+        <!-- MONTO HERO -->
+        <div class="monto-hero">
+            <div>
+                <div class="mh-label">Monto del Pago</div>
+                <div class="mh-value">RD$ @String.Format("{0:N2}", Model.Monto)</div>
+            </div>
+            <div class="mh-right">
+                <span class="tipo-badge">@Model.TipoPago</span>
+                @{
+                    var estadoClass = Model.EstadoPago switch
+                    {
+                        "Pagado" => "badge-pagado",
+                        "Pendiente" => "badge-pendiente",
+                        "Atrasado" => "badge-atrasado",
+                        "Cancelado" => "badge-cancelado",
+                        _ => "badge-otro"
+                    };
+                }
+                <span class="badge-estado @estadoClass">@Model.EstadoPago</span>
+            </div>
+        </div>
+
+        <div class="row g-3">
+
+            <!-- INFORMACIÓN GENERAL -->
+            <div class="col-lg-6">
+                <div class="detail-card">
+                    <div class="detail-card-header">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Información General
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="dr-icon"><i class="fa-regular fa-calendar"></i></div>
+                        <div>
+                            <div class="dr-label">Fecha</div>
+                            <div class="dr-value">@Html.DisplayFor(m => m.Fecha)</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="dr-icon"><i class="fa-solid fa-layer-group"></i></div>
+                        <div>
+                            <div class="dr-label">Tipo de Pago</div>
+                            <div class="dr-value">@Html.DisplayFor(m => m.TipoPago)</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="dr-icon"><i class="fa-solid fa-circle-half-stroke"></i></div>
+                        <div>
+                            <div class="dr-label">Estado</div>
+                            <div class="dr-value">@Html.DisplayFor(m => m.EstadoPago)</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- MÉTODO Y CONTRATO -->
+            <div class="col-lg-6">
+                <div class="detail-card">
+                    <div class="detail-card-header">
+                        <i class="fa-solid fa-file-contract"></i>
+                        Método y Contrato
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="dr-icon"><i class="fa-regular fa-credit-card"></i></div>
+                        <div>
+                            <div class="dr-label">Método de Pago</div>
+                            <div class="dr-value">@Html.DisplayFor(m => m.MetodoPago)</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="dr-icon"><i class="fa-solid fa-file-lines"></i></div>
+                        <div>
+                            <div class="dr-label">Contrato</div>
+                            <div class="dr-value">@Html.DisplayFor(m => m.IdContratoNavigation.IdContrato)</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="dr-icon"><i class="fa-solid fa-receipt"></i></div>
+                        <div>
+                            <div class="dr-label">Cuota</div>
+                            <div class="dr-value">@Html.DisplayFor(m => m.IdCuotaNavigation.IdCuota)</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="action-footer">
+            <a asp-action="Edit" asp-route-id="@Model?.IdPago" class="btn-edit">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Editar Pago
+            </a>
+            <a asp-action="Index" class="btn-list">
+                <i class="fa-solid fa-list"></i>
+                Volver al Listado
+            </a>
+        </div>
+
+    </div>
+</div>

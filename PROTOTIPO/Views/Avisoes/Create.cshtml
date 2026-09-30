@@ -1,0 +1,91 @@
+﻿@model PROTOTIPO.Models.Aviso
+
+@{
+    ViewData["Title"] = "Nuevo Aviso";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="card shadow border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Crear Nuevo Aviso</h3>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4">
+
+                    <form asp-action="Create">
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <!-- TITULO -->
+                        <div class="mb-3">
+                            <label asp-for="Titulo" class="form-label fw-semibold"></label>
+                            <input asp-for="Titulo" class="form-control" placeholder="Ej: Mantenimiento del agua" />
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                        </div>
+
+                        <!-- CONTENIDO -->
+                        <div class="mb-3">
+                            <label asp-for="Contenido" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Contenido"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Escribe el aviso aquí..."></textarea>
+                            <span asp-validation-for="Contenido" class="text-danger"></span>
+                        </div>
+
+                        <!-- FECHA (AUTO O MANUAL) -->
+                        <div class="mb-3">
+                            <label asp-for="FechaPublicacion" class="form-label fw-semibold"></label>
+                            <input asp-for="FechaPublicacion" type="date" class="form-control" />
+                            <span asp-validation-for="FechaPublicacion" class="text-danger"></span>
+                        </div>
+
+                        <!-- CONDOMINIO -->
+                        <div class="mb-3">
+                            <label asp-for="IdCondominio" class="form-label fw-semibold"></label>
+                            <select asp-for="IdCondominio"
+                                    class="form-select"
+                                    asp-items="ViewBag.IdCondominio">
+                                <option value="">Seleccione un condominio</option>
+                            </select>
+                            <span asp-validation-for="IdCondominio" class="text-danger"></span>
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary px-4">
+                                Publicar Aviso
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

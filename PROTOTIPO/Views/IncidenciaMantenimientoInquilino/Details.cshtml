@@ -1,0 +1,127 @@
+﻿@model PROTOTIPO.Models.IncidenciaMantenimiento
+
+@{
+    ViewData["Title"] = "Detalle de Incidencia";
+}
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">Detalle de Incidencia</h3>
+        <p class="text-muted mb-0">
+            Información completa del reporte
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- INFO PRINCIPAL -->
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <!-- ESTADO -->
+                    <div class="mb-3">
+                        @switch (Model.Estado)
+                        {
+                            case "Pendiente":
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                                break;
+                            case "En Proceso":
+                                <span class="badge bg-primary">En Proceso</span>
+                                break;
+                            case "Resuelta":
+                                <span class="badge bg-success">Resuelta</span>
+                                break;
+                            case "Cerrada":
+                                <span class="badge bg-secondary">Cerrada</span>
+                                break;
+                            default:
+                                <span class="badge bg-dark">@Model.Estado</span>
+                                break;
+                        }
+                    </div>
+
+                    <!-- DESCRIPCIÓN -->
+                    <h5 class="fw-semibold">Descripción</h5>
+                    <p class="text-muted">@Model.Descripcion</p>
+
+                    <hr />
+
+                    <!-- FECHAS -->
+                    <div class="row">
+
+                        <div class="col-6">
+                            <small class="text-muted">Fecha de solicitud</small>
+                            <div class="fw-semibold">
+                                @Model.FechaSolicitud?.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <small class="text-muted">Fecha de cierre</small>
+                            <div class="fw-semibold">
+                                @(Model.FechaCierre?.ToString("dd/MM/yyyy HH:mm") ?? "En proceso")
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- IMÁGENES -->
+        <div class="col-lg-5">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h6 class="fw-bold mb-3">Imágenes</h6>
+
+                    @if (Model.ImagenIncidencia == null || !Model.ImagenIncidencia.Any())
+                    {
+                        <div class="text-muted text-center py-4">
+                            Sin imágenes adjuntas
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row g-2">
+
+                            @foreach (var img in Model.ImagenIncidencia)
+                            {
+                                <div class="col-6">
+
+                                    <img src="@img.Url"
+                                         class="img-fluid rounded shadow-sm"
+                                         style="height:120px; object-fit:cover;" />
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- BOTÓN -->
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Volver
+        </a>
+    </div>
+
+</div>

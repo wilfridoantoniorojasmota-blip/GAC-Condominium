@@ -1,0 +1,102 @@
+﻿@model IEnumerable<PROTOTIPO.Models.ReservaAreaComun>
+
+@{
+    ViewData["Title"] = "Mis Reservas";
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Mis Reservas</h3>
+            <p class="text-muted mb-0">
+                Historial de reservas realizadas
+            </p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <h5>No tienes reservas registradas</h5>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Área</th>
+                                <th>Fecha</th>
+                                <th>Inicio</th>
+                                <th>Fin</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.IdAreaNavigation?.Nombre</td>
+
+                                    <td>
+                                        @item.Fecha?.ToString("dd/MM/yyyy")
+                                    </td>
+
+                                    <td>
+                                        @item.HoraInicio
+                                    </td>
+
+                                    <td>
+                                        @item.HoraFin
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            @item.Estado
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @if (item.Estado != "Cancelada")
+                                        {
+                                            <form asp-action="Cancelar"
+                                                  method="post">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@item.IdReserva" />
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger">
+                                                    Cancelar
+                                                </button>
+
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,575 @@
+﻿ 
+@model IEnumerable<PROTOTIPO.Models.Pago>
+
+@{
+    ViewData["Title"] = "Reporte Financiero";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="mnt-page">
+    <div class="container-fluid py-4 px-3 px-md-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3><i class="bi bi-currency-dollar me-2"></i>Reporte Financiero</h3>
+                <p>Detalle de ingresos y flujos de caja del mes seleccionado</p>
+            </div>
+
+            <a asp-controller="Reportes" asp-action="Index" class="btn-gac btn-gac-secondary-header">
+                <i class="bi bi-arrow-left"></i>
+                Volver al panel
+            </a>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="form-container mb-4" style="padding: 1.5rem 2rem;">
+            <form method="get" class="modern-form">
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-4">
+                        <label class="form-label-gac">Mes de consulta</label>
+                        <select name="mes" class="form-select-gac">
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i" selected="@(ViewBag.Mes == i)">
+                                    @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label-gac">Año de consulta</label>
+                        <input name="anio" type="number" class="form-control-gac" value="@ViewBag.Anio" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <button type="submit" class="btn-gac btn-gac-primary w-100" style="height: 48px; justify-content: center;">
+                            <i class="bi bi-search"></i>
+                            Consultar período
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <!-- TARJETAS ESTADISTICAS -->
+        <div class="row g-3 mb-4">
+
+            <!-- Ingresos Totales -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-success">
+                    <div class="sc-icon ic-green">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div class="sc-label">Ingresos totales</div>
+                    <div class="sc-value-currency">RD$ @String.Format("{0:N2}", ViewBag.TotalIngresos)</div>
+                </div>
+            </div>
+
+            <!-- Alquileres -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-info">
+                    <div class="sc-icon ic-blue">
+                        <i class="bi bi-house-door"></i>
+                    </div>
+                    <div class="sc-label">Alquileres</div>
+                    <div class="sc-value-currency">RD$ @String.Format("{0:N2}", ViewBag.IngresosAlquiler)</div>
+                </div>
+            </div>
+
+            <!-- Mantenimiento -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-warning">
+                    <div class="sc-icon ic-amber">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <div class="sc-label">Mantenimiento</div>
+                    <div class="sc-value-currency">RD$ @String.Format("{0:N2}", ViewBag.IngresosMantenimiento)</div>
+                </div>
+            </div>
+
+            <!-- Cantidad de pagos -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-slate">
+                    <div class="sc-icon ic-slate">
+                        <i class="bi bi-hash"></i>
+                    </div>
+                    <div class="sc-label">Cantidad pagos</div>
+                    <div class="sc-value">@(Model.Count())</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DETALLE DE PAGOS -->
+        <div class="table-card">
+
+            <div class="table-card-head">
+                <p class="tc-title">
+                    <i class="bi bi-list-ul"></i>
+                    Detalle de pagos
+                </p>
+                <span class="tc-count">@Model.Count() transacción@(Model.Count() == 1 ? "" : "es")</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="inc-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo de Pago</th>
+                            <th>Monto</th>
+                            <th>Método</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="center text-muted py-5">
+                                    <i class="bi bi-file-earmark-x d-block mb-2" style="font-size: 2rem; opacity: .4;"></i>
+                                    No existen pagos registrados para este período.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var pago in Model)
+                            {
+                                <tr>
+                                    <!-- Fecha -->
+                                    <td>
+                                        <span class="date-cell">
+                                            <i class="bi bi-calendar me-1"></i>@pago.Fecha?.ToString("dd/MM/yyyy")
+                                        </span>
+                                    </td>
+
+                                    <!-- Tipo -->
+                                    <td>
+                                        <span class="unit-pill">@pago.TipoPago</span>
+                                    </td>
+
+                                    <!-- Monto -->
+                                    <td>
+                                        <span class="monto-cell">
+                                            RD$ @String.Format("{0:N2}", pago.Monto)
+                                        </span>
+                                    </td>
+
+                                    <!-- Método -->
+                                    <td>
+                                        <span class="date-cell">@pago.MetodoPago</span>
+                                    </td>
+
+                                    <!-- Estado -->
+                                    <td>
+                                        @{
+                                            var esCompletado = string.Equals(pago.EstadoPago, "Completado", StringComparison.OrdinalIgnoreCase) || string.Equals(pago.EstadoPago, "Aprobado", StringComparison.OrdinalIgnoreCase);
+                                            var esPendiente = string.Equals(pago.EstadoPago, "Pendiente", StringComparison.OrdinalIgnoreCase);
+                                            var badgeClass = esCompletado ? "badge-resuelta" : (esPendiente ? "badge-pendiente" : "badge-otro");
+                                        }
+                                        <span class="badge-estado @badgeClass">
+                                            <span class="dot"></span>
+                                            @pago.EstadoPago
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    /* ── BUTTONS ── */
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.4rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        cursor: pointer;
+    }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-gac-primary:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    .btn-gac-secondary-header {
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+    }
+
+        .btn-gac-secondary-header:hover {
+            background: rgba(255,255,255,.2);
+            color: #fff;
+        }
+
+    /* ── FILTER CONTAINER ── */
+    .form-container {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        box-shadow: 0 10px 30px rgba(15,22,35,.03);
+    }
+
+    .form-label-gac {
+        display: block;
+        font-size: .85rem;
+        font-weight: 600;
+        color: var(--gac-navy);
+        margin-bottom: .5rem;
+    }
+
+    .form-control-gac,
+    .form-select-gac {
+        width: 100%;
+        border-radius: 10px;
+        border: 1.5px solid var(--gac-border);
+        padding: .75rem 1rem;
+        font-size: .9rem;
+        color: var(--gac-navy);
+        background-color: #fff;
+        transition: all .15s ease;
+        outline: none;
+        height: 48px;
+    }
+
+        .form-control-gac:focus,
+        .form-select-gac:focus {
+            border-color: var(--gac-primary);
+            box-shadow: 0 0 0 4px rgba(37,140,251,.1);
+        }
+
+    /* ── STAT CARDS ── */
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.4rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .stat-card.sc-info::after {
+            background: var(--gac-primary);
+        }
+
+        .stat-card.sc-warning::after {
+            background: var(--gac-warning);
+        }
+
+        .stat-card.sc-success::after {
+            background: var(--gac-success);
+        }
+
+        .stat-card.sc-slate::after {
+            background: #94a3b8;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15,22,35,.07);
+        }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        margin-bottom: .85rem;
+    }
+
+    .ic-blue {
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+    }
+
+    .ic-amber {
+        background: rgba(245,158,11,.1);
+        color: #d97706;
+    }
+
+    .ic-green {
+        background: rgba(34,197,94,.1);
+        color: #16a34a;
+    }
+
+    .ic-slate {
+        background: rgba(148, 163, 184, 0.1);
+        color: #64748b;
+    }
+
+    .sc-label {
+        font-size: .77rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .sc-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+        font-family: 'Sora', sans-serif;
+    }
+
+    .sc-value-currency {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.4;
+        font-family: 'Sora', sans-serif;
+    }
+
+    /* ── TABLE CARD ── */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-card-head {
+        padding: 1rem 1.4rem;
+        border-bottom: 1px solid var(--gac-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .tc-title {
+        font-weight: 700;
+        font-size: .95rem;
+        color: var(--gac-navy);
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: 0;
+        font-family: 'Sora', sans-serif;
+    }
+
+        .tc-title i {
+            color: var(--gac-primary);
+        }
+
+    .tc-count {
+        font-size: .75rem;
+        font-weight: 600;
+        color: #64748b;
+        background: var(--gac-surface);
+        border: 1px solid var(--gac-border);
+        border-radius: 20px;
+        padding: 3px 11px;
+    }
+
+    .inc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .inc-table thead {
+            background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        }
+
+            .inc-table thead th {
+                font-size: .73rem;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: rgba(255,255,255,.7);
+                font-weight: 700;
+                padding: .9rem 1.1rem;
+                border: none;
+                white-space: nowrap;
+                text-align: left;
+            }
+
+        .inc-table tbody td {
+            padding: .85rem 1.1rem;
+            color: #334155;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f4f9;
+            font-size: .9rem;
+        }
+
+            .inc-table tbody td.center {
+                text-align: center;
+            }
+
+        .inc-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inc-table tbody tr {
+            transition: background .15s ease;
+        }
+
+            .inc-table tbody tr:hover {
+                background: #fafcff;
+            }
+
+    .unit-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(15,22,35,.05);
+        border-radius: 50px;
+        padding: .3rem .75rem;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    .date-cell {
+        font-size: .83rem;
+        color: #64748b;
+        white-space: nowrap;
+    }
+
+    .monto-cell {
+        font-weight: 700;
+        font-size: .9rem;
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    /* ── BADGES ── */
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        font-size: .73rem;
+        padding: .35rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+        .badge-estado .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .badge-resuelta {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+        .badge-resuelta .dot {
+            background: var(--gac-success);
+        }
+
+    .badge-pendiente {
+        background: rgba(245,158,11,.12);
+        color: #b45309;
+    }
+
+        .badge-pendiente .dot {
+            background: var(--gac-warning);
+        }
+
+    .badge-otro {
+        background: rgba(15,22,35,.07);
+        color: var(--gac-navy);
+    }
+
+        .badge-otro .dot {
+            background: #94a3b8;
+        }
+</style>
+ 

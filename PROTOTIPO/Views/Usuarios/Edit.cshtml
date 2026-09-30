@@ -1,0 +1,1136 @@
+﻿@model PROTOTIPO.Models.Usuario
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --ink: #0c1220;
+        --ink-soft: #3d4a5c;
+        --ink-muted: #7a8799;
+        --surface: #f4f6fb;
+        --surface-2: #ffffff;
+        --border: #e4e9f0;
+        --accent: #1a56e8;
+        --accent-light: #eff4ff;
+        --teal: #0fd4b0;
+        --danger: #b91c1c;
+        --danger-soft: #fff1f0;
+        --r-lg: 14px;
+        --r-xl: 20px;
+        --r-2xl: 26px;
+        --r-pill: 999px;
+        --shadow-sm: 0 2px 8px rgba(12,18,32,.07);
+        --ease: .22s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: var(--font-b);
+        background: var(--surface);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page ───────────────────────────────────────── */
+    .edit-page {
+        max-width: 780px;
+        margin: 40px auto;
+        padding: 0 24px 60px;
+    }
+
+    /* ── Breadcrumb ─────────────────────────────────── */
+    .edit-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .78rem;
+        font-weight: 500;
+        color: var(--ink-muted);
+        margin-bottom: 24px;
+    }
+
+        .edit-breadcrumb a {
+            color: var(--ink-muted);
+            text-decoration: none;
+            transition: color var(--ease);
+        }
+
+            .edit-breadcrumb a:hover {
+                color: var(--accent);
+            }
+
+        .edit-breadcrumb i {
+            font-size: .7rem;
+        }
+
+    /* ── Header ─────────────────────────────────────── */
+    .edit-header {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .edit-header-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        box-shadow: 0 6px 20px rgba(26,86,232,.35);
+    }
+
+    .edit-header-title {
+        font-family: var(--font-d);
+        font-size: 1.55rem;
+        font-weight: 800;
+        letter-spacing: -.035em;
+        color: var(--ink);
+        margin: 0 0 3px;
+    }
+
+    .edit-header-sub {
+        font-size: .85rem;
+        color: var(--ink-muted);
+        margin: 0;
+    }
+
+    /* ── Card ───────────────────────────────────────── */
+    .edit-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-2xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    /* ── Section ────────────────────────────────────── */
+    .edit-section {
+        padding: 28px 32px;
+    }
+
+        .edit-section + .edit-section {
+            border-top: 1px solid var(--border);
+        }
+
+    .edit-section-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        margin-bottom: 20px;
+    }
+
+        .edit-section-label span {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+        }
+
+    /* ── Grids ──────────────────────────────────────── */
+    .g2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .g1 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    @@media (max-width: 575px) {
+        .g2 {
+            grid-template-columns: 1fr;
+        }
+
+        .edit-section {
+            padding: 22px 20px;
+        }
+
+        .edit-footer {
+            padding: 18px 20px;
+        }
+    }
+
+    /* ── Field ──────────────────────────────────────── */
+    .ef-label {
+        font-size: .78rem;
+        font-weight: 600;
+        color: var(--ink-soft);
+        margin-bottom: 7px;
+        display: block;
+    }
+
+        .ef-label .req {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--danger);
+            display: inline-block;
+            margin-left: 3px;
+            vertical-align: middle;
+        }
+
+    .ef-wrap {
+        position: relative;
+    }
+
+    .ef-input, .ef-select {
+        width: 100%;
+        padding: 11px 14px 11px 40px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-lg);
+        font-family: var(--font-b);
+        font-size: .875rem;
+        color: var(--ink);
+        background: var(--surface);
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+        transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+    }
+
+        .ef-input:focus, .ef-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(26,86,232,.11);
+            background: #fff;
+        }
+
+        .ef-input::placeholder {
+            color: #b8c4d0;
+        }
+
+    .ef-ico {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #c0cad6;
+        font-size: .9rem;
+        pointer-events: none;
+        transition: color var(--ease);
+    }
+
+    .ef-wrap:focus-within .ef-ico {
+        color: var(--accent);
+    }
+
+    /* Select arrow */
+    .ef-sel-wrap {
+        position: relative;
+    }
+
+        .ef-sel-wrap::after {
+            content: '\F282';
+            font-family: 'bootstrap-icons';
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-muted);
+            pointer-events: none;
+            font-size: .82rem;
+        }
+
+    .ef-select {
+        padding-right: 36px;
+        cursor: pointer;
+    }
+
+    /* Password toggle */
+    .ef-eye {
+        position: absolute;
+        right: 11px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--ink-muted);
+        cursor: pointer;
+        font-size: .95rem;
+        padding: 4px;
+        line-height: 1;
+        transition: color var(--ease);
+    }
+
+        .ef-eye:hover {
+            color: var(--accent);
+        }
+
+    /* Password hint */
+    .ef-hint {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .73rem;
+        color: var(--ink-muted);
+        margin-top: 6px;
+    }
+
+        .ef-hint i {
+            color: var(--teal);
+        }
+
+    /* ── Ocultar completamente los spans de validación de MVC ── */
+    span[data-valmsg-for],
+    .field-validation-error,
+    .field-validation-valid,
+    .text-danger {
+        display: none !important;
+    }
+
+    /* ── Footer ─────────────────────────────────────── */
+    .edit-footer {
+        background: #f8fafc;
+        border-top: 1px solid var(--border);
+        padding: 20px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: var(--r-lg);
+        border: 1.5px solid var(--border);
+        background: transparent;
+        color: var(--ink-soft);
+        text-decoration: none;
+        transition: var(--ease);
+        cursor: pointer;
+    }
+
+        .btn-back:hover {
+            background: #fff;
+            border-color: #c8d2de;
+            color: var(--ink);
+        }
+
+    .btn-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 700;
+        padding: 10px 28px;
+        border-radius: var(--r-lg);
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: var(--ease);
+        box-shadow: 0 4px 14px rgba(26,86,232,.35);
+    }
+
+        .btn-save:hover {
+            background: #1447d0;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26,86,232,.45);
+        }
+
+        .btn-save:active {
+            transform: translateY(0);
+        }
+
+        .btn-save .spin {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: rot .7s linear infinite;
+        }
+
+        .btn-save.loading .lbl, .btn-save.loading i {
+            display: none;
+        }
+
+        .btn-save.loading .spin {
+            display: block;
+        }
+    @@keyframes rot {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+
+
+<div class="edit-page">
+
+    <!-- Breadcrumb -->
+    <div class="edit-breadcrumb">
+        <a asp-action="Index">
+            <i class="bi bi-people-fill"></i> Usuarios
+        </a>
+
+        <i class="bi bi-chevron-right"></i>
+
+        <span>Editar usuario</span>
+    </div>
+
+
+    <!-- Header -->
+    <div class="edit-header">
+
+        <div class="edit-header-icon">
+            <i class="bi bi-person-gear"></i>
+        </div>
+
+        <div>
+            <h1 class="edit-header-title">Editar Usuario</h1>
+            <p class="edit-header-sub">
+                Actualiza la información del usuario en el sistema.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Card -->
+    <div class="edit-card">
+
+        <form asp-action="Edit" id="editForm">
+
+            <input type="hidden" asp-for="IdUsuario" />
+
+            <!-- =====================================================
+                 DATOS PERSONALES
+            ====================================================== -->
+
+            <div class="edit-section">
+
+                <div class="edit-section-label">
+                    <span>
+                        <i class="bi bi-person-fill"></i>
+                    </span>
+                    Datos personales
+                </div>
+
+
+                <div class="g2">
+
+                    <!-- Nombre -->
+                    <div>
+
+                        <label class="ef-label">
+                            Nombre <i class="req"></i>
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="Nombre"
+                                   class="ef-input"
+                                   placeholder="Ej. Juan">
+
+                            <i class="bi bi-person ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Apellido -->
+                    <div>
+
+                        <label class="ef-label">
+                            Apellido <i class="req"></i>
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="Apellido"
+                                   class="ef-input"
+                                   placeholder="Ej. Pérez">
+
+                            <i class="bi bi-person ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Tipo de cliente -->
+                    <div>
+
+                        <label class="ef-label">
+                            Tipo de cliente <i class="req"></i>
+                        </label>
+
+                        <div class="ef-sel-wrap ef-wrap">
+
+                            <select asp-for="TipoCliente"
+                                    class="ef-select ef-input"
+                                    id="tipoCliente"
+                                    style="padding-left:40px;">
+
+                                <option value="">— Seleccionar tipo —</option>
+                                <option value="Dominicano">Dominicano</option>
+                                <option value="Extranjero">Extranjero</option>
+                                <option value="Juridico">Jurídico</option>
+
+                            </select>
+
+                            <i class="bi bi-people ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Teléfono -->
+                    <div>
+
+                        <label class="ef-label">
+                            Teléfono
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="Telefono"
+                                   class="ef-input"
+                                   placeholder="809-000-0000">
+
+                            <i class="bi bi-telephone ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 IDENTIFICACIÓN
+            ====================================================== -->
+
+            <div class="edit-section">
+
+                <div class="edit-section-label">
+
+                    <span>
+                        <i class="bi bi-card-heading"></i>
+                    </span>
+
+                    Información de identificación
+
+                </div>
+
+
+                <div class="g2">
+
+
+                    <!-- =================================================
+                         DOMINICANO — CÉDULA
+                    ================================================== -->
+
+                    <div id="campoCedula">
+
+                        <label class="ef-label">
+                            Cédula
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="Cedula"
+                                   class="ef-input"
+                                   placeholder="000-0000000-0"
+                                   id="cedulaInput">
+
+                            <i class="bi bi-credit-card-2-front ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         EXTRANJERO — PASAPORTE
+                    ================================================== -->
+
+                    <div id="campoPasaporte">
+
+                        <label class="ef-label">
+                            Pasaporte
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="Pasaporte"
+                                   class="ef-input"
+                                   placeholder="Número de pasaporte">
+
+                            <i class="bi bi-passport ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         EXTRANJERO — NACIONALIDAD
+                    ================================================== -->
+
+                    <div id="campoNacionalidad">
+
+                        <label class="ef-label">
+                            Nacionalidad
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="Nacionalidad"
+                                   class="ef-input"
+                                   placeholder="Ej. Haitiana">
+
+                            <i class="bi bi-globe ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         JURÍDICO — RNC
+                    ================================================== -->
+
+                    <div id="campoRnc">
+
+                        <label class="ef-label">
+                            RNC
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="RNC"
+                                   class="ef-input"
+                                   placeholder="000000000">
+
+                            <i class="bi bi-building ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         JURÍDICO — EMPRESA
+                    ================================================== -->
+
+                    <div id="campoNombreEmpresa">
+
+                        <label class="ef-label">
+                            Nombre de empresa
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="NombreEmpresa"
+                                   class="ef-input"
+                                   placeholder="Nombre de la empresa">
+
+                            <i class="bi bi-buildings ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         JURÍDICO — PERSONA DE CONTACTO
+                    ================================================== -->
+
+                    <div id="campoPersonaAlojada">
+
+                        <label class="ef-label">
+                            Persona alojada
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="PersonaAlojada"
+                                   class="ef-input"
+                                   placeholder="Nombre de la persona">
+
+                            <i class="bi bi-person-badge ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 ACCESO
+            ====================================================== -->
+
+            <div class="edit-section">
+
+                <div class="edit-section-label">
+
+                    <span>
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </span>
+
+                    Acceso y credenciales
+
+                </div>
+
+
+                <div class="g1">
+
+                    <!-- Email -->
+                    <div>
+
+                        <label class="ef-label">
+                            Correo electrónico <i class="req"></i>
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="Email"
+                                   type="email"
+                                   class="ef-input"
+                                   placeholder="correo@ejemplo.com">
+
+                            <i class="bi bi-envelope ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Password -->
+                    <div>
+
+                        <label class="ef-label">
+                            Contraseña
+                        </label>
+
+                        <div class="ef-wrap">
+
+                            <input asp-for="Password"
+                                   type="password"
+                                   class="ef-input"
+                                   id="pwdInput"
+                                   placeholder="Dejar en blanco para no cambiarla">
+
+                            <i class="bi bi-lock ef-ico"></i>
+
+                            <button type="button"
+                                    class="ef-eye"
+                                    id="pwdToggle"
+                                    title="Mostrar/ocultar">
+
+                                <i class="bi bi-eye"
+                                   id="eyeIco"></i>
+
+                            </button>
+
+                        </div>
+
+                        <div class="ef-hint">
+
+                            <i class="bi bi-info-circle-fill"></i>
+
+                            Deja vacío si no deseas cambiar la contraseña actual.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 CONFIGURACIÓN
+            ====================================================== -->
+
+            <div class="edit-section">
+
+                <div class="edit-section-label">
+
+                    <span>
+                        <i class="bi bi-sliders"></i>
+                    </span>
+
+                    Configuración del sistema
+
+                </div>
+
+
+                <div class="g2">
+
+                    <!-- Rol -->
+                    <div>
+
+                        <label class="ef-label">
+                            Rol <i class="req"></i>
+                        </label>
+
+                        <div class="ef-sel-wrap ef-wrap">
+
+                            <select asp-for="IdRol"
+                                    class="ef-select ef-input"
+                                    asp-items="ViewBag.IdRol"
+                                    style="padding-left:40px;">
+
+                                <option value="">
+                                    — Seleccionar rol —
+                                </option>
+
+                            </select>
+
+                            <i class="bi bi-person-badge ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Condominio -->
+                    <div>
+
+                        <label class="ef-label">
+                            Condominio <i class="req"></i>
+                        </label>
+
+                        <div class="ef-sel-wrap ef-wrap">
+
+                            <select asp-for="IdCondominio"
+                                    class="ef-select ef-input"
+                                    asp-items="ViewBag.IdCondominio"
+                                    style="padding-left:40px;">
+
+                                <option value="">
+                                    — Seleccionar condominio —
+                                </option>
+
+                            </select>
+
+                            <i class="bi bi-buildings ef-ico"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 FOOTER
+            ====================================================== -->
+
+            <div class="edit-footer">
+
+                <a asp-action="Index"
+                   class="btn-back">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Volver a la lista
+
+                </a>
+
+
+                <button type="submit"
+                        class="btn-save"
+                        id="btnSave">
+
+                    <i class="bi bi-floppy-fill"></i>
+
+                    <span class="lbl">
+                        Guardar cambios
+                    </span>
+
+                    <div class="spin"></div>
+
+                </button>
+
+            </div>
+
+
+            @Html.AntiForgeryToken()
+
+        </form>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        (function () {
+
+            // =====================================================
+            // ELEMENTOS
+            // =====================================================
+
+            const tipoCliente = document.getElementById('tipoCliente');
+
+            const campoCedula =
+                document.getElementById('campoCedula');
+
+            const campoPasaporte =
+                document.getElementById('campoPasaporte');
+
+            const campoNacionalidad =
+                document.getElementById('campoNacionalidad');
+
+            const campoRnc =
+                document.getElementById('campoRnc');
+
+            const campoNombreEmpresa =
+                document.getElementById('campoNombreEmpresa');
+
+            const campoPersonaContacto =
+                document.getElementById('campoPersonaContacto');
+
+
+            // =====================================================
+            // MOSTRAR / OCULTAR CAMPOS SEGÚN TIPO DE CLIENTE
+            // =====================================================
+
+            function actualizarTipoCliente(tipo) {
+
+                // Ocultar todo inicialmente
+                if (campoCedula)
+                    campoCedula.style.display = 'none';
+
+                if (campoPasaporte)
+                    campoPasaporte.style.display = 'none';
+
+                if (campoNacionalidad)
+                    campoNacionalidad.style.display = 'none';
+
+                if (campoRnc)
+                    campoRnc.style.display = 'none';
+
+                if (campoNombreEmpresa)
+                    campoNombreEmpresa.style.display = 'none';
+
+                if (campoPersonaContacto)
+                    campoPersonaContacto.style.display = 'none';
+
+
+                // =================================================
+                // DOMINICANO
+                // =================================================
+
+                if (tipo === 'Dominicano') {
+
+                    if (campoCedula)
+                        campoCedula.style.display = 'block';
+
+                }
+
+
+                // =================================================
+                // EXTRANJERO
+                // =================================================
+
+                else if (tipo === 'Extranjero') {
+
+                    if (campoPasaporte)
+                        campoPasaporte.style.display = 'block';
+
+                    if (campoNacionalidad)
+                        campoNacionalidad.style.display = 'block';
+
+                }
+
+
+                // =================================================
+                // JURÍDICO
+                // =================================================
+
+                else if (tipo === 'Juridico') {
+
+                    if (campoRnc)
+                        campoRnc.style.display = 'block';
+
+                    if (campoNombreEmpresa)
+                        campoNombreEmpresa.style.display = 'block';
+
+                    if (campoPersonaContacto)
+                        campoPersonaContacto.style.display = 'block';
+
+                }
+
+            }
+
+
+            // =====================================================
+            // AL CARGAR LA VISTA
+            // =====================================================
+
+            actualizarTipoCliente(tipoCliente?.value);
+
+
+            // =====================================================
+            // AL CAMBIAR EL TIPO DE CLIENTE
+            // =====================================================
+
+            tipoCliente?.addEventListener('change', function () {
+
+                actualizarTipoCliente(this.value);
+
+            });
+
+
+            // =====================================================
+            // PASSWORD TOGGLE
+            // =====================================================
+
+            const pwd =
+                document.getElementById('pwdInput');
+
+            const toggle =
+                document.getElementById('pwdToggle');
+
+            const eye =
+                document.getElementById('eyeIco');
+
+
+            toggle?.addEventListener('click', function () {
+
+                const show =
+                    pwd.type === 'password';
+
+                pwd.type =
+                    show ? 'text' : 'password';
+
+                eye.className =
+                    show
+                        ? 'bi bi-eye-slash'
+                        : 'bi bi-eye';
+
+            });
+
+
+            // =====================================================
+            // SUBMIT LOADER
+            // =====================================================
+
+            document
+                .getElementById('editForm')
+                ?.addEventListener('submit', function () {
+
+                    const btn =
+                        document.getElementById('btnSave');
+
+                    btn.classList.add('loading');
+
+                    btn.disabled = true;
+
+
+                    // Seguridad:
+                    // si el request falla o vuelve rápido,
+                    // desbloquear después de 8 segundos.
+
+                    setTimeout(function () {
+
+                        btn.classList.remove('loading');
+
+                        btn.disabled = false;
+
+                    }, 8000);
+
+                });
+
+
+            // =====================================================
+            // FORMATO AUTOMÁTICO DE CÉDULA
+            // =====================================================
+
+            document
+                .getElementById('cedulaInput')
+                ?.addEventListener('input', function () {
+
+                    let v =
+                        this.value
+                            .replace(/\D/g, '')
+                            .slice(0, 11);
+
+
+                    if (v.length > 10) {
+
+                        v =
+                            v.slice(0, 3)
+                            + '-'
+                            + v.slice(3, 10)
+                            + '-'
+                            + v.slice(10);
+
+                    }
+
+                    else if (v.length > 3) {
+
+                        v =
+                            v.slice(0, 3)
+                            + '-'
+                            + v.slice(3);
+
+                    }
+
+
+                    this.value = v;
+
+                });
+
+
+        })();
+
+    </script>
+}
+}

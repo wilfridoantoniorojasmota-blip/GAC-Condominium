@@ -1,0 +1,208 @@
+﻿@model PROTOTIPO.Models.Documento
+
+@{
+    ViewData["Title"] = "Detalle del Documento";
+}
+
+<div class="container py-4">
+
+    <div class="card shadow-sm">
+
+        <!-- HEADER -->
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+
+            <h4 class="mb-0">
+                <i class="fa-solid fa-file-lines me-2"></i>
+                Detalle del Documento
+            </h4>
+
+            <span class="badge bg-light text-primary">
+                @Model.Tipo
+            </span>
+
+        </div>
+
+
+
+        <div class="card-body">
+
+
+            <div class="row">
+
+
+                <!-- INFORMACIÓN -->
+                <div class="col-md-7">
+
+
+                    <h5 class="mb-3">
+                        Información general
+                    </h5>
+
+
+
+                    <div class="mb-3">
+
+                        <label class="fw-bold">
+                            Nombre:
+                        </label>
+
+                        <p>
+                            @Model.Nombre
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="mb-3">
+
+                        <label class="fw-bold">
+                            Tipo:
+                        </label>
+
+                        <p>
+                            @Model.Tipo
+                        </p>
+
+                    </div>
+
+
+
+
+                    <div class="mb-3">
+
+                        <label class="fw-bold">
+                            Fecha subida:
+                        </label>
+
+                        <p>
+                            @Model.FechaSubida?.ToString("dd/MM/yyyy HH:mm")
+                        </p>
+
+                    </div>
+
+
+
+
+                    <div class="mb-3">
+
+                        <label class="fw-bold">
+                            Condominio:
+                        </label>
+
+                        <p>
+                            @(Model.IdCondominioNavigation?.Nombre ?? "No asignado")
+                        </p>
+
+                    </div>
+
+
+
+
+                    <div class="mb-3">
+
+                        <label class="fw-bold">
+                            Unidad:
+                        </label>
+
+                        <p>
+                            @(Model.IdUnidadNavigation?.Numero ?? "No asignada")
+                        </p>
+
+                    </div>
+
+
+
+                </div>
+
+
+
+
+                <!-- ARCHIVO -->
+                <div class="col-md-5">
+
+
+                    <div class="border rounded p-4 text-center">
+
+
+                        <i class="fa-solid fa-file-pdf fa-4x text-danger mb-3"></i>
+
+
+                        <h6>
+                            Archivo adjunto
+                        </h6>
+
+
+
+                        @if (!string.IsNullOrEmpty(Model.Archivo))
+                        {
+
+                            <a href="@Model.Archivo"
+                               target="_blank"
+                               class="btn btn-primary mt-2">
+
+                                <i class="fa-solid fa-eye me-2"></i>
+
+                                Abrir documento
+
+                            </a>
+
+                        }
+                        else
+                        {
+
+                            <p class="text-muted">
+                                No existe archivo asociado
+                            </p>
+
+                        }
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <hr />
+
+
+            <!-- ACCIONES -->
+
+            <div class="d-flex justify-content-between">
+
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Volver
+
+                </a>
+
+
+
+
+                <a asp-action="Edit"
+                   asp-route-id="@Model.IdDocumento"
+                   class="btn btn-warning">
+
+                    <i class="fa-solid fa-pen"></i>
+                    Editar
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>

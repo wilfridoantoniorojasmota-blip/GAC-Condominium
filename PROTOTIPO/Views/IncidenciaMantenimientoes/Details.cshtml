@@ -1,0 +1,776 @@
+﻿@model PROTOTIPO.Models.IncidenciaMantenimiento
+
+@{
+    ViewData["Title"] = "Detalles de Incidencia";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var isPendiente = Model.Estado == "Pendiente";
+    var isEnProceso = Model.Estado == "En Proceso";
+    var isResuelta = Model.Estado == "Resuelta";
+
+    var bannerClass = isPendiente ? "pending" : isEnProceso ? "process" : isResuelta ? "resolved" : "other";
+    var bannerLabel = isPendiente ? "Esperando atención"
+                    : isEnProceso ? "En curso"
+                    : isResuelta ? "Incidencia cerrada"
+                    : Model.Estado;
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --ink: #0c1220;
+        --ink-soft: #3d4a5c;
+        --ink-muted: #7a8799;
+        --surface: #f5f7fa;
+        --surface-2: #ffffff;
+        --border: #e4e9f0;
+        --accent: #1a56e8;
+        --accent-2: #0fd4b0;
+        --accent-soft: #eff6ff;
+        --amber-bg: #fffbeb;
+        --amber-ink: #92400e;
+        --amber-bdr: #fde68a;
+        --amber-acc: #f59e0b;
+        --ok-bg: #f0fdf6;
+        --ok-ink: #15803d;
+        --ok-bdr: #bbf7d0;
+        --ok-acc: #22c55e;
+        --no-bg: #fff1f0;
+        --no-ink: #b91c1c;
+        --no-bdr: #fecaca;
+        --indigo-bg: #f0f0ff;
+        --indigo-ink: #4338ca;
+        --indigo-bdr: #c7d2fe;
+        --indigo-acc: #6366f1;
+        --r-lg: 14px;
+        --r-xl: 20px;
+        --r-2xl: 28px;
+        --r-pill: 999px;
+        --shadow-sm: 0 1px 3px rgba(12,18,32,.06);
+        --shadow-lg: 0 20px 48px rgba(12,18,32,.13), 0 6px 16px rgba(12,18,32,.07);
+        --tr: .2s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+    }
+
+    body {
+        font-family: var(--font-b);
+        background: var(--surface);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .det-shell {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 44px 20px 80px;
+    }
+
+    .det-panel {
+        width: 100%;
+        max-width: 1200px;
+    }
+
+    /* ── Back link ── */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: .82rem;
+        font-weight: 600;
+        color: var(--ink-muted);
+        text-decoration: none;
+        margin-bottom: 26px;
+        transition: color var(--tr);
+    }
+
+        .back-link:hover {
+            color: var(--ink);
+        }
+
+    /* ── Card ── */
+    .det-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-2xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+    /* ── Status banner — full-bleed signature element ── */
+    .status-banner {
+        width: 100%;
+        padding: 18px 32px;
+        border-bottom: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+        .status-banner.pending {
+            background: var(--amber-bg);
+            border-color: var(--amber-bdr);
+        }
+
+        .status-banner.process {
+            background: var(--indigo-bg);
+            border-color: var(--indigo-bdr);
+        }
+
+        .status-banner.resolved {
+            background: var(--ok-bg);
+            border-color: var(--ok-bdr);
+        }
+
+        .status-banner.other {
+            background: var(--surface);
+            border-color: var(--border);
+        }
+
+    .sb-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sb-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .pending .sb-dot {
+        background: var(--amber-acc);
+        animation: pulse-a 1.8s infinite;
+    }
+
+    .process .sb-dot {
+        background: var(--indigo-acc);
+        animation: pulse-i 1.8s infinite;
+    }
+
+    .resolved .sb-dot {
+        background: var(--ok-acc);
+    }
+
+    .other .sb-dot {
+        background: var(--ink-muted);
+    }
+
+    @@keyframes pulse-a {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(245,158,11,.55);
+        }
+
+        50% {
+            box-shadow: 0 0 0 7px rgba(245,158,11,0);
+        }
+    }
+    @@keyframes pulse-i {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(99,102,241,.5);
+        }
+
+        50% {
+            box-shadow: 0 0 0 7px rgba(99,102,241,0);
+        }
+    }
+
+    .sb-texts {
+    }
+
+    .sb-eyebrow {
+        font-size: .65rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin-bottom: 1px;
+    }
+
+    .pending .sb-eyebrow {
+        color: var(--amber-acc);
+    }
+
+    .process .sb-eyebrow {
+        color: var(--indigo-acc);
+    }
+
+    .resolved .sb-eyebrow {
+        color: var(--ok-acc);
+    }
+
+    .other .sb-eyebrow {
+        color: var(--ink-muted);
+    }
+
+    .sb-label {
+        font-family: var(--font-d);
+        font-size: .95rem;
+        font-weight: 700;
+        letter-spacing: -.02em;
+    }
+
+    .pending .sb-label {
+        color: var(--amber-ink);
+    }
+
+    .process .sb-label {
+        color: var(--indigo-ink);
+    }
+
+    .resolved .sb-label {
+        color: var(--ok-ink);
+    }
+
+    .other .sb-label {
+        color: var(--ink-soft);
+    }
+
+    .sb-pill {
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: var(--r-pill);
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .pending .sb-pill {
+        background: var(--amber-acc);
+    }
+
+    .process .sb-pill {
+        background: var(--indigo-acc);
+    }
+
+    .resolved .sb-pill {
+        background: var(--ok-acc);
+    }
+
+    .other .sb-pill {
+        background: var(--ink-muted);
+    }
+
+    /* ── Dark header ── */
+    .det-head {
+        position: relative;
+        padding: 26px 32px 22px;
+        background: var(--ink);
+        overflow: hidden;
+    }
+
+        .det-head::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,.055) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        .det-head::after {
+            content: '';
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(15,212,176,.17) 0%, transparent 70%);
+            right: -40px;
+            top: -50px;
+            pointer-events: none;
+        }
+
+    .det-head-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .det-head-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.14);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #ffffff;
+        flex-shrink: 0;
+    }
+
+    .det-head-title {
+        font-family: var(--font-d);
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -.03em;
+        margin: 0;
+    }
+
+    .det-head-sub {
+        font-size: .77rem;
+        color: rgba(255,255,255,.5);
+        margin: 2px 0 0;
+    }
+
+    /* ── Body ── */
+    .det-body {
+        padding: 28px 32px 32px;
+    }
+
+    /* ── Section heading ── */
+    .sec-hd {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 18px;
+    }
+
+        .sec-hd i {
+            font-size: .8rem;
+            color: var(--accent);
+        }
+
+    /* ── Description block ── */
+    .desc-block {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 18px 20px;
+        font-size: .9rem;
+        color: var(--ink-soft);
+        line-height: 1.75;
+        margin-bottom: 28px;
+    }
+
+    /* ── Photo gallery ── */
+    .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+        margin-bottom: 28px;
+    }
+
+    .photo-item {
+        position: relative;
+        border-radius: var(--r-lg);
+        overflow: hidden;
+        aspect-ratio: 1;
+        border: 1px solid var(--border);
+        background: var(--surface);
+    }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .4s ease;
+        }
+
+        .photo-item:hover img {
+            transform: scale(1.06);
+        }
+
+        .photo-item a {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        /* Zoom overlay on hover */
+        .photo-item::after {
+            content: '\F52A';
+            font-family: 'bootstrap-icons';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #fff;
+            background: rgba(12,18,32,.45);
+            opacity: 0;
+            transition: opacity .25s;
+        }
+
+        .photo-item:hover::after {
+            opacity: 1;
+        }
+
+    /* ── Info grid (field rows) ── */
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--r-xl);
+        overflow: hidden;
+        margin-bottom: 28px;
+    }
+    @@media (max-width: 480px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .info-cell {
+        padding: 16px 20px;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        transition: background var(--tr);
+    }
+
+        .info-cell:hover {
+            background: #fafbfd;
+        }
+
+        .info-cell:nth-child(2n) {
+            border-right: none;
+        }
+
+        .info-cell:nth-last-child(-n+2) {
+            border-bottom: none;
+        }
+    @@media (max-width: 480px) {
+        .info-cell {
+            border-right: none;
+        }
+
+            .info-cell:nth-last-child(-n+2) {
+                border-bottom: 1px solid var(--border);
+            }
+
+            .info-cell:last-child {
+                border-bottom: none;
+            }
+    }
+
+    .info-label {
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .info-label i {
+            font-size: .75rem;
+            color: var(--accent);
+        }
+
+    .info-value {
+        font-size: .9rem;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    /* Ref chip */
+    .ref-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        padding: 5px 12px;
+        font-size: .83rem;
+        font-weight: 600;
+        color: var(--ink-soft);
+    }
+
+        .ref-chip i {
+            font-size: .8rem;
+            color: var(--ink-muted);
+        }
+
+    /* Date pending tag */
+    .date-pending {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .8rem;
+        color: var(--ink-muted);
+        font-style: italic;
+    }
+
+    /* ── Divider ── */
+    .det-divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 0 0 24px;
+    }
+
+    /* ── Footer actions ── */
+    .det-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: var(--r-lg);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--ink-soft);
+        font-family: var(--font-b);
+        font-weight: 600;
+        font-size: .875rem;
+        text-decoration: none;
+        transition: var(--tr);
+    }
+
+        .btn-back:hover {
+            background: var(--surface-2);
+            border-color: #c8d0dc;
+            color: var(--ink);
+        }
+
+    .btn-edit {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: var(--r-lg);
+        border: none;
+        background: linear-gradient(135deg, var(--amber-acc) 0%, #d97706 100%);
+        color: #ffffff;
+        font-family: var(--font-b);
+        font-weight: 700;
+        font-size: .875rem;
+        text-decoration: none;
+        transition: var(--tr);
+        box-shadow: 0 3px 12px rgba(245,158,11,.3);
+    }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245,158,11,.38);
+            color: #fff;
+        }
+
+    @@media (max-width: 480px) {
+        .det-head {
+            padding: 22px 20px 18px;
+        }
+
+        .det-body {
+            padding: 22px 20px 26px;
+        }
+
+        .status-banner {
+            padding: 14px 20px;
+        }
+    }
+</style>
+
+<div class="det-shell">
+    <div class="det-panel">
+
+        <!-- Back -->
+        <a asp-action="Index" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            Volver a incidencias
+        </a>
+
+        <div class="det-card">
+
+            <!-- Status banner -->
+            <div class="status-banner @bannerClass">
+                <div class="sb-left">
+                    <span class="sb-dot"></span>
+                    <div class="sb-texts">
+                        <div class="sb-eyebrow">Estado actual</div>
+                        <div class="sb-label">@bannerLabel</div>
+                    </div>
+                </div>
+                <span class="sb-pill">@Model.Estado</span>
+            </div>
+
+            <!-- Dark header -->
+            <div class="det-head">
+                <div class="det-head-inner">
+                    <div class="det-head-icon">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <div>
+                        <h1 class="det-head-title">Incidencia #@Model.IdIncidencia</h1>
+                        <p class="det-head-sub">Registro de mantenimiento del condominio</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="det-body">
+
+                <!-- Description -->
+                <div class="sec-hd">
+                    <i class="bi bi-chat-left-text-fill"></i>
+                    Descripción del problema
+                </div>
+                <div class="desc-block">
+                    @(string.IsNullOrEmpty(Model.Descripcion) ? "Sin descripción registrada." : Model.Descripcion)
+                </div>
+
+                <!-- Photos -->
+                @if (Model.ImagenIncidencia != null && Model.ImagenIncidencia.Count > 0)
+                {
+                    <div class="sec-hd">
+                        <i class="bi bi-images"></i>
+                        Fotografías adjuntas
+                        <span style="margin-left:auto;font-size:.7rem;color:var(--ink-muted);font-weight:500;text-transform:none;letter-spacing:0;">
+                            @Model.ImagenIncidencia.Count imagen@(Model.ImagenIncidencia.Count != 1 ? "es" : "")
+                        </span>
+                    </div>
+                    <div class="photo-grid" style="margin-bottom:28px;">
+                        @foreach (var img in Model.ImagenIncidencia)
+                        {
+                            <div class="photo-item">
+                                @if (!string.IsNullOrWhiteSpace(img.Url))
+                                {
+                                    <a href="@Url.Content(img.Url ?? "")" target="_blank" rel="noopener noreferrer" title="@img.Descripcion">
+                                        <img src="@Url.Content(img.Url ?? "")" alt="@img.Descripcion" loading="lazy" />
+                                    </a>
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center justify-content-center" style="height:100%;padding:8px;color:var(--ink-muted);font-size:.85rem;">
+                                        Imagen no disponible
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="sec-hd">
+                        <i class="bi bi-images"></i>
+                        Fotografías adjuntas
+                    </div>
+                    <div class="desc-block">No hay imágenes adjuntas para esta incidencia.</div>
+                }
+
+                <!-- Info fields -->
+                <div class="sec-hd">
+                    <i class="bi bi-info-circle-fill"></i>
+                    Información general
+                </div>
+
+                <div class="info-grid">
+
+                    <div class="info-cell">
+                        <div class="info-label"><i class="bi bi-calendar-plus"></i>Fecha solicitud</div>
+                        <div class="info-value">
+                            @if (Model.FechaSolicitud.HasValue)
+                            {
+                                @Model.FechaSolicitud.Value.ToString("dd/MM/yyyy")
+                            }
+                            else
+                            {
+                                <span class="date-pending"><i class="bi bi-clock"></i> Sin fecha</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="info-cell">
+                        <div class="info-label"><i class="bi bi-calendar-check"></i>Fecha cierre</div>
+                        <div class="info-value">
+                            @if (Model.FechaCierre.HasValue)
+                            {
+                                @Model.FechaCierre.Value.ToString("dd/MM/yyyy")
+                            }
+                            else
+                            {
+                                <span class="date-pending"><i class="bi bi-clock"></i> Pendiente</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="info-cell">
+                        <div class="info-label"><i class="bi bi-door-open"></i>Unidad habitacional</div>
+                        <div class="info-value">
+                            <span class="ref-chip">
+                                <i class="bi bi-door-open-fill"></i>
+                                @Model.IdUnidadNavigation?.Numero
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-cell">
+                        <div class="info-label"><i class="bi bi-person"></i>Usuario responsable</div>
+                        <div class="info-value">
+                            <span class="ref-chip">
+                                <i class="bi bi-person-fill"></i>
+								@Model.IdUsuarioNavigation?.Nombre @Model.IdUsuarioNavigation?.Apellido
+                            </span>
+                        </div>
+                        
+                    </div>
+                    <div class="info-cell">
+                        <div class="info-label">
+                            <i class="bi bi-person-fill"></i>
+                            Técnico asignado
+                        </div>
+
+                        <div class="info-value">
+                            @(Model.TecnicoAsignado ?? "Sin asignar")
+                        </div>
+                    </div>
+                   
+
+                </div>
+
+                <hr class="det-divider">
+
+                <!-- Footer actions -->
+                <div class="det-footer">
+                    <a asp-action="Index" class="btn-back">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver
+                    </a>
+
+                    @if (User.IsInRole("Administrador"))
+                    {
+                        <a asp-action="Edit"
+                           asp-route-id="@Model.IdIncidencia"
+                           class="btn-edit">
+                            <i class="bi bi-pencil-fill"></i>
+                            Editar incidencia
+                        </a>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

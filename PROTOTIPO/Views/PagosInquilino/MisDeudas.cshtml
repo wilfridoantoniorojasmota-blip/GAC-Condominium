@@ -1,0 +1,306 @@
+﻿@{
+    ViewData["Title"] = "Mis Deudas";
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-success: #22c55e;
+    }
+
+    .deudas-page {
+        background: #f4f6fb;
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15, 22, 35, 0.15);
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0;
+        }
+
+    /* SUMMARY CARDS */
+    .summary-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #eef1f6;
+        padding: 1.5rem;
+        text-align: center;
+        height: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-top: 4px solid var(--gac-warning);
+    }
+
+        .summary-card.summary-danger {
+            border-top-color: var(--gac-danger);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15, 22, 35, 0.06);
+        }
+
+        .summary-card .summary-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .summary-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--gac-warning);
+        }
+
+        .summary-card.summary-danger .summary-value {
+            color: var(--gac-danger);
+        }
+
+    /* SECTION TITLE */
+    .section-title {
+        font-weight: 700;
+        color: var(--gac-navy);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+        .section-title i {
+            color: var(--gac-primary);
+            font-size: 0.95rem;
+        }
+
+    /* DEUDA CARDS */
+    .deuda-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #eef1f6;
+        height: 100%;
+        padding: 1.5rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .deuda-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gac-primary);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .deuda-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(15, 22, 35, 0.08);
+            border-color: transparent;
+        }
+
+            .deuda-card:hover::before {
+                opacity: 1;
+            }
+
+    .badge-categoria {
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.4rem 0.85rem;
+        border-radius: 50px;
+        display: inline-block;
+        margin-bottom: 0.75rem;
+    }
+
+    .badge-renta {
+        background: rgba(37, 140, 251, 0.1);
+        color: var(--gac-primary-dark);
+    }
+
+    .badge-cuota {
+        background: rgba(15, 22, 35, 0.06);
+        color: var(--gac-navy);
+    }
+
+    .deuda-monto {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        margin-bottom: 0.75rem;
+    }
+
+    .badge-estado {
+        font-weight: 600;
+        font-size: 0.78rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: 50px;
+        letter-spacing: 0.02em;
+    }
+
+    .badge-completado {
+        background: rgba(34, 197, 94, 0.12);
+        color: #15803d;
+    }
+
+    .badge-pendiente {
+        background: rgba(245, 158, 11, 0.12);
+        color: #b45309;
+    }
+
+    .badge-atrasado {
+        background: rgba(239, 68, 68, 0.12);
+        color: #b91c1c;
+    }
+
+    /* EMPTY STATE */
+    .empty-state-mini {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px dashed #d8e0ee;
+        padding: 1.75rem;
+        text-align: center;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+</style>
+
+<div class="deudas-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h3>Mis Deudas</h3>
+        </div>
+
+        <!-- RESUMEN -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-6">
+                <div class="summary-card">
+                    <div class="summary-label">Total Renta Pendiente</div>
+                    <div class="summary-value">RD$ @ViewBag.TotalRenta</div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="summary-card summary-danger">
+                    <div class="summary-label">Total Cuotas Pendientes</div>
+                    <div class="summary-value">RD$ @ViewBag.TotalCuotas</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RENTA -->
+        <div class="section-title">
+            <i class="fa-solid fa-house"></i>
+            Renta
+        </div>
+
+        @if (ViewBag.Rentas == null || ((IEnumerable<dynamic>)ViewBag.Rentas).Count() == 0)
+        {
+            <div class="empty-state-mini mb-4">
+                No tienes rentas pendientes.
+            </div>
+        }
+        else
+        {
+            <div class="row g-3 mb-4">
+
+                @foreach (var item in ViewBag.Rentas)
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+
+                        <div class="deuda-card">
+
+                            <span class="badge-categoria badge-renta">Renta</span>
+
+                            <div class="deuda-monto">RD$ @item.Monto</div>
+
+                            @if (item.EstadoPago == "Atrasado")
+                            {
+                                <span class="badge-estado badge-atrasado">Atrasado</span>
+                            }
+                            else if (item.EstadoPago == "Completado")
+                            {
+                                <span class="badge-estado badge-completado">Completado</span>
+                            }
+                            else
+                            {
+                                <span class="badge-estado badge-pendiente">@item.EstadoPago</span>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+        <!-- CUOTAS -->
+        <div class="section-title">
+            <i class="fa-solid fa-receipt"></i>
+            Cuotas
+        </div>
+
+        @if (ViewBag.Cuotas == null || ((IEnumerable<dynamic>)ViewBag.Cuotas).Count() == 0)
+        {
+            <div class="empty-state-mini">
+                No tienes cuotas pendientes.
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+
+                @foreach (var item in ViewBag.Cuotas)
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+
+                        <div class="deuda-card">
+
+                            <span class="badge-categoria badge-cuota">Cuota</span>
+
+                            <div class="deuda-monto">RD$ @item.Monto</div>
+
+                            @if (item.EstadoPago == "Atrasado")
+                            {
+                                <span class="badge-estado badge-atrasado">Atrasado</span>
+                            }
+                            else
+                            {
+                                <span class="badge-estado badge-pendiente">@item.EstadoPago</span>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+</div>

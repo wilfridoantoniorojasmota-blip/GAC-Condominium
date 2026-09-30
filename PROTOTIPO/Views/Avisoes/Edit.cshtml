@@ -1,0 +1,91 @@
+﻿@model PROTOTIPO.Models.Aviso
+
+@{
+    ViewData["Title"] = "Editar Aviso";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="card shadow border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">Editar Aviso</h3>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4">
+
+                    <form asp-action="Edit">
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <input type="hidden" asp-for="IdAviso" />
+
+                        <!-- TITULO -->
+                        <div class="mb-3">
+                            <label asp-for="Titulo" class="form-label fw-semibold"></label>
+                            <input asp-for="Titulo" class="form-control" />
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                        </div>
+
+                        <!-- CONTENIDO -->
+                        <div class="mb-3">
+                            <label asp-for="Contenido" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Contenido"
+                                      class="form-control"
+                                      rows="5"></textarea>
+                            <span asp-validation-for="Contenido" class="text-danger"></span>
+                        </div>
+
+                        <!-- FECHA -->
+                        <div class="mb-3">
+                            <label asp-for="FechaPublicacion" class="form-label fw-semibold"></label>
+                            <input asp-for="FechaPublicacion" type="date" class="form-control" />
+                            <span asp-validation-for="FechaPublicacion" class="text-danger"></span>
+                        </div>
+
+                        <!-- CONDOMINIO -->
+                        <div class="mb-3">
+                            <label asp-for="IdCondominio" class="form-label fw-semibold"></label>
+                            <select asp-for="IdCondominio"
+                                    class="form-select"
+                                    asp-items="ViewBag.IdCondominio">
+                            </select>
+                            <span asp-validation-for="IdCondominio" class="text-danger"></span>
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-warning px-4">
+                                Guardar Cambios
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

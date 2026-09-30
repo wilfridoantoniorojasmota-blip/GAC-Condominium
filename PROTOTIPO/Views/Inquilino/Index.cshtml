@@ -1,0 +1,739 @@
+﻿@model PROTOTIPO.Models.ViewModels.DashboardTenantVM
+
+@{
+    ViewData["Title"] = "Dashboard Inquilino";
+}
+
+<style>
+    :root {
+        --gac-blue: #258cfb;
+        --gac-blue-light: #4dabf7;
+        --gac-blue-lighter: #e8f4ff;
+        --gac-blue-dark: #1a6fcf;
+        --gac-surface: #f7f9fc;
+        --gac-card: #ffffff;
+        --gac-text: #1a202c;
+        --gac-muted: #64748b;
+        --gac-border: #e2e8f0;
+        --gac-radius: 14px;
+        --gac-radius-sm: 8px;
+        --gac-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(37,140,251,0.07);
+        --gac-shadow-hover: 0 4px 20px rgba(37,140,251,0.18);
+    }
+
+    .dash-wrapper {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--gac-text);
+    }
+
+    /* ── HEADER ── */
+    .dash-header {
+        background: linear-gradient(135deg, #1a6fcf 0%, #258cfb 55%, #4dabf7 100%);
+        border-radius: var(--gac-radius);
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dash-header::before {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255,255,255,0.07);
+        border-radius: 50%;
+    }
+
+    .dash-header::after {
+        content: '';
+        position: absolute;
+        bottom: -60px;
+        right: 80px;
+        width: 140px;
+        height: 140px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+    }
+
+    .dash-header h4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 0.2rem;
+        letter-spacing: -0.3px;
+    }
+
+    .dash-header .sub {
+        opacity: 0.82;
+        font-size: 0.875rem;
+    }
+
+    .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+    }
+
+    .hbadge-success {
+        background: rgba(16,185,129,0.18);
+        color: #d1fae5;
+        border: 1px solid rgba(16,185,129,0.3);
+    }
+
+    .hbadge-primary {
+        background: rgba(255,255,255,0.18);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .hbadge-warning {
+        background: rgba(251,191,36,0.18);
+        color: #fef3c7;
+        border: 1px solid rgba(251,191,36,0.3);
+    }
+
+    /* ── METRIC CARDS ── */
+    .metric-card {
+        background: var(--gac-card);
+        border-radius: var(--gac-radius);
+        border: 1px solid var(--gac-border);
+        padding: 1.25rem 1.4rem;
+        box-shadow: var(--gac-shadow);
+        transition: box-shadow 0.2s, transform 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card:hover {
+        box-shadow: var(--gac-shadow-hover);
+        transform: translateY(-2px);
+    }
+
+    .metric-card .icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--gac-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .icon-blue   { background: rgba(37,140,251,0.1);  color: #258cfb; }
+    .icon-green  { background: rgba(16,185,129,0.1);  color: #10b981; }
+    .icon-yellow { background: rgba(245,158,11,0.1);  color: #f59e0b; }
+    .icon-red    { background: rgba(239,68,68,0.1);   color: #ef4444; }
+
+    .metric-label {
+        font-size: 0.75rem;
+        color: var(--gac-muted);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 4px;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gac-text);
+        line-height: 1.1;
+    }
+
+    .metric-sub {
+        font-size: 0.78rem;
+        color: var(--gac-muted);
+        margin-top: 4px;
+    }
+
+    .metric-card .accent-bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        border-radius: 3px 0 0 3px;
+    }
+
+    /* ── ACCESOS RÁPIDOS ── */
+    .quick-link {
+        background: var(--gac-card);
+        border-radius: var(--gac-radius);
+        border: 1px solid var(--gac-border);
+        padding: 1.4rem 1rem;
+        text-align: center;
+        text-decoration: none;
+        color: var(--gac-text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        box-shadow: var(--gac-shadow);
+        transition: all 0.2s;
+    }
+
+    .quick-link:hover {
+        box-shadow: var(--gac-shadow-hover);
+        transform: translateY(-2px);
+        color: var(--gac-blue);
+        border-color: rgba(37,140,251,0.3);
+    }
+
+    .quick-link .ql-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        transition: transform 0.2s;
+    }
+
+    .quick-link:hover .ql-icon {
+        transform: scale(1.08);
+    }
+
+    .quick-link .ql-label {
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+    /* ── PANEL CARDS (bottom) ── */
+    .panel-card {
+        background: var(--gac-card);
+        border-radius: var(--gac-radius);
+        border: 1px solid var(--gac-border);
+        box-shadow: var(--gac-shadow);
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .panel-header {
+        padding: 1rem 1.4rem;
+        border-bottom: 1px solid var(--gac-border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        background: #fafcff;
+    }
+
+    .panel-header .ph-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--gac-blue);
+    }
+
+    .panel-body {
+        padding: 1rem 1.4rem;
+    }
+
+    /* incidencia item */
+    .incidencia-empty {
+        text-align: center;
+        padding: 2rem 0;
+        color: var(--gac-muted);
+    }
+
+    .incidencia-empty i {
+        font-size: 2rem;
+        opacity: 0.25;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .incidencia-active {
+        border-left: 3px solid var(--gac-blue);
+        border-radius: 0 var(--gac-radius-sm) var(--gac-radius-sm) 0;
+        background: var(--gac-blue-lighter);
+        padding: 12px 14px;
+        margin-bottom: 8px;
+    }
+
+    /* aviso item */
+    .aviso-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--gac-border);
+    }
+
+    .aviso-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .aviso-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--gac-blue);
+        flex-shrink: 0;
+        margin-top: 5px;
+    }
+
+    .aviso-titulo {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--gac-text);
+        margin-bottom: 2px;
+    }
+
+    .aviso-fecha {
+        font-size: 0.75rem;
+        color: var(--gac-muted);
+    }
+
+    .aviso-empty {
+        text-align: center;
+        padding: 2rem 0;
+        color: var(--gac-muted);
+    }
+
+    /* section label */
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--gac-muted);
+        margin-bottom: 0.75rem;
+    }
+
+    /* badge pagada */
+    .badge-pagada {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(16,185,129,0.12);
+        color: #059669;
+        border: 1px solid rgba(16,185,129,0.25);
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 3px 9px;
+        margin-top: 6px;
+    }
+
+    .badge-pendiente {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: rgba(245, 158, 11, 0.15);
+        color: #b45309;
+        font-weight: 600;
+    }
+
+
+
+
+
+
+
+    
+    /* ══ CONTENEDOR DE AVISO ══ */
+    .aviso-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        background: #ffffff;
+        border-left: 4px solid #ef4444;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        /* hover elegante */
+        .aviso-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+    /* ══ PUNTO DE NOTIFICACIÓN ══ */
+    .aviso-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ef4444;
+        margin-top: 6px;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+    }
+
+    /* ══ ICONO OPCIONAL (si lo usas después) ══ */
+    .aviso-icon {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    /* ══ TÍTULO DEL AVISO ══ */
+    .aviso-titulo {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #0f172a;
+        margin-bottom: 2px;
+    }
+
+    /* ══ FECHA DEL AVISO ══ */
+    .aviso-fecha {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    /* ══ ESTADO "SIN AVISOS" ══ */
+    .aviso-empty {
+        text-align: center;
+        padding: 20px;
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* ══ VARIANTE: AVISO IMPORTANTE (opcional futuro) ══ */
+    .aviso-item.importante {
+        border-left-color: #f59e0b;
+    }
+
+        .aviso-item.importante .aviso-dot {
+            background: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+        }
+
+    /* ══ VARIANTE: AVISO URGENTE (opcional futuro) ══ */
+    .aviso-item.urgente {
+        border-left-color: #ef4444;
+        background: rgba(239, 68, 68, 0.03);
+    }
+
+    /* ══ ANIMACIÓN SUAVE DE ENTRADA ══ */
+    @@keyframes fadeInAviso {
+        from {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .aviso-item {
+        animation: fadeInAviso 0.25s ease-out;
+    }
+
+    .incidencia-active {
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: #f8fafc;
+        border-left: 3px solid #f59e0b;
+        margin-bottom: 8px;
+        transition: all .2s ease;
+    }
+
+        .incidencia-active:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .incidencia-active .fw-semibold {
+            color: #0f172a;
+        }
+</style>
+
+<div class="dash-wrapper">
+
+    <!-- ══ HEADER ══ -->
+    <div class="dash-header mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 position-relative">
+
+            <div>
+                <h4>Hola, @Model.NombreInquilino 👋</h4>
+                <div class="sub">
+                    <i class="fa-solid fa-location-dot me-1"></i>
+                    @Model.Unidad &nbsp;·&nbsp; Residencial Los Almendros
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+
+                <!-- CUOTA DINÁMICA REAL -->
+                @if (Model.TieneDeuda)
+                {
+                    <span class="header-badge hbadge-warning">
+                        <i class="fa-solid fa-triangle-exclamation fa-xs"></i> Cuota pendiente
+                    </span>
+                }
+                else
+                {
+                    <span class="header-badge hbadge-success">
+                        <i class="fa-solid fa-circle-check fa-xs"></i> Cuota al día
+                    </span>
+                }
+
+                <span class="header-badge hbadge-primary">
+                    <i class="fa-solid fa-wrench fa-xs"></i> @Model.IncidenciasActivas Incidencias
+                </span>
+
+                <span class="header-badge hbadge-warning">
+                    <i class="fa-solid fa-bell fa-xs"></i> @Model.AvisosRecientes.Count Avisos
+                </span>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══ METRIC CARDS ══ -->
+    <p class="section-label">Resumen del mes</p>
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card">
+                <div class="accent-bar" style="background:#258cfb;"></div>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="metric-label">Mensualidad</div>
+                        <div class="metric-value">RD$@Model.CuotaMensual.ToString("N0")</div>
+
+                        @if (Model.TieneDeuda)
+                        {
+                            <span class="badge-pendiente">
+                                <i class="fa-solid fa-clock fa-xs"></i> Pendiente
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-pagada">
+                                <i class="fa-solid fa-check fa-xs"></i> Pagada
+                            </span>
+                        }
+
+                    </div>
+                    <div class="icon-wrap icon-blue">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card">
+                <div class="accent-bar" style="background:#10b981;"></div>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="metric-label">Próximo pago</div>
+
+                        <!-- REAL DEL VIEWMODEL -->
+                        <div class="metric-value">
+                            @(Model.ProximoPago.HasValue
+                                ? Model.ProximoPago.Value.ToString("dd MMM")
+                                : "Contrato Finalizado")
+                        </div>
+
+                        <div class="metric-sub">Vencimiento</div>
+                    </div>
+                    <div class="icon-wrap icon-green">
+                        <i class="fa-regular fa-calendar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card">
+                <div class="accent-bar" style="background:#f59e0b;"></div>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="metric-label">Incidencias</div>
+                        <div class="metric-value">@Model.IncidenciasActivas</div>
+                        <div class="metric-sub">En seguimiento</div>
+                    </div>
+                    <div class="icon-wrap icon-yellow">
+                        <i class="fa-solid fa-wrench"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card">
+                <div class="accent-bar" style="background:#ef4444;"></div>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="metric-label">Avisos</div>
+                        <div class="metric-value">@Model.AvisosRecientes.Count</div>
+                        <div class="metric-sub">Total</div>
+                    </div>
+                    <div class="icon-wrap icon-red">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══ ACCESOS RÁPIDOS ══ -->
+    <p class="section-label">Accesos rápidos</p>
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-md-3">
+            <a class="quick-link"
+               asp-controller="IncidenciaMantenimientoInquilino" asp-action="Index">
+                <div class="ql-icon icon-blue">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <span class="ql-label">Reportar</span>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <a class="quick-link"
+               asp-controller="ReservasInquilino" asp-action="Index">
+                <div class="ql-icon icon-green">
+                    <i class="fa-solid fa-tree"></i>
+                </div>
+                <span class="ql-label">Áreas comunes</span>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <a class="quick-link"
+               asp-controller="DocumentoInquilino" asp-action="Index">
+                <div class="ql-icon" style="background:rgba(100,116,139,0.1);color:#64748b;">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <span class="ql-label">Documentos</span>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <a class="quick-link"
+               asp-controller="Inquilino" asp-action="MiUnidad">
+                <div class="ql-icon icon-yellow">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span class="ql-label">Mi unidad</span>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ══ PANELES INFERIORES ══ -->
+    <div class="row g-4">
+
+        <!-- INCIDENCIAS -->
+        <div class="col-lg-7">
+            <div class="panel-card">
+
+                <div class="panel-header">
+                    <div class="ph-dot"></div>
+                    Incidencias recientes
+                </div>
+
+                <div class="panel-body">
+
+                    @if (Model.IncidenciasActivas == 0)
+                    {
+                        <div class="incidencia-empty">
+                            <i class="fa-regular fa-circle-check"></i>
+                            Sin incidencias registradas
+                        </div>
+                    }
+                    else
+                    {
+                        @if (Model.IncidenciasRecientes != null && Model.IncidenciasRecientes.Any())
+                        {
+                            foreach (var inc in Model.IncidenciasRecientes)
+                            {
+                                <div class="incidencia-active mb-2">
+
+                                    <div class="fw-semibold" style="font-size:.85rem;">
+                                        @inc.Descripcion
+                                    </div>
+
+                                    <div style="font-size:.75rem; color:var(--gac-muted);">
+                                        @inc.Estado · @inc.FechaSolicitud?.ToString("dd MMM yyyy")
+                                    </div>
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="incidencia-empty">
+                                <i class="fa-regular fa-circle-check"></i>
+                                Sin incidencias registradas
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- AVISOS -->
+        <div class="col-lg-5">
+            <div class="panel-card">
+
+                <div class="panel-header">
+                    <div class="ph-dot" style="background:#ef4444;"></div>
+                    Avisos recientes
+                </div>
+
+                <div class="panel-body">
+
+                    @if (Model.AvisosRecientes.Count == 0)
+                    {
+                        <div class="aviso-empty">
+                            <i class="fa-regular fa-bell" style="font-size:1.8rem;opacity:.2;display:block;margin-bottom:8px;"></i>
+                            Sin avisos recientes
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var aviso in Model.AvisosRecientes)
+                        {
+                            <div class="aviso-item">
+                                <div class="aviso-dot"></div>
+                                <div>
+                                    <div class="aviso-titulo">@aviso.Titulo</div>
+                                    <div class="aviso-fecha">
+                                        @aviso.FechaPublicacion?.ToString("dd MMM yyyy")
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,164 @@
+﻿@model PROTOTIPO.Models.AreaComun
+
+@{
+    ViewData["Title"] = "Detalle de Área Común";
+}
+
+<div class="container py-4">
+
+    <!-- HERO CARD -->
+    <div class="card border-0 shadow-lg overflow-hidden mb-4">
+
+        <!-- IMAGE HERO -->
+        @{
+            var imagen = Model?.ImagenAreas?.FirstOrDefault();
+        }
+
+        <div class="position-relative">
+
+            @if (imagen != null && !string.IsNullOrEmpty(imagen.Url))
+            {
+                <img src="@imagen.Url"
+                     class="w-100"
+                     style="height: 320px; object-fit: cover;">
+            }
+            else
+            {
+                <img src="https://placehold.co/1200x400"
+                     class="w-100"
+                     style="height: 320px; object-fit: cover;">
+            }
+
+            <!-- overlay -->
+            <div class="position-absolute top-0 start-0 w-100 h-100"
+                 style="background: rgba(0,0,0,.35);"></div>
+
+            <!-- title overlay -->
+            <div class="position-absolute bottom-0 start-0 p-4 text-white">
+
+                <h2 class="fw-bold mb-1">
+                    @Model.Nombre
+                </h2>
+
+                <div class="d-flex gap-2 flex-wrap">
+
+                    <span class="badge bg-light text-dark">
+                        Condominio: @Model.IdCondominioNavigation?.Nombre
+                    </span>
+
+                    <span class="badge bg-success">
+                        Activa
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body p-4">
+
+            <div class="row g-3">
+
+                <!-- DESCRIPCIÓN -->
+                <div class="col-12">
+
+                    <h5 class="fw-bold mb-2">Descripción</h5>
+
+                    <div class="p-3 bg-light rounded border">
+                        @Model.Descripcion
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CALENDARIO CARD -->
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+
+            <h5 class="mb-0 fw-bold">
+                Calendario de reservas
+            </h5>
+
+            <span class="badge bg-primary">
+                Disponibilidad
+            </span>
+
+        </div>
+
+        <div class="card-body">
+
+            <div id="calendar"></div>
+
+        </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="d-flex justify-content-between mt-4">
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            ← Volver
+        </a>
+
+        <div class="d-flex gap-2">
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.IdArea"
+               class="btn btn-warning">
+                Editar
+            </a>
+
+            <a asp-action="Delete"
+               asp-route-id="@Model.IdArea"
+               class="btn btn-danger">
+                Eliminar
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FULLCALENDAR -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+    const calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+
+    initialView: 'dayGridMonth',
+    height: 650,
+    themeSystem: 'bootstrap5',
+
+    headerToolbar: {
+    left: 'prev,next today',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek'
+    },
+
+    events: function (info, successCallback, failureCallback) {
+
+    fetch('/AreaComuns/GetReservasCalendario?idArea=@Model.IdArea')
+    .then(res => res.json())
+    .then(data => successCallback(data))
+    .catch(err => failureCallback(err));
+    }
+
+    });
+
+    calendar.render();
+    });
+</script>

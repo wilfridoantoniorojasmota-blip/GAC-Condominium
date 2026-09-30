@@ -1,0 +1,699 @@
+﻿@model PROTOTIPO.Models.Condominio
+
+@{
+    ViewData["Title"] = "Editar Condominio";
+}
+
+<style>
+    :root {
+        --ink: #0c1220;
+        --ink-soft: #3d4a5c;
+        --ink-muted: #7a8799;
+        --surface: #f4f6fb;
+        --surface-2: #ffffff;
+        --border: #e4e9f0;
+        --accent: #1a56e8;
+        --accent-light: #eff4ff;
+        --teal: #0fd4b0;
+        --r-lg: 14px;
+        --r-xl: 20px;
+        --r-2xl: 26px;
+        --r-pill: 999px;
+        --shadow-sm: 0 2px 8px rgba(12,18,32,.07);
+        --ease: .22s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    .ce-page {
+        max-width:1080px;
+        margin: 36px auto;
+        padding: 0 24px 64px;
+    }
+
+    .ce-bc {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .78rem;
+        font-weight: 500;
+        color: var(--ink-muted);
+        margin-bottom: 26px;
+    }
+
+        .ce-bc a {
+            color: var(--ink-muted);
+            text-decoration: none;
+            transition: color var(--ease);
+        }
+
+            .ce-bc a:hover {
+                color: var(--accent);
+            }
+
+    .ce-hd {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .ce-hd-ico {
+        width: 52px;
+        height: 52px;
+        border-radius: 15px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+        box-shadow: 0 6px 20px rgba(26,86,232,.32);
+    }
+
+    .ce-hd-title {
+        font-family: var(--font-d);
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -.035em;
+        color: var(--ink);
+        margin: 0 0 3px;
+    }
+
+    .ce-hd-sub {
+        font-size: .84rem;
+        color: var(--ink-muted);
+        margin: 0;
+    }
+    /* Show condominio name in sub if available */
+    .ce-hd-name {
+        font-family: var(--font-d);
+        font-size: .85rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    .ce-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-2xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    .ce-band {
+        background: var(--ink);
+        padding: 20px 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .ce-band::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        .ce-band::after {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(26,86,232,.22) 0%, transparent 68%);
+            top: -70px;
+            right: -40px;
+            pointer-events: none;
+        }
+
+    .ce-band-ico {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(26,86,232,.25);
+        border: 1px solid rgba(26,86,232,.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #93c5fd;
+        font-size: 1rem;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .ce-band-title {
+        font-family: var(--font-d);
+        font-size: .95rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .ce-band-sub {
+        font-size: .72rem;
+        color: rgba(255,255,255,.4);
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .ce-section {
+        padding: 26px 28px 8px;
+    }
+
+        .ce-section + .ce-section {
+            border-top: 1px solid var(--border);
+            padding-top: 22px;
+        }
+
+    .ce-section-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        margin-bottom: 18px;
+    }
+
+        .ce-section-label span {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .78rem;
+        }
+
+    .ce-g2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .ce-g3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .ce-g1 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .cf-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        margin-bottom: 8px;
+    }
+
+        .cf-label i {
+            color: var(--accent);
+            font-size: .82rem;
+        }
+
+        .cf-label .req {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #ef4444;
+            display: inline-block;
+            margin-left: 2px;
+        }
+
+        .cf-label .opt {
+            font-size: .68rem;
+            font-weight: 500;
+            color: var(--ink-muted);
+            margin-left: 3px;
+        }
+
+    .cf-wrap {
+        position: relative;
+    }
+
+    .cf-input, .cf-select {
+        width: 100%;
+        padding: 11px 14px 11px 40px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-lg);
+        font-family: var(--font-b);
+        font-size: .875rem;
+        color: var(--ink);
+        background: var(--surface);
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+        transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+    }
+
+        .cf-input:focus, .cf-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(26,86,232,.11);
+            background: #fff;
+        }
+
+        .cf-input::placeholder {
+            color: #b8c4d0;
+        }
+
+    .cf-ico {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #c0cad6;
+        font-size: .88rem;
+        pointer-events: none;
+        transition: color var(--ease);
+    }
+
+    .cf-wrap:focus-within .cf-ico {
+        color: var(--accent);
+    }
+
+    .cf-sel-wrap {
+        position: relative;
+    }
+
+        .cf-sel-wrap::after {
+            content: '\F282';
+            font-family: 'bootstrap-icons';
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-muted);
+            pointer-events: none;
+            font-size: .82rem;
+        }
+
+    .cf-select {
+        padding-right: 36px;
+        cursor: pointer;
+    }
+
+    .cf-wrap.instagram:focus-within .cf-ico {
+        color: #be185d;
+    }
+
+    .cf-wrap.instagram .cf-input:focus {
+        border-color: #be185d;
+        box-shadow: 0 0 0 3px rgba(190,24,93,.1);
+    }
+
+    .cf-wrap.facebook:focus-within .cf-ico {
+        color: #1d4ed8;
+    }
+
+    .cf-wrap.facebook .cf-input:focus {
+        border-color: #1d4ed8;
+        box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+    }
+
+    .cf-hint {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .72rem;
+        color: var(--ink-muted);
+        margin-top: 6px;
+    }
+
+        .cf-hint i {
+            color: var(--teal);
+            font-size: .78rem;
+        }
+
+    .ce-footer {
+        background: #f8fafc;
+        border-top: 1px solid var(--border);
+        padding: 18px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-ce-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: var(--r-lg);
+        border: 1.5px solid var(--border);
+        background: transparent;
+        color: var(--ink-soft);
+        text-decoration: none;
+        transition: var(--ease);
+    }
+
+        .btn-ce-cancel:hover {
+            background: var(--surface-2);
+            border-color: #c8d2de;
+            color: var(--ink);
+        }
+
+    .btn-ce-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 700;
+        padding: 10px 26px;
+        border-radius: var(--r-lg);
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: var(--ease);
+        box-shadow: 0 4px 14px rgba(26,86,232,.35);
+    }
+
+        .btn-ce-save:hover {
+            background: #1447d0;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26,86,232,.45);
+        }
+
+        .btn-ce-save:active {
+            transform: translateY(0);
+        }
+
+        .btn-ce-save .ce-spin {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: ce-rot .7s linear infinite;
+        }
+
+        .btn-ce-save.loading .ce-lbl,
+        .btn-ce-save.loading .ce-ico-btn {
+            display: none;
+        }
+
+        .btn-ce-save.loading .ce-spin {
+            display: block;
+        }
+
+    @@keyframes ce-rot {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    span[data-valmsg-for],
+    .field-validation-error,
+    .field-validation-valid,
+    .text-danger {
+        display: none !important;
+    }
+
+    @@media (max-width: 767px) {
+        .ce-g3 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media (max-width: 575px) {
+        .ce-page {
+            padding: 0 16px 48px;
+        }
+
+        .ce-band, .ce-section {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .ce-footer {
+            padding: 16px 20px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-ce-cancel, .btn-ce-save {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .ce-g2, .ce-g3 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="ce-page">
+
+    <!-- Breadcrumb -->
+    <div class="ce-bc">
+        <a asp-action="Index"><i class="bi bi-buildings-fill"></i> Condominios</a>
+        <i class="bi bi-chevron-right" style="font-size:.65rem;"></i>
+        <span>Editar</span>
+        @if (!string.IsNullOrEmpty(Model.Nombre))
+        {
+            <i class="bi bi-chevron-right" style="font-size:.65rem;"></i>
+            <span>@Model.Nombre</span>
+        }
+    </div>
+
+    <!-- Header -->
+    <div class="ce-hd">
+        <div class="ce-hd-ico"><i class="bi bi-pencil-fill"></i></div>
+        <div>
+            <h1 class="ce-hd-title">Editar Condominio</h1>
+            <p class="ce-hd-sub">
+                Actualizando:
+                <span class="ce-hd-name">@(Model.Nombre ?? "condominio")</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Card -->
+    <div class="ce-card">
+
+        <!-- Band -->
+        <div class="ce-band">
+            <div class="ce-band-ico"><i class="bi bi-buildings-fill"></i></div>
+            <div>
+                <div class="ce-band-title">Datos del condominio</div>
+                <div class="ce-band-sub">Modifica los campos que necesites actualizar</div>
+            </div>
+        </div>
+
+        <form asp-action="Edit" id="ceForm">
+            <input type="hidden" asp-for="IdCondominio" />
+
+            <!-- ── Sección 1: Información general ── -->
+            <div class="ce-section">
+                <div class="ce-section-label">
+                    <span><i class="bi bi-info-circle-fill"></i></span>
+                    Información general
+                </div>
+
+                <div class="ce-g2">
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-tag-fill"></i>
+                            Nombre <span class="req"></span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Nombre" class="cf-input" placeholder="Ej. Residencial Los Almendros">
+                            <i class="bi bi-tag cf-ico"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-map-fill"></i>
+                            Sector <span class="req"></span>
+                        </label>
+                        <div class="cf-sel-wrap cf-wrap">
+                            <select asp-for="IdSector" class="cf-select"
+                                    asp-items="ViewBag.IdSector"
+                                    style="padding-left:40px;">
+                                <option value="">— Seleccionar sector —</option>
+                            </select>
+                            <i class="bi bi-map cf-ico"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ce-g1">
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            Dirección <span class="req"></span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Direccion" class="cf-input" placeholder="Ej. Calle 5, Residencial Las Palmas">
+                            <i class="bi bi-geo-alt cf-ico"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ce-g3">
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-telephone-fill"></i>
+                            Teléfono <span class="req"></span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Telefono" class="cf-input" placeholder="809-000-0000">
+                            <i class="bi bi-telephone cf-ico"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-envelope-fill"></i>
+                            Correo <span class="req"></span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Email" type="email" class="cf-input" placeholder="info@condominio.com">
+                            <i class="bi bi-envelope cf-ico"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-credit-card-2-front-fill"></i>
+                            RNC <span class="opt">(opcional)</span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Rnc" class="cf-input" placeholder="000-00000-0">
+                            <i class="bi bi-credit-card-2-front cf-ico"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ce-g1" style="margin-bottom:0;">
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-aspect-ratio-fill"></i>
+                            Tamaño (número de unidades) <span class="opt">(opcional)</span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Tamano" type="number" min="1" class="cf-input" placeholder="Ej. 24">
+                            <i class="bi bi-123 cf-ico"></i>
+                        </div>
+                        <div class="cf-hint">
+                            <i class="bi bi-info-circle-fill"></i>
+                            Cantidad total de unidades habitacionales del condominio.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Sección 2: Presencia digital ── -->
+            <div class="ce-section" style="padding-bottom:16px;">
+                <div class="ce-section-label">
+                    <span><i class="bi bi-globe2"></i></span>
+                    Presencia digital
+                </div>
+
+                <div class="ce-g1" style="margin-bottom:14px;">
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-globe2"></i>
+                            Página web <span class="opt">(opcional)</span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="PaginaWeb" class="cf-input" placeholder="https://www.condominio.com">
+                            <i class="bi bi-globe cf-ico"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ce-g2" style="margin-bottom:0;">
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-instagram" style="color:#be185d;"></i>
+                            Instagram <span class="opt">(opcional)</span>
+                        </label>
+                        <div class="cf-wrap instagram">
+                            <input asp-for="Instagram" class="cf-input" placeholder="https://instagram.com/...">
+                            <i class="bi bi-instagram cf-ico"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="cf-label">
+                            <i class="bi bi-facebook" style="color:#1d4ed8;"></i>
+                            Facebook <span class="opt">(opcional)</span>
+                        </label>
+                        <div class="cf-wrap facebook">
+                            <input asp-for="Facebook" class="cf-input" placeholder="https://facebook.com/...">
+                            <i class="bi bi-facebook cf-ico"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="ce-footer">
+                <a asp-action="Index" class="btn-ce-cancel">
+                    <i class="bi bi-arrow-left"></i> Volver a la lista
+                </a>
+                <button type="submit" class="btn-ce-save" id="btnCeSave">
+                    <i class="ce-ico-btn bi bi-floppy-fill"></i>
+                    <span class="ce-lbl">Guardar cambios</span>
+                    <div class="ce-spin"></div>
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        (function () {
+            document.getElementById('ceForm')?.addEventListener('submit', function () {
+                setTimeout(function () {
+                    var btn = document.getElementById('btnCeSave');
+                    btn.classList.add('loading');
+                    btn.disabled = true;
+                }, 0);
+            });
+        })();
+    </script>
+}

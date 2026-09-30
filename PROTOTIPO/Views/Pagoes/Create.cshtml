@@ -1,0 +1,640 @@
+﻿@model PROTOTIPO.Models.Pago
+
+@{
+    ViewData["Title"] = "Registrar Pago";
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+        --gac-muted: #64748b;
+    }
+
+    .create-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+        .page-header .ph-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(37,140,251,.2);
+            color: #60a8fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0 0 2px;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    /* FORM CARD */
+    .form-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,22,35,.04);
+    }
+
+    .form-section {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gac-border);
+    }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+    .section-heading {
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #94a3b8;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .section-heading i {
+            color: var(--gac-primary);
+        }
+
+    /* INPUTS */
+    .form-label {
+        font-size: .85rem;
+        font-weight: 700;
+        color: #2c3a52;
+        margin-bottom: .4rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        min-height: 46px;
+        font-size: .9rem;
+        color: var(--gac-navy);
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--gac-primary);
+            box-shadow: 0 0 0 3px rgba(37,140,251,.12);
+        }
+
+        .form-control::placeholder {
+            color: #a2adbd;
+        }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+        .input-with-icon .form-control,
+        .input-with-icon .form-select {
+            padding-left: 2.75rem;
+        }
+
+        .input-with-icon .input-icon {
+            position: absolute;
+            left: .9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: .9rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+    .field-validation-error,
+    .text-danger {
+        font-size: .8rem;
+        font-weight: 600;
+        color: #dc2626;
+        margin-top: .3rem;
+        display: block;
+    }
+
+    /* INQUILINO BANNER */
+    .inquilino-banner {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+        background: rgba(37,140,251,.07);
+        border: 1px solid rgba(37,140,251,.2);
+        border-radius: 12px;
+        padding: .9rem 1.1rem;
+    }
+
+        .inquilino-banner .ib-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(37,140,251,.12);
+            color: var(--gac-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .inquilino-banner .ib-label {
+            font-size: .75rem;
+            color: var(--gac-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 1px;
+        }
+
+        .inquilino-banner .ib-value {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--gac-navy);
+        }
+
+    /* ACTION BUTTONS */
+    .form-actions {
+        padding: 1.25rem 1.5rem;
+        background: #fafbfd;
+        border-top: 1px solid var(--gac-border);
+        display: flex;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-save {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: .65rem 1.5rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .btn-save:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    .btn-cancel {
+        border: 1.5px solid #e2e8f0;
+        background: #fff;
+        color: var(--gac-muted);
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.25rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .btn-cancel:hover {
+            border-color: var(--gac-primary);
+            color: var(--gac-primary);
+        }
+
+    #contratoContainer .ts-control,
+    #cuotaContainer .ts-control {
+        padding-left: 45px !important;
+    }
+
+        #contratoContainer .ts-control input,
+        #cuotaContainer .ts-control input {
+            padding-left: 0 !important;
+        }
+</style>
+
+<div class="create-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div class="ph-icon">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <div>
+                <h3>Registrar Pago</h3>
+                <p>Completa los campos para registrar un nuevo pago</p>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <form asp-action="Create" method="post">
+
+                <!-- SECCIÓN: INFORMACIÓN GENERAL -->
+                <div class="form-section">
+                    <div class="section-heading">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Información del Pago
+                    </div>
+
+                    <div class="row g-3">
+
+                        <!-- FECHA -->
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-regular fa-calendar"></i>
+                                <input asp-for="Fecha" type="date" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Fecha" class="text-danger"></span>
+                        </div>
+
+                        <!-- MONTO -->
+                        <div class="col-md-4">
+                            <label class="form-label">Monto</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-solid fa-dollar-sign"></i>
+                                <input asp-for="Monto"
+                                       id="montoInput"
+                                       type="number"
+                                       step="0.01"
+                                       class="form-control"
+                                       placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="Monto" class="text-danger"></span>
+                        </div>
+
+                        <!-- MÉTODO PAGO -->
+                        <div class="col-md-4">
+                            <label class="form-label">Método de Pago</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-regular fa-credit-card"></i>
+                                <select asp-for="MetodoPago" class="form-select">
+                                    <option value="">Seleccione</option>
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Transferencia">Transferencia</option>
+                                    <option value="Tarjeta">Tarjeta</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: CLASIFICACIÓN -->
+                <div class="form-section">
+                    <div class="section-heading">
+                        <i class="fa-solid fa-tags"></i>
+                        Clasificación
+                    </div>
+
+                    <div class="row g-3">
+
+                        <!-- TIPO PAGO -->
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Pago</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-solid fa-layer-group"></i>
+                                <select asp-for="TipoPago"
+                                        class="form-select"
+                                        id="tipoPagoSelect">
+                                    <option value="">Seleccione</option>
+                                    <option value="Alquiler">Alquiler</option>
+                                    <option value="Mantenimiento">Mantenimiento</option>
+                                    
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- ESTADO -->
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-solid fa-circle-half-stroke"></i>
+                                <select asp-for="EstadoPago" class="form-select">
+                                    <option value="Pagado">Pagado</option>
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: CONTRATO E INQUILINO -->
+                <!-- SECCIÓN: RELACIÓN DEL PAGO -->
+                <div class="form-section" id="relacionPagoSection">
+
+                    <div class="section-heading">
+                        <i class="fa-solid fa-file-contract"></i>
+                        Información relacionada
+                    </div>
+
+
+                    <div class="row g-3">
+
+
+                        <!-- CONTRATO -->
+                        <div class="col-md-12" id="contratoContainer">
+
+                            <label class="form-label">
+                                Contrato de alquiler
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="input-icon fa-solid fa-file-lines"></i>
+
+                                <select asp-for="IdContrato"
+                                        class="form-select"
+                                        asp-items="ViewBag.IdContrato"
+                                        id="contratoSelect">
+
+                                    <option value="">
+                                        Seleccione un contrato
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- CUOTA -->
+                        <div class="col-md-12" id="cuotaContainer" style="display:none;">
+
+                            <label class="form-label">
+                                Cuota de mantenimiento
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <i class="input-icon fa-solid fa-receipt"></i>
+
+                                <select asp-for="IdCuota"
+                                        class="form-select"
+                                        asp-items="ViewBag.IdCuota"
+                                        id="cuotaSelect">
+
+                                    <option value="">
+                                        Seleccione una cuota pendiente
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- BANNER -->
+                        <div class="col-12">
+
+                            <div class="inquilino-banner">
+
+                                <div class="ib-icon">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+
+
+                                <div>
+
+                                    <div class="ib-label">
+                                        Pago seleccionado
+                                    </div>
+
+                                    <div class="ib-value" id="nombreInquilino">
+                                        Ninguno
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-save">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Guardar Pago
+                    </button>
+                    <a asp-action="Index" class="btn btn-cancel">
+                        <i class="fa-solid fa-xmark"></i>
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+
+<!-- Tom Select -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const montoInput = document.getElementById("montoInput");
+
+        const tipoPago = document.getElementById("tipoPagoSelect");
+
+        const contratoContainer =
+            document.getElementById("contratoContainer");
+
+        const cuotaContainer =
+            document.getElementById("cuotaContainer");
+
+        const banner =
+            document.getElementById("nombreInquilino");
+
+
+        // ==========================================
+        // TOM SELECT - CONTRATO
+        // ==========================================
+
+        const contratoTom = new TomSelect("#contratoSelect", {
+            placeholder: "Buscar por nombre, apellido, unidad o contrato...",
+            allowEmptyOption: true,
+            maxOptions: 100,
+            searchField: ["text"],
+            create: false
+        });
+
+
+        // ==========================================
+        // TOM SELECT - CUOTA
+        // ==========================================
+
+        const cuotaTom = new TomSelect("#cuotaSelect", {
+            placeholder: "Buscar cuota, unidad, residente o período...",
+            allowEmptyOption: true,
+            maxOptions: 100,
+            searchField: ["text"],
+            create: false
+        });
+
+
+        // ==========================================
+        // CUANDO SELECCIONA CONTRATO
+        // ==========================================
+
+        contratoTom.on("change", function(idContrato) {
+
+            if (idContrato) {
+
+                fetch(`/Pagoes/ObtenerMontoContrato?idContrato=${idContrato}`)
+                    .then(response => response.json())
+                    .then(data => {
+
+                        montoInput.value = data.monto;
+
+                    });
+
+                banner.innerText =
+                    contratoTom.options[idContrato].text;
+            }
+            else {
+
+                banner.innerText = "Ninguno";
+            }
+
+        });
+
+
+        // ==========================================
+        // CUANDO SELECCIONA CUOTA
+        // ==========================================
+
+        cuotaTom.on("change", function(idCuota) {
+
+            if (idCuota) {
+
+                fetch(`/Pagoes/ObtenerMontoCuota?idCuota=${idCuota}`)
+                    .then(response => response.json())
+                    .then(data => {
+
+                        montoInput.value = data.monto;
+
+                    });
+
+                banner.innerText =
+                    cuotaTom.options[idCuota].text;
+            }
+            else {
+
+                banner.innerText = "Ninguno";
+            }
+
+        });
+
+
+        // ==========================================
+        // CAMBIAR TIPO DE PAGO
+        // ==========================================
+
+        function cambiarTipoPago() {
+
+            if (tipoPago.value === "Mantenimiento") {
+
+                // Ocultar contratos
+                contratoContainer.style.display = "none";
+
+                // Mostrar cuotas
+                cuotaContainer.style.display = "block";
+
+
+                // Limpiar contrato
+                contratoTom.clear();
+
+
+                // Limpiar banner
+                banner.innerText = "Ninguno";
+
+            }
+            else {
+
+                // Mostrar contratos
+                contratoContainer.style.display = "block";
+
+                // Ocultar cuotas
+                cuotaContainer.style.display = "none";
+
+
+                // Limpiar cuota
+                cuotaTom.clear();
+
+
+                // Limpiar banner
+                banner.innerText = "Ninguno";
+
+            }
+
+        }
+
+
+        tipoPago.addEventListener(
+            "change",
+            cambiarTipoPago
+        );
+
+
+        // Ejecutar al cargar la página
+        cambiarTipoPago();
+
+    });
+</script>
+}

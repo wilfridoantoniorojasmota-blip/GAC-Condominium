@@ -1,0 +1,520 @@
+﻿@model PROTOTIPO.Models.ViewModel.MiUnidadVM
+
+@{
+    ViewData["Title"] = "Mi Unidad";
+
+    var badgeClass = Model.EstadoUnidad == "Ocupada"
+        ? "estado-ocupada"
+        : Model.EstadoUnidad == "Disponible"
+            ? "estado-disponible"
+            : "estado-otro";
+}
+
+<style>
+    :root {
+        --gac-blue: #258cfb;
+        --gac-blue-dark: #1a6fcf;
+        --gac-blue-light: #4dabf7;
+        --gac-blue-lighter: #e8f4ff;
+        --gac-muted: #64748b;
+        --gac-border: #e2e8f0;
+        --gac-card: #ffffff;
+        --gac-surface: #f7f9fc;
+        --gac-text: #1a202c;
+        --gac-radius: 14px;
+        --gac-radius-sm: 8px;
+        --gac-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(37,140,251,.07);
+        --gac-shadow-hover: 0 4px 20px rgba(37,140,251,.16);
+    }
+
+    .unidad-wrapper {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--gac-text);
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 1.75rem;
+    }
+
+    .page-header .ph-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #258cfb, #4dabf7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(37,140,251,.3);
+    }
+
+    .page-header h2 {
+        font-size: 1.45rem;
+        font-weight: 700;
+        margin: 0 0 2px;
+        letter-spacing: -.3px;
+    }
+
+    .page-header p {
+        margin: 0;
+        color: var(--gac-muted);
+        font-size: .875rem;
+    }
+
+    /* ── SHARED CARD ── */
+    .gac-card {
+        background: var(--gac-card);
+        border-radius: var(--gac-radius);
+        border: 1px solid var(--gac-border);
+        box-shadow: var(--gac-shadow);
+        overflow: hidden;
+    }
+
+    .gac-card-header {
+        padding: .9rem 1.4rem;
+        border-bottom: 1px solid var(--gac-border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: .875rem;
+        background: #fafcff;
+    }
+
+    .gac-card-header .ch-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--gac-blue);
+        flex-shrink: 0;
+    }
+
+    .gac-card-body {
+        padding: 1.4rem;
+    }
+
+    /* ── IMAGEN ── */
+    .img-card {
+        border-radius: var(--gac-radius);
+        overflow: hidden;
+        border: 1px solid var(--gac-border);
+        box-shadow: var(--gac-shadow);
+        height: 100%;
+        min-height: 280px;
+        position: relative;
+    }
+
+    .img-card img {
+        width: 100%;
+        height: 100%;
+        min-height: 280px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .img-placeholder {
+        width: 100%;
+        height: 100%;
+        min-height: 280px;
+        background: linear-gradient(135deg, #f0f4f8 0%, #e8f4ff 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--gac-muted);
+        gap: 10px;
+    }
+
+    .img-placeholder i {
+        font-size: 2.5rem;
+        opacity: .3;
+    }
+
+    .img-placeholder span {
+        font-size: .82rem;
+    }
+
+    /* ── ESTADO BADGE ── */
+    .estado-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: .75rem;
+        font-weight: 600;
+    }
+
+    .estado-badge::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+
+    .estado-ocupada {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+        border: 1px solid rgba(16,185,129,.25);
+    }
+
+    .estado-ocupada::before { background: #10b981; }
+
+    .estado-disponible {
+        background: rgba(37,140,251,.12);
+        color: #1a6fcf;
+        border: 1px solid rgba(37,140,251,.25);
+    }
+
+    .estado-disponible::before { background: #258cfb; }
+
+    .estado-otro {
+        background: rgba(245,158,11,.12);
+        color: #b45309;
+        border: 1px solid rgba(245,158,11,.25);
+    }
+
+    .estado-otro::before { background: #f59e0b; }
+
+    /* ── STAT PILLS ── */
+    .stat-pill {
+        background: var(--gac-surface);
+        border: 1px solid var(--gac-border);
+        border-radius: var(--gac-radius-sm);
+        padding: 1rem;
+        text-align: center;
+        transition: box-shadow .2s, transform .2s;
+    }
+
+    .stat-pill:hover {
+        box-shadow: var(--gac-shadow-hover);
+        transform: translateY(-2px);
+    }
+
+    .stat-pill .sp-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--gac-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin: 0 auto 8px;
+    }
+
+    .sp-green { background: rgba(16,185,129,.1); color: #10b981; }
+    .sp-blue  { background: rgba(37,140,251,.1);  color: #258cfb; }
+    .sp-red   { background: rgba(239,68,68,.1);   color: #ef4444; }
+
+    .stat-pill .sp-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--gac-text);
+        line-height: 1.2;
+    }
+
+    .stat-pill .sp-label {
+        font-size: .72rem;
+        color: var(--gac-muted);
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        font-weight: 500;
+        margin-top: 3px;
+    }
+
+    /* ── TIPO UNIDAD CHIP ── */
+    .tipo-chip {
+        background: var(--gac-blue-lighter);
+        color: var(--gac-blue-dark);
+        border: 1px solid rgba(37,140,251,.2);
+        border-radius: 20px;
+        padding: 4px 14px;
+        font-size: .8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* ── INFO FIELDS ── */
+    .info-field {
+        padding: .85rem 0;
+        border-bottom: 1px solid var(--gac-border);
+    }
+
+    .info-field:last-child { border-bottom: none; }
+
+    .info-field .if-label {
+        font-size: .7rem;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        font-weight: 600;
+        color: var(--gac-muted);
+        margin-bottom: 3px;
+    }
+
+    .info-field .if-value {
+        font-size: .9rem;
+        font-weight: 600;
+        color: var(--gac-text);
+    }
+
+    .info-field .if-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--gac-radius-sm);
+        background: var(--gac-blue-lighter);
+        color: var(--gac-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .9rem;
+        flex-shrink: 0;
+    }
+
+    /* ── DESCRIPCION ── */
+    .desc-box {
+        background: var(--gac-surface);
+        border: 1px solid var(--gac-border);
+        border-left: 3px solid var(--gac-blue);
+        border-radius: 0 var(--gac-radius-sm) var(--gac-radius-sm) 0;
+        padding: 1rem 1.2rem;
+        font-size: .9rem;
+        color: var(--gac-text);
+        line-height: 1.7;
+    }
+
+    .desc-empty {
+        color: var(--gac-muted);
+        font-size: .875rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ── UNIT NUMBER HEADING ── */
+    .unit-number {
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -.5px;
+        color: var(--gac-text);
+        margin-bottom: 6px;
+    }
+
+    .section-label {
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--gac-muted);
+        margin-bottom: .75rem;
+    }
+</style>
+
+<div class="unidad-wrapper container-fluid py-4">
+
+    <!-- ══ PAGE HEADER ══ -->
+    <div class="page-header">
+        <div class="ph-icon">
+            <i class="fa-solid fa-building"></i>
+        </div>
+        <div>
+            <h2>Mi Unidad</h2>
+            <p>Consulta la información de tu apartamento y contrato.</p>
+        </div>
+    </div>
+
+    <!-- ══ FILA PRINCIPAL ══ -->
+    <div class="row g-4 mb-4">
+
+        <!-- Imagen -->
+        <div class="col-lg-4">
+            <div class="img-card">
+                @if (!string.IsNullOrEmpty(Model.ImagenPrincipal))
+                {
+                    <img src="@Model.ImagenPrincipal" alt="Unidad @Model.NumeroUnidad" />
+                }
+                else
+                {
+                    <div class="img-placeholder">
+                        <i class="fa-regular fa-image"></i>
+                        <span>Sin imagen disponible</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="col-lg-8">
+            <div class="gac-card h-100">
+                <div class="gac-card-body">
+
+                    <!-- Encabezado unidad -->
+                    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+                        <div>
+                            <div class="unit-number">
+                                Unidad @Model.NumeroUnidad
+                            </div>
+                            <span class="estado-badge @badgeClass">
+                                @Model.EstadoUnidad
+                            </span>
+                        </div>
+                        <div class="tipo-chip">
+                            <i class="fa-solid fa-tag fa-xs"></i>
+                            @Model.TipoUnidad
+                        </div>
+                    </div>
+
+                    <p class="section-label">Detalles del contrato</p>
+
+                    <!-- Stats -->
+                    <div class="row g-3">
+
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-pill">
+                                <div class="sp-icon sp-green">
+                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                </div>
+                                <div class="sp-value">
+                                    RD$@Model.MontoRenta.ToString("N2")
+                                </div>
+                                <div class="sp-label">Renta Mensual</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-pill">
+                                <div class="sp-icon sp-blue">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <div class="sp-value">
+                                    @(Model.FechaInicio?.ToString("dd/MM/yyyy") ?? "—")
+                                </div>
+                                <div class="sp-label">Inicio Contrato</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-4">
+                            <div class="stat-pill">
+                                <div class="sp-icon sp-red">
+                                    <i class="fa-solid fa-calendar-xmark"></i>
+                                </div>
+                                <div class="sp-value">
+                                    @(Model.FechaFin?.ToString("dd/MM/yyyy") ?? "—")
+                                </div>
+                                <div class="sp-label">Fin Contrato</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+    <div class="stat-pill">
+        <div class="sp-icon sp-blue">
+            <i class="fa-solid fa-receipt"></i>
+        </div>
+
+        <div class="sp-value">
+            RD$@Model.CuotaMensual.ToString("N2")
+        </div>
+
+        <div class="sp-label">Cuota Mensual</div>
+    </div>
+</div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══ INFORMACIÓN DEL INQUILINO ══ -->
+    <div class="gac-card mb-4">
+
+        <div class="gac-card-header">
+            <div class="ch-dot"></div>
+            Información del Inquilino
+        </div>
+
+        <div class="gac-card-body">
+            <div class="row g-0">
+
+                <div class="col-md-4">
+                    <div class="info-field pe-md-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="if-icon">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div>
+                                <div class="if-label">Nombre</div>
+                                <div class="if-value">@Model.NombreInquilino</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="info-field px-md-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="if-icon">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <div>
+                                <div class="if-label">Correo Electrónico</div>
+                                <div class="if-value">@Model.Email</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="info-field ps-md-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="if-icon">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <div class="if-label">Teléfono</div>
+                                <div class="if-value">@Model.Telefono</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══ DESCRIPCIÓN ══ -->
+    <div class="gac-card">
+
+        <div class="gac-card-header">
+            <div class="ch-dot" style="background:#64748b;"></div>
+            Descripción de la Unidad
+        </div>
+
+        <div class="gac-card-body">
+            @if (!string.IsNullOrWhiteSpace(Model.DescripcionUnidad))
+            {
+                <div class="desc-box">
+                    @Model.DescripcionUnidad
+                </div>
+            }
+            else
+            {
+                <div class="desc-empty">
+                    <i class="fa-regular fa-file-lines" style="opacity:.35; font-size:1.2rem;"></i>
+                    No hay descripción disponible para esta unidad.
+                </div>
+            }
+        </div>
+
+    </div>
+
+</div>

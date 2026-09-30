@@ -1,0 +1,565 @@
+@model PROTOTIPO.Models.UnidadHabitacional
+
+@{
+    var imgUrl = Model.ImagenUnidads?.FirstOrDefault()?.Url;
+    if (string.IsNullOrEmpty(imgUrl)) imgUrl = Url.Content("~/img/placeholder-unidad.jpg");
+
+    var offcanvasId = "editOffcanvas-" + Model.IdUnidad;
+    var formId = "editForm-" + Model.IdUnidad;
+}
+
+<div class="offcanvas offcanvas-end od-offcanvas" tabindex="-1" id="@offcanvasId">
+
+    <div class="od-header">
+        <div class="od-title">Editar unidad - @Model.Numero</div>
+        <button type="button" class="od-close" data-bs-dismiss="offcanvas">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <div class="offcanvas-body od-body">
+
+        <div class="od-img-wrap">
+            <img src="@Url.Content(imgUrl)" class="od-img" />
+            <div class="od-img-overlay"></div>
+            <div class="od-img-badge">@Model.Numero</div>
+            <div class="od-estado">@Model.Estado</div>
+        </div>
+
+        <p class="od-section-label">Editar unidad</p>
+
+        <form id="@formId"
+              method="post"
+              enctype="multipart/form-data"
+              action='@Url.Action("Edit", "UnidadHabitacionals", new { id = Model.IdUnidad })'>
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="IdUnidad" value="@Model.IdUnidad" />
+            <input type="hidden" name="IdCondominio" value="@Model.IdCondominio" />
+
+            <div class="od-info-grid">
+
+                <!-- ================= NUMERO ================= -->
+                <div class="od-chip od-chip--full">
+
+                    <label class="od-chip-lbl">Número de Unidad</label>
+
+                    <div class="row g-2">
+
+                        <div class="col-5">
+                            <select id="bloqueUnidad-@Model.IdUnidad" class="od-form-control">
+                                <option value="">Bloque</option>
+                                @for (char letra = 'A'; letra <= 'Z'; letra++)
+                                {
+                                    <option value="@letra">@letra</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-7">
+                            <input type="text"
+                                   id="numeroUnidad-@Model.IdUnidad"
+                                   class="od-form-control"
+                                   placeholder="Número" />
+                        </div>
+
+                    </div>
+
+                    <!-- 🔥 ESTE ES EL ÚNICO QUE SE ENVÍA -->
+                    <input type="hidden"
+                           id="Numero-@Model.IdUnidad"
+                           name="Numero"
+                           value="@Model.Numero" />
+
+                </div>
+
+                <div class="od-chip">
+                    <input type="text" name="Tipo" value="@Model.Tipo" class="od-form-control" />
+                </div>
+
+                <div class="od-chip">
+                    <select name="Estado" class="od-form-control">
+                        <option value="disponible">Disponible</option>
+                        <option value="ocupada">Ocupada</option>
+                        <option value="proceso">En proceso</option>
+                    </select>
+                </div>
+
+                <div class="od-chip od-chip--full">
+                    <textarea name="Descripcion" class="od-form-control">@Model.Descripcion</textarea>
+                </div>
+
+                <div class="od-chip od-chip--full">
+                    <input type="file" name="ImageFile" class="od-form-control" />
+                </div>
+
+            </div>
+
+            <div class="od-footer">
+                <button type="button" data-bs-dismiss="offcanvas">Cancelar</button>
+                <button type="submit">Guardar</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+
+            const form = document.getElementById('@formId');
+            if (!form) return;
+
+            const id = "@Model.IdUnidad";
+
+            const bloque = document.getElementById("bloqueUnidad-" + id);
+            const numeroInput = document.getElementById("numeroUnidad-" + id);
+            const hiddenNumero = document.getElementById("Numero-" + id);
+
+            // =========================
+            // INIT
+            // =========================
+            if (hiddenNumero.value?.includes("-")) {
+                const parts = hiddenNumero.value.split("-");
+                if (bloque) bloque.value = parts[0];
+                if (numeroInput) numeroInput.value = parts[1];
+            }
+
+            function syncNumero() {
+                if (!hiddenNumero) return;
+
+                const b = bloque?.value || "";
+                const n = numeroInput?.value || "";
+
+                if (b && n) {
+                    hiddenNumero.value = `${b}-${n}`;
+                } else {
+                    hiddenNumero.value = "";
+                }
+            }
+
+            bloque?.addEventListener("change", syncNumero);
+            numeroInput?.addEventListener("input", syncNumero);
+
+            form.addEventListener("submit", async function (e) {
+                e.preventDefault();
+
+                const btn = form.querySelector("button[type='submit']");
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = "Guardando...";
+                }
+
+                syncNumero(); // 🔥 GARANTIZA VALOR FINAL
+
+                const formData = new FormData(form);
+
+                const resp = await fetch(form.action, {
+                    method: "POST",
+                    headers: {
+                        "RequestVerificationToken": formData.get("__RequestVerificationToken"),
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Accept": "application/json"
+                    },
+                    body: formData
+                });
+
+                const json = await resp.json();
+
+                if (json?.success) {
+
+                    const btnEdit = document.querySelector(`.btn-unidad-edit[data-id='${json.id}']`);
+
+                    if (btnEdit) {
+                        const card = btnEdit.closest(".uh-card");
+
+                        if (card) {
+                            const badge = card.querySelector(".uh-badge-num");
+                            if (badge) badge.textContent = json.numero;
+
+                            const img = card.querySelector(".uh-img");
+                            if (img && json.imgUrl) img.src = json.imgUrl;
+                        }
+                    }
+
+                    bootstrap.Offcanvas.getOrCreateInstance(
+                        document.getElementById("@offcanvasId")
+                    ).hide();
+                }
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = "Guardar";
+                }
+            });
+
+        })();
+    </script>
+}
+
+
+<style>
+    /* ── OFFCANVAS BASE ── */
+    .od-offcanvas {
+        width: 420px !important;
+        font-family: 'Outfit', sans-serif;
+        border-left: 1px solid #e8edf6 !important;
+        box-shadow: -8px 0 40px rgba(15, 23, 42, .12) !important;
+    }
+
+    /* ── HEADER ── */
+    .od-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 24px 0;
+    }
+
+    .od-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 22px;
+        color: #0f172a;
+        font-weight: 400;
+    }
+
+    .od-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #f8faff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 15px;
+        color: #64748b;
+        transition: .2s ease;
+    }
+
+    .od-close:hover {
+        background: #fee2e2;
+        border-color: #fecaca;
+        color: #dc2626;
+    }
+
+    /* ── BODY SCROLL ── */
+    .od-body {
+        padding: 0 24px 16px !important;
+        overflow-y: auto;
+    }
+
+    /* ── IMAGEN ── */
+    .od-img-wrap {
+        position: relative;
+        margin: 18px 0 0;
+        height: 200px;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .od-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .od-img-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 35%, rgba(15,23,42,.62) 100%);
+    }
+
+    .od-img-badge {
+        position: absolute;
+        bottom: 13px;
+        left: 13px;
+        background: rgba(255,255,255,.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,.3);
+        color: #fff;
+        padding: 6px 13px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .od-estado {
+        position: absolute;
+        bottom: 13px;
+        right: 13px;
+        padding: 6px 12px;
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .od-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+    }
+
+    .od-badge--dis { background: rgba(34,197,94,.18);  border: 1px solid rgba(34,197,94,.3);  color: #86efac; }
+    .od-badge--ocu { background: rgba(239,68,68,.18);  border: 1px solid rgba(239,68,68,.3);  color: #fca5a5; }
+    .od-badge--pro { background: rgba(245,158,11,.18); border: 1px solid rgba(245,158,11,.3); color: #fcd34d; }
+    .od-badge--def { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); color: #fff; }
+
+    /* ── SECTION LABEL ── */
+    .od-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin: 22px 0 12px;
+    }
+
+    /* ── INFO GRID ── */
+    .od-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .od-chip {
+        background: #f8faff;
+        border: 1px solid #e8edf6;
+        border-radius: 14px;
+        padding: 13px 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .od-field { position: relative; }
+    .od-field .od-form-control { padding-top: 18px; padding-bottom: 10px; }
+    .od-float-lbl {
+        position: absolute;
+        left: 12px;
+        top: 10px;
+        font-size: 11px;
+        color: #94a3b8;
+        pointer-events: none;
+        transition: transform .12s ease, font-size .12s ease, top .12s ease;
+    }
+    .od-field .od-form-control:not(:placeholder-shown) + .od-float-lbl,
+    .od-field .od-form-control:focus + .od-float-lbl {
+        transform: translateY(-10px);
+        font-size: 10px;
+        top: 6px;
+        color: #60a5fa;
+    }
+
+    /* Modern form controls */
+    .od-form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #e6eef8;
+        background: #ffffff;
+        color: #0f172a;
+        font-size: 14px;
+        box-shadow: 0 1px 2px rgba(16,24,40,0.03) inset;
+        transition: border-color .15s ease, box-shadow .15s ease, transform .08s ease;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    .od-form-control:focus {
+        outline: none;
+        border-color: #60a5fa;
+        box-shadow: 0 8px 24px rgba(96,165,250,0.12);
+        transform: translateY(-1px);
+    }
+
+    textarea.od-form-control { min-height: 110px; resize: vertical; padding-top: 12px; }
+
+    select.od-form-control { padding-right: 34px; background-image: linear-gradient(45deg, transparent 50%, #475569 50%), linear-gradient(135deg, #475569 50%, transparent 50%); background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 12px) calc(1em + 2px); background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
+
+    input[type="file"].od-form-control {
+        padding: 10px 12px;
+        height: auto;
+    }
+
+    .od-chip--full  { grid-column: 1 / -1; }
+
+    .od-chip-lbl {
+        font-size: 10px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        font-weight: 500;
+    }
+
+    .od-chip-val {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .od-chip-val--desc {
+        font-size: 13px;
+        font-weight: 400;
+        color: #475569;
+        line-height: 1.55;
+    }
+
+    /* ── DIVIDER ── */
+    .od-divider {
+        height: 1px;
+        background: #f1f5f9;
+        margin: 6px 0 4px;
+    }
+
+    /* ── INQUILINO CARD ── */
+    .od-inq-card {
+        background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+        border: 1px solid #dbeafe;
+        border-radius: 18px;
+        padding: 6px 16px;
+    }
+
+    .od-inq-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(219,234,254,.7);
+    }
+
+    .od-inq-row:last-child {
+        border-bottom: none;
+    }
+
+    .od-inq-ico {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid #dbeafe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #2563eb;
+        flex-shrink: 0;
+    }
+
+    .od-inq-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .od-inq-lbl {
+        font-size: 10px;
+        color: #7cb4e4;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        font-weight: 500;
+    }
+
+    .od-inq-val {
+        font-size: 13px;
+        font-weight: 600;
+        color: #0f172a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ── SIN INQUILINO ── */
+    .od-no-inq {
+        background: #f8faff;
+        border: 1.5px dashed #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 13px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .od-no-inq i {
+        font-size: 22px;
+        opacity: .5;
+    }
+
+    /* ── FOOTER ── */
+    .od-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 14px 24px 22px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .od-foot-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 13px;
+        border-radius: 13px;
+        font-family: 'Outfit', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform .2s ease, background .2s ease, color .2s ease;
+        border: 1px solid transparent;
+    }
+
+    .od-foot-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .od-foot-btn--edit {
+        background: #fffbeb;
+        color: #d97706;
+        border-color: #fde68a;
+    }
+
+    .od-foot-btn--edit:hover {
+        background: #d97706;
+        color: #fff;
+        border-color: #d97706;
+    }
+
+    .od-foot-btn--delete {
+        background: #fef2f2;
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+
+    .od-foot-btn--delete:hover {
+        background: #dc2626;
+        color: #fff;
+        border-color: #dc2626;
+    }
+
+    /* ── RESPONSIVE ── */
+    @@media (max-width: 480px) {
+        .od-offcanvas { width: 100vw !important; }
+    }
+</style>

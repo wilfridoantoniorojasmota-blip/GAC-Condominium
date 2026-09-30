@@ -1,0 +1,1249 @@
+﻿@model IEnumerable<PROTOTIPO.Models.UnidadHabitacional>
+
+@{
+    ViewData["Title"] = "Unidades Habitacionales";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+}
+
+<div class="up-page">
+
+    <!-- ══════════════════════════════════════
+         HERO HEADER
+    ══════════════════════════════════════ -->
+    <div class="up-hero">
+
+        <div class="up-hero-bg"></div>
+        <div class="up-hero-grain"></div>
+
+        <div class="up-hero-content">
+
+            <div class="up-hero-left">
+                <p class="up-hero-eyebrow">
+                    <span class="up-pulse-dot"></span>
+                    Sistema GAC · En tiempo real
+                </p>
+                <h1 class="up-hero-title">Unidades <em>Habitacionales</em></h1>
+                <p class="up-hero-sub">
+                    @ViewBag.TotalCount unidades registradas
+                    &nbsp;·&nbsp;
+                    @ViewBag.DisponiblesCount disponibles
+                    &nbsp;·&nbsp;
+                    @ViewBag.OcupadasCount ocupadas
+                </p>
+            </div>
+
+            <a href="/UnidadHabitacionals/Create" class="up-btn-nueva">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                Nueva unidad
+            </a>
+
+        </div>
+
+        <!-- Filtros de estado -->
+        <div class="up-filters">
+            <button class="up-filter active" data-filter="all">Todas</button>
+            <button class="up-filter" data-filter="disponible">
+                <span class="up-fdot" style="background:#4ade80;"></span>Disponibles
+            </button>
+            <button class="up-filter" data-filter="ocupada">
+                <span class="up-fdot" style="background:#f87171;"></span>Ocupadas
+            </button>
+            <button class="up-filter" data-filter="proceso">
+                <span class="up-fdot" style="background:#fbbf24;"></span>En proceso
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════
+         GRID DE CARDS
+    ══════════════════════════════════════ -->
+    <div class="up-grid" id="upGrid">
+
+        @{
+            int cardIdx = 0;
+        }
+
+        @foreach (var item in Model)
+        {
+            var estado = item.Estado?.ToLower() ?? "";
+            var imgUrl = item.ImagenUnidads?.FirstOrDefault()?.Url;
+            if (string.IsNullOrEmpty(imgUrl))
+                imgUrl = Url.Content("~/img/placeholder-unidad.jpg");
+
+            var inqContrato = item.ContratoAlquilers?
+                .FirstOrDefault(c => string.Equals(c.Estado, "activo", StringComparison.OrdinalIgnoreCase));
+            var inquilino = inqContrato?.IdUsuarioNavigation?.Nombre;
+
+            string estadoColor = estado switch
+            {
+                "disponible" => "#22c55e",
+                "ocupada" => "#ef4444",
+                "proceso" => "#f59e0b",
+                _ => "#94a3b8"
+            };
+            string estadoLabel = item.Estado ?? "N/A";
+
+            cardIdx++;
+
+            <article class="up-card"
+                     data-estado="@estado"
+                     style="animation-delay: @(cardIdx * 60)ms">
+
+                <!-- ── Imagen ── -->
+                <div class="up-card-img-wrap">
+
+                    <img src="@Url.Content(imgUrl)"
+                         alt="Unidad @item.Numero"
+                         class="up-card-img"
+                         loading="lazy" />
+
+                    <div class="up-card-img-veil"></div>
+
+                    <!-- Número en serif grande -->
+                    <div class="up-card-num">
+                        <span class="up-card-num-label">Unidad</span>
+                        <span class="up-card-num-val">@item.Numero</span>
+                    </div>
+
+                    <!-- Badge estado -->
+                    <div class="up-card-badge" style="--st-color: @estadoColor;">
+                        <span class="up-badge-dot"></span>
+                        @estadoLabel
+                    </div>
+
+                </div>
+
+                <!-- ── Cuerpo ── -->
+                <div class="up-card-body">
+
+                    <div class="up-card-meta">
+
+                        <div class="up-meta-item">
+                            <svg class="up-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5L12 4l9 7.5" /><path d="M9 21V12h6v9" /></svg>
+                            <div>
+                                <span class="up-meta-lbl">Tipo</span>
+                                <span class="up-meta-val">@(item.Tipo ?? "—")</span>
+                            </div>
+                        </div>
+
+                        <div class="up-meta-divider"></div>
+
+                        <div class="up-meta-item">
+                            <svg class="up-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                            <div>
+                                <span class="up-meta-lbl">Inquilino</span>
+                                <span class="up-meta-val @(inquilino == null ? "up-meta-empty" : "")">
+                                    @(inquilino ?? "Sin inquilino")
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="uh-specs">
+
+                        <div class="uh-spec-item">
+                            <i class="fa-solid fa-bed"></i>
+                            <span>@item.CantidadHabitaciones Hab</span>
+                        </div>
+
+                        <div class="uh-spec-item">
+                            <i class="fa-solid fa-bath"></i>
+                            <span>@item.CantidadBanos Baños</span>
+                        </div>
+
+                        <div class="uh-spec-item">
+                            <i class="fa-solid fa-ruler-combined"></i>
+                            <span>@item.MetrosCuadrados m²</span>
+                        </div>
+
+
+
+                    </div>
+
+                </div>
+
+                <!-- ── Acciones ── -->
+                <div class="up-card-actions">
+
+                    <button class="up-act up-act-view btn-unidad-details"
+                            data-id="@item.IdUnidad"
+                            title="Ver detalles">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><circle cx="12" cy="8" r=".5" fill="currentColor" /></svg>
+                        <span>Detalles</span>
+                    </button>
+
+                    <a class="up-act up-act-edit"
+                       asp-action="Edit"
+                       asp-controller="UnidadHabitacionals"
+                       asp-route-id="@item.IdUnidad"
+                       title="Editar unidad">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M16 3l5 5L8 21H3v-5L16 3z" />
+                        </svg>
+                        <span>Editar</span>
+                    </a>
+
+                    <button class="up-act up-act-assign btn-unidad-assign"
+                            data-id="@item.IdUnidad"
+                            title="Asignar inquilino">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><path d="M20 8v6M23 11h-6" /></svg>
+                        <span>Asignar</span>
+                    </button>
+
+                    <a href="/UnidadHabitacionals/Delete/@item.IdUnidad"
+                       class="up-act up-act-delete"
+                       title="Eliminar unidad">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
+                        <span>Eliminar</span>
+                    </a>
+                    <a asp-action="Duplicate"
+                       asp-route-id="@item.IdUnidad"
+                       class="unit-duplicate-btn"
+                       title="Duplicar unidad">
+                        <i class="bi bi-copy"></i>
+                        Duplicar
+                    </a>
+
+
+                </div>
+
+            </article>
+        }
+
+    </div>
+
+    <!-- Empty state -->
+    <div class="up-empty" id="upEmpty" style="display:none;">
+        <div class="up-empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 11.5L12 4l9 7.5" /><path d="M9 21V12h6v9" /></svg>
+        </div>
+        <p class="up-empty-title">Sin resultados</p>
+        <p class="up-empty-sub">No hay unidades con ese estado</p>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         PAGINACIÓN
+    ══════════════════════════════════════ -->
+    <div class="up-pager">
+        @{
+            var current = (int)(ViewBag.CurrentPage ?? 1);
+            var total = (int)(ViewBag.TotalPages ?? 1);
+        }
+        <nav aria-label="Páginas">
+            <ul class="pagination up-pagination">
+                <li class="page-item @(current == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(current - 1)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6" /></svg>
+                    </a>
+                </li>
+                @for (int i = 1; i <= total; i++)
+                {
+                    <li class="page-item @(i == current ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(current == total ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(current + 1)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6" /></svg>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+   <script>
+    /* ════════════════════════════════════
+       FILTROS DE ESTADO
+    ════════════════════════════════════ */
+    document.querySelectorAll('.up-filter').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.up-filter').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const filter = this.dataset.filter;
+            const cards = document.querySelectorAll('.up-card');
+            let visible = 0;
+
+            cards.forEach(card => {
+                const match = filter === 'all' || card.dataset.estado === filter;
+                card.style.display = match ? '' : 'none';
+                if (match) visible++;
+            });
+
+            document.getElementById('upEmpty').style.display = visible === 0 ? 'flex' : 'none';
+        });
+    });
+
+    /* ════════════════════════════════════
+       HELPER: cargar detalle de un contrato
+    ════════════════════════════════════ */
+    async function cargarDetalleContrato(off, idContrato) {
+        const contenedorDetalle = off.querySelector('[data-role="contrato-detalle"]');
+
+        if (!contenedorDetalle) return;
+
+        if (!idContrato) {
+            contenedorDetalle.style.display = 'none';
+            return;
+        }
+
+        try {
+            const resp = await fetch(
+                `/UnidadHabitacionals/ObtenerContrato?id=${idContrato}`,
+                {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }
+            );
+
+            if (!resp.ok)
+                throw new Error('Error en la petición');
+
+            const data = await resp.json();
+
+            if (data.success) {
+
+                const setField = (name, value, fallback) => {
+                    const el = contenedorDetalle.querySelector(
+                        `[data-field="${name}"]`
+                    );
+
+                    if (el)
+                        el.innerText = value || fallback;
+                };
+
+                // ==========================================
+                // DATOS GENERALES
+                // ==========================================
+                setField('nombre', data.nombre, 'N/A');
+                setField('nombreEmpresa', data.nombreEmpresa, 'N/A');
+                setField('personaAlojada', data.personaAlojada, 'No especificada');
+                setField('telefono', data.telefono, 'N/A');
+                setField('fechaInicio', data.fechaInicio, 'N/A');
+                setField('fechaFin', data.fechaFin, 'Sin fecha');
+                setField('renta', data.renta, '0.00');
+                setField('estado', data.estado, 'N/A');
+
+                // ==========================================
+                // ELEMENTOS DINÁMICOS POR TIPO DE CLIENTE
+                // ==========================================
+                const filaNombreEmpresa = contenedorDetalle.querySelector('#filaNombreEmpresa');
+                const filaPersonaAlojada = contenedorDetalle.querySelector('#filaPersonaAlojada');
+                const inquilinoLabel = contenedorDetalle.querySelector('#inquilinoLabel');
+
+                const identificacionLabel = contenedorDetalle.querySelector('#identificacionLabel');
+                const identificacion = contenedorDetalle.querySelector('#detalleIdentificacion');
+
+                // Resetear visibilidad por defecto
+                if (filaNombreEmpresa) filaNombreEmpresa.style.display = 'none';
+                if (filaPersonaAlojada) filaPersonaAlojada.style.display = 'none';
+
+                // Determinar si es Jurídico o Persona Física
+                const esJuridico = data.tipoCliente === 'Juridico';
+
+                // Cambiar el label de Inquilino / Responsable
+                if (inquilinoLabel) {
+                    inquilinoLabel.innerText = esJuridico ? 'Responsable:' : 'Inquilino:';
+                }
+
+                if (identificacionLabel && identificacion) {
+                    if (data.tipoCliente === 'Dominicano') {
+                        identificacionLabel.innerText = 'Cédula:';
+                        identificacion.innerText = data.cedula || 'N/A';
+                    }
+                    else if (data.tipoCliente === 'Extranjero') {
+                        identificacionLabel.innerText = 'Pasaporte:';
+                        identificacion.innerText = data.pasaporte || 'N/A';
+                    }
+                    else if (esJuridico) {
+                        identificacionLabel.innerText = 'RNC:';
+                        identificacion.innerText = data.rnc || 'N/A';
+
+                        // Mostrar campos adicionales de Empresa y Persona Alojada
+                        if (filaNombreEmpresa) filaNombreEmpresa.style.display = 'flex';
+                        if (filaPersonaAlojada) filaPersonaAlojada.style.display = 'flex';
+                    }
+                    else {
+                        identificacionLabel.innerText = 'Identificación:';
+                        identificacion.innerText = 'N/A';
+                    }
+                }
+
+                // ==========================================
+                // MOSTRAR DETALLE
+                // ==========================================
+                contenedorDetalle.style.display = 'block';
+
+            }
+            else {
+                contenedorDetalle.style.display = 'none';
+            }
+
+        }
+        catch (err) {
+            console.error('Error al obtener contrato:', err);
+            contenedorDetalle.style.display = 'none';
+        }
+    }
+
+    /* ════════════════════════════════════
+       OFFCANVAS — detalles / editar / asignar
+    ════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.up-grid') || document.body;
+
+        container.addEventListener('click', async function(e) {
+            const btn = e.target.closest('.btn-unidad-details, .btn-unidad-edit, .btn-unidad-assign');
+            if (!btn) return;
+            e.preventDefault();
+            if (btn.dataset.busy === '1') return;
+            btn.dataset.busy = '1';
+
+            try {
+                const id = btn.getAttribute('data-id');
+
+                const loadAndShow = async (url) => {
+                    const resp = await fetch(url, {
+                        credentials: 'same-origin',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' }
+                    });
+                    if (!resp.ok) return null;
+                    const html = await resp.text();
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = html;
+                    document.querySelectorAll('.offcanvas.dynamic-partial').forEach(el => {
+                        try { const inst = bootstrap.Offcanvas.getInstance(el); if (inst) inst.dispose(); } catch (err) { }
+                        el.remove();
+                    });
+                    document.body.appendChild(wrapper);
+                    const off = wrapper.querySelector('.offcanvas');
+                    if (off) off.classList.add('dynamic-partial');
+                    return { wrapper, off };
+                };
+
+                if (btn.classList.contains('btn-unidad-details')) {
+                    const res = await loadAndShow(`/UnidadHabitacionals/DetailsPartial/${id}`);
+                    if (!res) { alert('No se pudo cargar detalles'); return; }
+                    bootstrap.Offcanvas.getOrCreateInstance(res.off).show();
+                    res.off.addEventListener('hidden.bs.offcanvas', () => res.wrapper.remove());
+                }
+
+                if (btn.classList.contains('btn-unidad-edit')) {
+                    const res = await loadAndShow(`/UnidadHabitacionals/EditPartial/${id}`);
+                    if (!res) { alert('No se pudo cargar formulario de edición'); return; }
+                    bootstrap.Offcanvas.getOrCreateInstance(res.off).show();
+                    res.off.addEventListener('hidden.bs.offcanvas', () => res.wrapper.remove());
+                }
+
+                if (btn.classList.contains('btn-unidad-assign')) {
+                    const res = await loadAndShow(`/UnidadHabitacionals/AssignPartial/${id}`);
+                    if (!res) { alert('No se pudo cargar formulario de asignación'); return; }
+                    const bs = bootstrap.Offcanvas.getOrCreateInstance(res.off);
+                    bs.show();
+
+                    /* ── listener del select de contrato ── */
+                    const selectContrato = res.off.querySelector('[data-role="select-contrato"]');
+                    if (selectContrato) {
+                        selectContrato.addEventListener('change', function() {
+                            cargarDetalleContrato(res.off, this.value);
+                        });
+                    }
+
+                    const form = res.off.querySelector('#assignForm');
+                    if (form && form.dataset.init !== '1') {
+                        form.dataset.init = '1';
+                        form.addEventListener('submit', async function(e) {
+                            e.preventDefault();
+                            const formData = new FormData(form);
+                            const token = formData.get('__RequestVerificationToken');
+                            const post = await fetch(form.action, {
+                                method: 'POST',
+                                headers: { 'RequestVerificationToken': token },
+                                body: formData
+                            });
+                            if (post.ok) {
+                                const contentType = post.headers.get('content-type') || '';
+                                if (contentType.indexOf('application/json') !== -1) {
+                                    const json = await post.json();
+                                    if (json && json.success) { bs.hide(); location.reload(); }
+                                    else {
+                                        const msg = (json && json.message) ? json.message : 'No se pudo asignar inquilino';
+                                        console.warn('Assign failed response', json);
+                                        let detail = json && json.detail ? ('\n\nDETALLE:\n' + json.detail) : '';
+                                        alert(msg + detail);
+                                    }
+                                } else {
+                                    const html2 = await post.text();
+                                    const newWrap = document.createElement('div');
+                                    newWrap.innerHTML = html2;
+                                    const newOff = newWrap.querySelector('.offcanvas');
+                                    if (newOff) res.off.replaceWith(newOff);
+                                }
+                            } else { alert('Error al asignar inquilino'); }
+                        });
+                    }
+                    res.off.addEventListener('hidden.bs.offcanvas', () => res.wrapper.remove());
+                }
+
+            } finally { delete btn.dataset.busy; }
+        }, true);
+
+        /* Unassign delegado */
+        document.body.addEventListener('click', async function(e) {
+            const btn = e.target.closest('.od-btn-unassign');
+            if (!btn) return;
+            e.preventDefault();
+            if (!confirm('¿Desvincular inquilino de esta unidad?')) return;
+            const id = btn.getAttribute('data-id');
+            let token = null;
+            try {
+                const off = btn.closest('.offcanvas');
+                const local = off ? off.querySelector('input[name="__RequestVerificationToken"]') : null;
+                if (local) token = local.value;
+            } catch (err) { }
+            if (!token) {
+                const g = document.querySelector('input[name="__RequestVerificationToken"]');
+                token = g ? g.value : null;
+            }
+            const headers = { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' };
+            let body = null;
+            if (token) {
+                headers['RequestVerificationToken'] = token;
+                headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+                body = new URLSearchParams({ __RequestVerificationToken: token }).toString();
+            }
+            const resp = await fetch(`/UnidadHabitacionals/Unassign/${id}`, {
+                method: 'POST', credentials: 'same-origin', headers, body
+            });
+            if (resp.ok) {
+                const json = await resp.json();
+                if (json && json.success) {
+                    try {
+                        const off = document.getElementById(`editOffcanvas-${id}`);
+                        if (off) {
+                            const chip = off.querySelector('.od-chip.od-chip--full');
+                            if (chip) {
+                                const noinq = document.createElement('div');
+                                noinq.className = 'od-no-inq';
+                                noinq.innerHTML = '<i class="fa-solid fa-user-slash"></i><span>Sin inquilino registrado</span>';
+                                chip.replaceWith(noinq);
+                            }
+                        }
+                    } catch (err) { console.warn(err); }
+                } else { alert((json && json.message) ? json.message : 'No se pudo desvincular'); }
+            } else { alert('No se pudo desvincular'); }
+        }, true);
+    });
+</script>
+}
+
+<style>
+
+    /* ═══════════════════════════════════════════
+       VARIABLES
+    ═══════════════════════════════════════════ */
+    :root {
+        --up-blue: #258cfb;
+        --up-blue-dk: #1a6fd4;
+        --up-blue-glow: rgba(37,140,251,.22);
+        --up-dark: #0d1117;
+        --up-text: #0f172a;
+        --up-muted: #64748b;
+        --up-border: #e2e8f0;
+        --up-surface: #f8fafc;
+        --up-white: #ffffff;
+        --serif: 'Cormorant Garamond', Georgia, serif;
+        --sans: 'Sora', sans-serif;
+        --up-radius: 20px;
+        --up-shadow: 0 2px 8px rgba(15,23,42,.06), 0 12px 32px rgba(15,23,42,.06);
+    }
+
+    .up-page, .up-page * {
+        font-family: var(--sans);
+    }
+
+    .up-page {
+        padding: 0 0 48px;
+        background: #f1f5fb;
+        min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════════
+       HERO HEADER
+    ═══════════════════════════════════════════ */
+    .up-hero {
+        position: relative;
+        background: var(--up-dark);
+        padding: 44px 36px 0;
+        overflow: hidden;
+        margin-bottom: 36px;
+    }
+
+    /* Fondo geométrico abstracto */
+    .up-hero-bg {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 700px 400px at 80% -20%, rgba(37,140,251,.18) 0%, transparent 65%), radial-gradient(ellipse 400px 300px at -5% 120%, rgba(37,140,251,.10) 0%, transparent 60%), linear-gradient(160deg, #0d1117 0%, #141c2e 100%);
+    }
+
+    /* Grain overlay */
+    .up-hero-grain {
+        position: absolute;
+        inset: 0;
+        opacity: .028;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 200px;
+    }
+
+    /* Líneas decorativas horizontales */
+    .up-hero::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 56px;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(37,140,251,.25), transparent);
+    }
+
+    .up-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+
+    .up-hero-eyebrow {
+        font-size: 11px;
+        font-weight: 500;
+        color: rgba(255,255,255,.45);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .up-pulse-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4ade80;
+        display: inline-block;
+        box-shadow: 0 0 0 0 rgba(74,222,128,.5);
+        animation: pulseDot 2s ease infinite;
+    }
+
+    @@keyframes pulseDot {
+        0% {
+            box-shadow: 0 0 0 0 rgba(74,222,128,.5);
+        }
+
+        70% {
+            box-shadow: 0 0 0 7px rgba(74,222,128,0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(74,222,128,0);
+        }
+    }
+
+    .up-hero-title {
+        font-family: var(--serif);
+        font-size: clamp(34px, 3.5vw, 50px);
+        font-weight: 600;
+        color: #fff;
+        line-height: 1.05;
+        margin: 0 0 10px;
+        letter-spacing: -.3px;
+    }
+
+        .up-hero-title em {
+            font-style: italic;
+            color: #93c5fd;
+        }
+
+    .up-hero-sub {
+        font-size: 12.5px;
+        color: rgba(255,255,255,.38);
+        margin: 0;
+        letter-spacing: .3px;
+    }
+
+    /* Botón nueva unidad */
+    .up-btn-nueva {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0 24px;
+        height: 46px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, #258cfb, #1a6fd4);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: .22s;
+        box-shadow: 0 8px 24px rgba(37,140,251,.32);
+        flex-shrink: 0;
+    }
+
+        .up-btn-nueva:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(37,140,251,.42);
+        }
+
+    /* Filtros pill */
+    .up-filters {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        padding-bottom: 0;
+        border-top: 1px solid rgba(255,255,255,.07);
+        padding-top: 16px;
+    }
+
+    .up-filter {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 18px;
+        border-radius: 99px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: transparent;
+        color: rgba(255,255,255,.50);
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s;
+        margin-bottom: -1px;
+    }
+
+        .up-filter:hover {
+            border-color: rgba(255,255,255,.22);
+            color: rgba(255,255,255,.8);
+        }
+
+        .up-filter.active {
+            background: #fff;
+            border-color: #fff;
+            color: var(--up-dark);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-color: #f1f5fb;
+            margin-bottom: -2px;
+            padding-bottom: 9px;
+        }
+
+    .up-fdot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       GRID
+    ═══════════════════════════════════════════ */
+    .up-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 22px;
+        padding: 0 36px;
+    }
+
+    /* ═══════════════════════════════════════════
+       CARD
+    ═══════════════════════════════════════════ */
+    .up-card {
+        background: var(--up-white);
+        border-radius: var(--up-radius);
+        overflow: hidden;
+        border: 1px solid var(--up-border);
+        box-shadow: var(--up-shadow);
+        display: flex;
+        flex-direction: column;
+        animation: cardIn .5s ease both;
+        transition: transform .28s ease, box-shadow .28s ease;
+    }
+
+    @@keyframes cardIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .up-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(15,23,42,.08), 0 28px 56px rgba(15,23,42,.10);
+    }
+
+    /* Imagen */
+    .up-card-img-wrap {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .up-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform .55s ease;
+    }
+
+    .up-card:hover .up-card-img {
+        transform: scale(1.06);
+    }
+
+    .up-card-img-veil {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient( to bottom, rgba(13,17,23,.08) 0%, rgba(13,17,23,.55) 100% );
+    }
+
+    /* Número unidad — serif grande bottom-left */
+    .up-card-num {
+        position: absolute;
+        bottom: 14px;
+        left: 16px;
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+    }
+
+    .up-card-num-label {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.55);
+        margin-bottom: 1px;
+    }
+
+    .up-card-num-val {
+        font-family: var(--serif);
+        font-size: 28px;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1;
+        text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+
+    /* Badge estado — glassmorphism top-right */
+    .up-card-badge {
+        position: absolute;
+        top: 13px;
+        right: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 11px;
+        border-radius: 99px;
+        background: rgba(0,0,0,.35);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,.15);
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: .2px;
+    }
+
+    .up-badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--st-color, #94a3b8);
+        flex-shrink: 0;
+        box-shadow: 0 0 0 2px rgba(255,255,255,.2);
+    }
+
+    /* Cuerpo */
+    .up-card-body {
+        padding: 16px 18px 0;
+    }
+
+    .up-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 0;
+    }
+
+    .up-meta-divider {
+        width: 1px;
+        height: 36px;
+        background: var(--up-border);
+        margin: 0 16px;
+        flex-shrink: 0;
+    }
+
+    .up-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .up-meta-icon {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+        padding: 8px;
+        border-radius: 10px;
+        background: #eff6ff;
+        color: var(--up-blue);
+        stroke: currentColor;
+    }
+
+    .up-meta-item > div {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+    }
+
+    .up-meta-lbl {
+        font-size: 9.5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        color: var(--up-muted);
+    }
+
+    .up-meta-val {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--up-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .up-meta-empty {
+        color: #cbd5e1;
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    /* ── Acciones ── */
+    .up-card-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--up-border);
+        margin-top: 16px;
+    }
+
+    .up-act {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 12px 6px;
+        border: none;
+        background: transparent;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: .3px;
+        cursor: pointer;
+        text-decoration: none;
+        border-right: 1px solid var(--up-border);
+        transition: background .18s, color .18s;
+        font-family: var(--sans);
+    }
+
+        .up-act:last-child {
+            border-right: none;
+        }
+
+        .up-act svg {
+            width: 16px;
+            height: 16px;
+            transition: transform .18s;
+        }
+
+        .up-act:hover svg {
+            transform: scale(1.18);
+        }
+
+    .up-act-view {
+        color: var(--up-blue);
+    }
+
+    .up-act-edit {
+        color: #d97706;
+    }
+
+    .up-act-assign {
+        color: #16a34a;
+    }
+
+    .up-act-delete {
+        color: #dc2626;
+    }
+
+    .up-act-view:hover {
+        background: #eff6ff;
+        color: #1a6fd4;
+    }
+
+    .up-act-edit:hover {
+        background: #fffbeb;
+        color: #b45309;
+    }
+
+    .up-act-assign:hover {
+        background: #f0fdf4;
+        color: #15803d;
+    }
+
+    .up-act-delete:hover {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+    /* ═══════════════════════════════════════════
+       EMPTY STATE
+    ═══════════════════════════════════════════ */
+    .up-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 72px 20px;
+        gap: 12px;
+        color: #94a3b8;
+    }
+
+    .up-empty-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #cbd5e1;
+    }
+
+        .up-empty-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+    .up-empty-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .up-empty-sub {
+        font-size: 13px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       PAGINACIÓN
+    ═══════════════════════════════════════════ */
+    .up-pager {
+        display: flex;
+        justify-content: center;
+        padding: 28px 0 0;
+    }
+
+    .up-pagination .page-link {
+        border: 1px solid var(--up-border);
+        color: var(--up-muted);
+        border-radius: 10px !important;
+        margin: 0 3px;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        transition: .18s;
+        padding: 0;
+    }
+
+        .up-pagination .page-link:hover {
+            background: var(--up-blue);
+            border-color: var(--up-blue);
+            color: #fff;
+        }
+
+    .up-pagination .page-item.active .page-link {
+        background: var(--up-blue);
+        border-color: var(--up-blue);
+        color: #fff;
+        box-shadow: 0 4px 12px var(--up-blue-glow);
+    }
+
+    .up-pagination .page-item.disabled .page-link {
+        opacity: .35;
+        pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @@media (max-width: 768px) {
+        .up-hero {
+            padding: 30px 20px 0;
+        }
+
+        .up-grid {
+            grid-template-columns: 1fr;
+            padding: 0 16px;
+        }
+
+        .up-hero-title {
+            font-size: 32px;
+        }
+
+        .up-hero-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .up-filter.active {
+            border-radius: 99px;
+            margin-bottom: 0;
+            padding-bottom: 7px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .up-card-actions {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .up-act:nth-child(2) {
+            border-right: none;
+        }
+
+        .up-act:nth-child(3) {
+            border-top: 1px solid var(--up-border);
+        }
+
+        .up-act:nth-child(4) {
+            border-top: 1px solid var(--up-border);
+        }
+    }
+
+
+    .uh-specs {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    .uh-spec-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.04); /* gris suave tipo slate */
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        font-size: 12px;
+        font-weight: 500;
+        color: #334155;
+        transition: all 0.2s ease;
+    }
+
+        /* hover sutil tipo dashboard */
+        .uh-spec-item:hover {
+            transform: translateY(-1px);
+            background: rgba(59, 130, 246, 0.08);
+            border-color: rgba(59, 130, 246, 0.25);
+        }
+
+        /* iconos */
+        .uh-spec-item i {
+            font-size: 13px;
+            color: #3b82f6; /* azul moderno */
+        }
+
+        /* valores */
+        .uh-spec-item span {
+            white-space: nowrap;
+        }
+
+    .uh-spec-item {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    @@media (max-width: 576px) {
+        .uh-spec-item {
+            font-size: 11px;
+            padding: 5px 8px;
+        }
+    }
+
+    .unit-duplicate-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 13px;
+        border-radius: 8px;
+        border: 1px solid #bfdbfe;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background .15s, border-color .15s, color .15s;
+        white-space: nowrap;
+    }
+
+        .unit-duplicate-btn:hover {
+            background: #1a56e8;
+            border-color: #1a56e8;
+            color: #ffffff;
+        }
+
+        .unit-duplicate-btn i {
+            font-size: 15px;
+        }
+</style>

@@ -1,0 +1,519 @@
+﻿@model PROTOTIPO.Models.Usuario
+
+@{
+    ViewData["Title"] = "Eliminar Usuario";
+
+    var iniciales = "";
+    if (!string.IsNullOrEmpty(Model.Nombre)) iniciales += Model.Nombre[0];
+    if (!string.IsNullOrEmpty(Model.Apellido)) iniciales += Model.Apellido[0];
+    iniciales = iniciales.ToUpper();
+
+    var rolNombre = Model.IdRolNavigation?.Nombre ?? "Sin rol";
+    var condoNombre = Model.IdCondominioNavigation?.Nombre ?? "—";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --ink: #0c1220;
+        --ink-soft: #3d4a5c;
+        --ink-muted: #7a8799;
+        --surface: #f4f6fb;
+        --surface-2: #ffffff;
+        --border: #e4e9f0;
+        --accent: #1a56e8;
+        --accent-light: #eff4ff;
+        --danger: #b91c1c;
+        --danger-soft: #fff1f0;
+        --danger-bdr: #fecaca;
+        --danger-mid: #dc2626;
+        --r-lg: 14px;
+        --r-xl: 20px;
+        --r-2xl: 26px;
+        --r-pill: 999px;
+        --shadow-sm: 0 2px 8px rgba(12,18,32,.07);
+        --shadow-md: 0 8px 28px rgba(12,18,32,.09);
+        --ease: .22s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: var(--font-b);
+        background: var(--surface);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page ───────────────────────────────────────── */
+    .del-page {
+        max-width: 620px;
+        margin: 48px auto;
+        padding: 0 24px 64px;
+    }
+
+    /* ── Breadcrumb ─────────────────────────────────── */
+    .del-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .78rem;
+        font-weight: 500;
+        color: var(--ink-muted);
+        margin-bottom: 28px;
+    }
+
+        .del-breadcrumb a {
+            color: var(--ink-muted);
+            text-decoration: none;
+            transition: color var(--ease);
+        }
+
+            .del-breadcrumb a:hover {
+                color: var(--accent);
+            }
+
+        .del-breadcrumb i.sep {
+            font-size: .65rem;
+        }
+
+    /* ── Warning banner ─────────────────────────────── */
+    .del-warning {
+        background: var(--danger-soft);
+        border: 1px solid var(--danger-bdr);
+        border-radius: var(--r-xl);
+        padding: 18px 22px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .del-warning-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: #fee2e2;
+        color: var(--danger);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+
+    .del-warning-title {
+        font-family: var(--font-d);
+        font-size: .95rem;
+        font-weight: 700;
+        color: var(--danger);
+        margin-bottom: 3px;
+    }
+
+    .del-warning-sub {
+        font-size: .8rem;
+        color: #b91c1c;
+        opacity: .75;
+        line-height: 1.5;
+    }
+
+    /* ── Card ───────────────────────────────────────── */
+    .del-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-2xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    /* ── Card header with avatar ────────────────────── */
+    .del-card-header {
+        background: var(--ink);
+        padding: 28px 32px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+        /* dot grid */
+        .del-card-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        /* danger glow */
+        .del-card-header::after {
+            content: '';
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(220,38,38,.2) 0%, transparent 68%);
+            top: -80px;
+            right: -60px;
+            pointer-events: none;
+        }
+
+    .del-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: rgba(185,28,28,.35);
+        border: 2px solid rgba(252,165,165,.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-d);
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #fca5a5;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .del-card-header-text {
+        position: relative;
+        z-index: 1;
+    }
+
+    .del-user-name {
+        font-family: var(--font-d);
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -.03em;
+        color: #fff;
+        margin: 0 0 5px;
+    }
+
+    .del-user-meta {
+        font-size: .8rem;
+        color: rgba(255,255,255,.5);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .del-user-meta i {
+            font-size: .8rem;
+        }
+
+    /* ── Info rows ──────────────────────────────────── */
+    .del-info-list {
+        padding: 8px 0;
+    }
+
+    .del-info-row {
+        display: flex;
+        align-items: center;
+        padding: 15px 32px;
+        border-bottom: 1px solid var(--border);
+        transition: background var(--ease);
+        gap: 16px;
+    }
+
+        .del-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .del-info-row:hover {
+            background: #fafbfc;
+        }
+
+    .del-info-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--accent-light);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .9rem;
+        flex-shrink: 0;
+    }
+
+    .del-info-label {
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--ink-muted);
+        margin-bottom: 2px;
+    }
+
+    .del-info-value {
+        font-size: .9rem;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .del-info-value--pwd {
+        letter-spacing: .2em;
+        color: var(--ink-muted);
+        font-size: .85rem;
+        font-weight: 400;
+    }
+
+    /* ── Footer / actions ───────────────────────────── */
+    .del-footer {
+        background: var(--danger-soft);
+        border-top: 1px solid var(--danger-bdr);
+        padding: 22px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .del-footer-note {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: .75rem;
+        color: var(--danger);
+        opacity: .8;
+        font-weight: 500;
+    }
+
+        .del-footer-note i {
+            font-size: .85rem;
+        }
+
+    .del-footer-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn-del-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: var(--r-lg);
+        border: 1.5px solid var(--border);
+        background: var(--surface-2);
+        color: var(--ink-soft);
+        text-decoration: none;
+        transition: var(--ease);
+    }
+
+        .btn-del-cancel:hover {
+            background: #fff;
+            border-color: #c8d2de;
+            color: var(--ink);
+        }
+
+    .btn-del-confirm {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 700;
+        padding: 10px 24px;
+        border-radius: var(--r-lg);
+        border: none;
+        background: var(--danger-mid);
+        color: #fff;
+        cursor: pointer;
+        transition: var(--ease);
+        box-shadow: 0 4px 14px rgba(185,28,28,.35);
+    }
+
+        .btn-del-confirm:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(185,28,28,.45);
+        }
+
+        .btn-del-confirm:active {
+            transform: translateY(0);
+        }
+
+        /* Spinner */
+        .btn-del-confirm .spin {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: rot .7s linear infinite;
+        }
+
+        .btn-del-confirm.loading .lbl,
+        .btn-del-confirm.loading i {
+            display: none;
+        }
+
+        .btn-del-confirm.loading .spin {
+            display: block;
+        }
+    @@keyframes rot {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @@media (max-width: 575px) {
+        .del-page {
+            padding: 0 16px 48px;
+        }
+
+        .del-card-header {
+            padding: 22px 20px;
+        }
+
+        .del-info-row {
+            padding: 13px 20px;
+        }
+
+        .del-footer {
+            padding: 18px 20px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .del-footer-actions {
+            flex-direction: column;
+        }
+
+        .btn-del-cancel, .btn-del-confirm {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="del-page">
+
+    <!-- Breadcrumb -->
+    <div class="del-breadcrumb">
+        <a asp-action="Index"><i class="bi bi-people-fill"></i> Usuarios</a>
+        <i class="bi bi-chevron-right sep"></i>
+        <span>Eliminar usuario</span>
+    </div>
+
+    <!-- Warning banner -->
+    <div class="del-warning">
+        <div class="del-warning-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div>
+            <div class="del-warning-title">Acción irreversible</div>
+            <div class="del-warning-sub">
+                Este usuario será eliminado permanentemente del sistema. Esta acción no se puede deshacer.
+            </div>
+        </div>
+    </div>
+
+    <!-- Card -->
+    <div class="del-card">
+
+        <!-- Header con avatar -->
+        <div class="del-card-header">
+            <div class="del-avatar">@iniciales</div>
+            <div class="del-card-header-text">
+                <div class="del-user-name">@Model.Nombre @Model.Apellido</div>
+                <div class="del-user-meta">
+                    <i class="bi bi-person-badge"></i> @rolNombre
+                    &nbsp;·&nbsp;
+                    <i class="bi bi-buildings"></i> @condoNombre
+                </div>
+            </div>
+        </div>
+
+        <!-- Info rows -->
+        <div class="del-info-list">
+
+            <div class="del-info-row">
+                <div class="del-info-icon"><i class="bi bi-envelope"></i></div>
+                <div>
+                    <div class="del-info-label">Correo electrónico</div>
+                    <div class="del-info-value">@(string.IsNullOrEmpty(Model.Email) ? "—" : Model.Email)</div>
+                </div>
+            </div>
+
+            <div class="del-info-row">
+                <div class="del-info-icon"><i class="bi bi-telephone"></i></div>
+                <div>
+                    <div class="del-info-label">Teléfono</div>
+                    <div class="del-info-value">@(string.IsNullOrEmpty(Model.Telefono) ? "—" : Model.Telefono)</div>
+                </div>
+            </div>
+
+            <div class="del-info-row">
+                <div class="del-info-icon"><i class="bi bi-lock"></i></div>
+                <div>
+                    <div class="del-info-label">Contraseña</div>
+                    <div class="del-info-value del-info-value--pwd">••••••••</div>
+                </div>
+            </div>
+
+            <div class="del-info-row">
+                <div class="del-info-icon"><i class="bi bi-person-badge"></i></div>
+                <div>
+                    <div class="del-info-label">Rol</div>
+                    <div class="del-info-value">@rolNombre</div>
+                </div>
+            </div>
+
+            <div class="del-info-row">
+                <div class="del-info-icon"><i class="bi bi-buildings"></i></div>
+                <div>
+                    <div class="del-info-label">Condominio</div>
+                    <div class="del-info-value">@condoNombre</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer con form -->
+        <div class="del-footer">
+            <div class="del-footer-note">
+                <i class="bi bi-trash3-fill"></i>
+                Esta operación no se puede revertir
+            </div>
+            <div class="del-footer-actions">
+                <a asp-action="Index" class="btn-del-cancel">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+                <form asp-action="Delete" style="margin:0;" id="delForm">
+                    <input type="hidden" asp-for="IdUsuario" />
+                    <button type="submit" class="btn-del-confirm" id="btnDel">
+                        <i class="bi bi-trash3-fill"></i>
+                        <span class="lbl">Sí, eliminar</span>
+                        <div class="spin"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.getElementById('delForm')?.addEventListener('submit', function () {
+        const btn = document.getElementById('btnDel');
+        btn.classList.add('loading');
+        btn.disabled = true;
+    });
+</script>

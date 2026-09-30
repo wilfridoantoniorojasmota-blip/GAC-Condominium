@@ -1,0 +1,161 @@
+﻿@model PROTOTIPO.Models.ReservaAreaComun
+
+@{
+    ViewData["Title"] = "Editar Reserva";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-warning text-dark">
+
+                    <h3 class="mb-0">
+                        Editar Reserva
+                    </h3>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4">
+
+                    <form asp-action="Edit">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger">
+                        </div>
+
+                        <input type="hidden" asp-for="IdReserva" />
+
+                        <div class="row">
+
+                            <!-- AREA -->
+                            <div class="col-md-6 mb-3">
+
+                                <label asp-for="IdArea"
+                                       class="form-label fw-semibold">
+                                    Área Común
+                                </label>
+
+                                <select asp-for="IdArea"
+                                        class="form-select"
+                                        asp-items="ViewBag.IdArea">
+                                </select>
+
+                            </div>
+
+                            <!-- USUARIO -->
+                            <div class="col-md-6 mb-3">
+
+                                <label asp-for="IdUsuario"
+                                       class="form-label fw-semibold">
+                                    Usuario
+                                </label>
+
+                                <select asp-for="IdUsuario"
+                                        class="form-select"
+                                        asp-items="ViewBag.IdUsuario">
+                                </select>
+
+                            </div>
+
+                            <!-- FECHA -->
+                            <div class="col-md-4 mb-3">
+
+                                <label asp-for="Fecha"
+                                       class="form-label fw-semibold">
+                                    Fecha
+                                </label>
+
+                                <input asp-for="Fecha"
+                                       type="date"
+                                       class="form-control" />
+
+                            </div>
+
+                            <!-- HORA INICIO -->
+                            <div class="col-md-4 mb-3">
+
+                                <label asp-for="HoraInicio"
+                                       class="form-label fw-semibold">
+                                    Hora Inicio
+                                </label>
+
+                                <input asp-for="HoraInicio"
+                                       type="time"
+                                       class="form-control" />
+
+                            </div>
+
+                            <!-- HORA FIN -->
+                            <div class="col-md-4 mb-3">
+
+                                <label asp-for="HoraFin"
+                                       class="form-label fw-semibold">
+                                    Hora Fin
+                                </label>
+
+                                <input asp-for="HoraFin"
+                                       type="time"
+                                       class="form-control" />
+
+                            </div>
+
+                            <!-- ESTADO -->
+                            <div class="col-12 mb-4">
+
+                                <label asp-for="Estado"
+                                       class="form-label fw-semibold">
+                                    Estado
+                                </label>
+
+                                <select asp-for="Estado"
+                                        class="form-select">
+
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Aprobada">Aprobada</option>
+                                    <option value="Rechazada">Rechazada</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Index"
+                                   class="btn btn-outline-secondary">
+                                Volver
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-warning">
+                                Guardar Cambios
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

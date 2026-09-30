@@ -1,0 +1,820 @@
+﻿@model PROTOTIPO.Models.UnidadHabitacional
+
+@{
+    ViewData["Title"] = "Editar Unidad";
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-warning: #f59e0b;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+        --gac-muted: #64748b;
+    }
+
+    .edit-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header .ph-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-header .ph-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(245,158,11,.2);
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0 0 2px;
+            font-size: 1.4rem;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    .btn-back {
+        border: 1.5px solid rgba(255,255,255,.25);
+        background: rgba(255,255,255,.08);
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.2rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,.16);
+            color: #fff;
+            border-color: rgba(255,255,255,.45);
+        }
+
+    /* EDIT NOTICE */
+    .edit-notice {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+        background: rgba(245,158,11,.07);
+        border: 1px solid rgba(245,158,11,.2);
+        border-radius: 12px;
+        padding: .9rem 1.1rem;
+        margin-bottom: 1.5rem;
+        font-size: .875rem;
+        color: #92400e;
+    }
+
+        .edit-notice i {
+            color: var(--gac-warning);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+    /* LAYOUT */
+    .form-layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 1.25rem;
+        align-items: start;
+    }
+
+    @@media (max-width: 991px) {
+        .form-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* FORM CARD */
+    .form-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,22,35,.04);
+    }
+
+    .form-section {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gac-border);
+    }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+    .section-heading {
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #94a3b8;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .section-heading i {
+            color: var(--gac-primary);
+        }
+
+    /* INPUTS */
+    .form-label {
+        font-size: .85rem;
+        font-weight: 700;
+        color: #2c3a52;
+        margin-bottom: .4rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        min-height: 46px;
+        font-size: .9rem;
+        color: var(--gac-navy);
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--gac-primary);
+            box-shadow: 0 0 0 3px rgba(37,140,251,.12);
+        }
+
+        .form-control::placeholder {
+            color: #a2adbd;
+        }
+
+    textarea.form-control {
+        min-height: 90px;
+        resize: vertical;
+    }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+        .input-with-icon .form-control,
+        .input-with-icon .form-select {
+            padding-left: 2.75rem;
+        }
+
+        .input-with-icon .input-icon {
+            position: absolute;
+            left: .9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: .9rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .input-with-icon.textarea-icon .input-icon {
+            top: 1rem;
+            transform: none;
+        }
+
+    .field-validation-error,
+    .text-danger {
+        font-size: .8rem;
+        font-weight: 600;
+        color: #dc2626;
+        margin-top: .3rem;
+        display: block;
+    }
+
+    /* IMAGE CARD */
+    .img-upload-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,22,35,.04);
+    }
+
+        .img-upload-card .card-title {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gac-border);
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #94a3b8;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+            .img-upload-card .card-title i {
+                color: var(--gac-primary);
+            }
+
+    /* CURRENT IMAGE */
+    .current-img-wrap {
+        margin: 1.25rem;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--gac-border);
+        position: relative;
+    }
+
+        .current-img-wrap img {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+    .current-img-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(15,22,35,.65);
+        color: rgba(255,255,255,.85);
+        font-size: .75rem;
+        font-weight: 600;
+        padding: .4rem .75rem;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .img-placeholder-box {
+        margin: 1.25rem;
+        border-radius: 12px;
+        border: 1px dashed #d8e4f5;
+        background: #f8fbff;
+        padding: 1.5rem;
+        text-align: center;
+        color: #94a3b8;
+        font-size: .82rem;
+    }
+
+        .img-placeholder-box i {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: .5rem;
+            opacity: .4;
+        }
+
+    /* DROP ZONE */
+    .img-drop-zone {
+        margin: 0 1.25rem 1.25rem;
+        border: 2px dashed #d8e4f5;
+        border-radius: 12px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all .2s ease;
+        background: #f8fbff;
+        position: relative;
+    }
+
+        .img-drop-zone:hover,
+        .img-drop-zone.dragover {
+            border-color: var(--gac-primary);
+            background: rgba(37,140,251,.04);
+        }
+
+        .img-drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .img-drop-zone .dz-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(37,140,251,.1);
+            color: var(--gac-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin: 0 auto .75rem;
+        }
+
+        .img-drop-zone .dz-label {
+            font-size: .875rem;
+            font-weight: 600;
+            color: var(--gac-navy);
+            margin-bottom: .25rem;
+        }
+
+        .img-drop-zone .dz-hint {
+            font-size: .75rem;
+            color: var(--gac-muted);
+        }
+
+    .img-new-preview {
+        display: none;
+        margin: 0 1.25rem 1.25rem;
+    }
+
+        .img-new-preview img {
+            width: 100%;
+            border-radius: 10px;
+            object-fit: cover;
+            max-height: 180px;
+            border: 1px solid var(--gac-border);
+        }
+
+        .img-new-preview .img-name {
+            font-size: .78rem;
+            color: var(--gac-muted);
+            margin-top: .4rem;
+            text-align: center;
+        }
+
+    /* FORM ACTIONS */
+    .form-actions {
+        padding: 1.25rem 1.5rem;
+        background: #fafbfd;
+        border-top: 1px solid var(--gac-border);
+        display: flex;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-save {
+        background: var(--gac-warning);
+        border: none;
+        color: #fff;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: .65rem 1.5rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .btn-save:hover {
+            background: #d97706;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245,158,11,.35);
+        }
+
+    .btn-cancel {
+        border: 1.5px solid #e2e8f0;
+        background: #fff;
+        color: var(--gac-muted);
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.25rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        text-decoration: none;
+    }
+
+        .btn-cancel:hover {
+            border-color: var(--gac-primary);
+            color: var(--gac-primary);
+        }
+</style>
+
+<div class="edit-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div class="ph-left">
+                <div class="ph-icon">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <div>
+                    <h3>Editar Unidad Habitacional</h3>
+                    <p>Actualiza los datos de la unidad</p>
+                </div>
+            </div>
+            <a asp-action="Index" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                Volver
+            </a>
+        </div>
+
+        <!-- AVISO EDICIÓN -->
+        <div class="edit-notice">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Estás editando una unidad existente. Los cambios se guardarán de forma permanente.</span>
+        </div>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 px-1"></div>
+            <input type="hidden" asp-for="IdUnidad" />
+
+            <div class="form-layout">
+
+                <!-- COLUMNA IZQUIERDA -->
+                <div class="form-card">
+
+                    <!-- IDENTIFICACIÓN -->
+                    <div class="form-section">
+                        <div class="section-heading">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Identificación
+                        </div>
+
+                        <div class="row g-3">
+                            @{
+                                var partes = (Model.Numero ?? "").Split('-');
+
+                                string edificio = "";
+                                string piso = "";
+                                string apartamento = "";
+
+                                if (partes.Length >= 3)
+                                {
+                                    edificio = partes[0];
+                                    piso = partes[1];
+                                    apartamento = partes[2];
+                                }
+                            }
+
+                            <div class="col-md-6">
+                                <label class="form-label">Número de Unidad</label>
+
+                                <div class="row g-2">
+
+                                    <div class="col-4">
+                                        <select id="bloqueUnidad" class="form-select">
+
+                                            <option value="">Edificio</option>
+
+                                            @for (char letra = 'A'; letra <= 'Z'; letra++)
+                                            {
+                                                if (edificio == letra.ToString())
+                                                {
+                                                    <option value="@letra" selected>@letra</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@letra">@letra</option>
+                                                }
+                                            }
+
+                                        </select>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <input type="number"
+                                               id="pisoUnidad"
+                                               class="form-control"
+                                               min="1"
+                                               max="99"
+                                               value="@piso"
+                                               placeholder="Piso" />
+                                    </div>
+
+                                    <div class="col-4">
+                                        <input type="number"
+                                               id="apartamentoUnidad"
+                                               class="form-control"
+                                               min="1"
+                                               max="99"
+                                               value="@apartamento"
+                                               placeholder="Apto." />
+                                    </div>
+
+                                </div>
+
+                                <input asp-for="Numero" type="hidden" />
+
+                                <span asp-validation-for="Numero" class="text-danger"></span>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Tipo" class="form-label">Tipo</label>
+                                <div class="input-with-icon">
+                                    <i class="input-icon fa-solid fa-tag"></i>
+                                    <input asp-for="Tipo" class="form-control" placeholder="Ej: Apartamento" />
+                                </div>
+                                <span asp-validation-for="Tipo" class="text-danger"></span>
+                            </div>
+
+                            <!-- 🆕 HABITACIONES -->
+                            <div class="col-md-4">
+                                <label asp-for="CantidadHabitaciones" class="form-label">Habitaciones</label>
+                                <div class="input-with-icon">
+                                    <i class="input-icon fa-solid fa-bed"></i>
+                                    <input asp-for="CantidadHabitaciones" class="form-control" type="number" min="0" />
+                                </div>
+                                <span asp-validation-for="CantidadHabitaciones" class="text-danger"></span>
+                            </div>
+
+                            <!-- 🆕 BAÑOS -->
+                            <div class="col-md-4">
+                                <label asp-for="CantidadBanos" class="form-label">Baños</label>
+                                <div class="input-with-icon">
+                                    <i class="input-icon fa-solid fa-bath"></i>
+                                    <input asp-for="CantidadBanos" class="form-control" type="number" min="0" />
+                                </div>
+                                <span asp-validation-for="CantidadBanos" class="text-danger"></span>
+                            </div>
+
+                            <!-- 🆕 METROS CUADRADOS -->
+                            <div class="col-md-4">
+                                <label asp-for="MetrosCuadrados" class="form-label">Metros²</label>
+                                <div class="input-with-icon">
+                                    <i class="input-icon fa-solid fa-ruler-combined"></i>
+                                    <input asp-for="MetrosCuadrados" class="form-control" type="number" step="0.01" />
+                                </div>
+                                <span asp-validation-for="MetrosCuadrados" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Estado" class="form-label">Estado</label>
+                                <div class="input-with-icon">
+                                    <i class="input-icon fa-solid fa-circle-half-stroke"></i>
+                                    <select asp-for="Estado" class="form-select">
+                                        <option value="">Seleccione</option>
+                                        <option value="Disponible">Disponible</option>
+                                        <option value="Ocupada">Ocupada</option>
+                                        <option value="Proceso">En Proceso</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Estado" class="text-danger"></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold mb-3">Características</label>
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-4">
+                                        <div class="form-check border rounded-3 p-3 shadow-sm h-100">
+                                            <input asp-for="SalaEstar" class="form-check-input me-2" />
+                                            <label asp-for="SalaEstar" class="form-check-label fw-semibold">
+                                                <i class="fa-solid fa-couch text-primary me-2"></i>
+                                                Sala de estar
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-check border rounded-3 p-3 shadow-sm h-100">
+                                            <input asp-for="Balcon" class="form-check-input me-2" />
+                                            <label asp-for="Balcon" class="form-check-label fw-semibold">
+                                                <i class="fa-solid fa-building text-primary me-2"></i>
+                                                Balcón
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-check border rounded-3 p-3 shadow-sm h-100">
+                                            <input asp-for="Terraza" class="form-check-input me-2" />
+                                            <label asp-for="Terraza" class="form-check-label fw-semibold">
+                                                <i class="fa-solid fa-umbrella-beach text-primary me-2"></i>
+                                                Terraza
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-check border rounded-3 p-3 shadow-sm h-100">
+                                            <input asp-for="Jacuzzi" class="form-check-input me-2" />
+                                            <label asp-for="Jacuzzi" class="form-check-label fw-semibold">
+                                                <i class="fa-solid fa-hot-tub-person text-primary me-2"></i>
+                                                Jacuzzi
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-check border rounded-3 p-3 shadow-sm h-100">
+                                            <input asp-for="Picuzzi" class="form-check-input me-2" />
+                                            <label asp-for="Picuzzi" class="form-check-label fw-semibold">
+                                                <i class="fa-solid fa-water-ladder text-primary me-2"></i>
+                                                Picuzzi
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="IdCondominio" class="form-label">Condominio</label>
+                                <div class="input-with-icon">
+                                    <i class="input-icon fa-solid fa-building"></i>
+                                    <select asp-for="IdCondominio" class="form-select" asp-items="ViewBag.IdCondominio">
+                                        <option value="">Seleccione</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="IdCondominio" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPCIÓN -->
+                    <div class="form-section">
+                        <div class="section-heading">
+                            <i class="fa-regular fa-file-lines"></i>
+                            Descripción
+                        </div>
+
+                        <div class="input-with-icon textarea-icon">
+                            <i class="input-icon fa-regular fa-file-lines"></i>
+                            <textarea asp-for="Descripcion" class="form-control"
+                                      style="padding-left:2.75rem;"
+                                      placeholder="Describe las características de la unidad..."></textarea>
+                        </div>
+
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Guardar Cambios
+                        </button>
+                        <a asp-action="Index" class="btn-cancel">
+                            <i class="fa-solid fa-xmark"></i>
+                            Cancelar
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- COLUMNA DERECHA -->
+                <div class="img-upload-card">
+                    <div class="card-title">
+                        <i class="fa-regular fa-image"></i>
+                        Imagen Principal
+                    </div>
+
+                    @{
+                        var imgUrl = Model.ImagenUnidads?.FirstOrDefault()?.Url;
+                    }
+
+                    @if (!string.IsNullOrEmpty(imgUrl))
+                    {
+                        <div class="current-img-wrap">
+                            <img src="@imgUrl" alt="Imagen actual" />
+                            <div class="current-img-label">
+                                <i class="fa-solid fa-image fa-xs"></i>
+                                Imagen actual
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="img-placeholder-box">
+                            <i class="fa-regular fa-image"></i>
+                            Sin imagen actual
+                        </div>
+                    }
+
+                    <div class="img-drop-zone" id="dropZone">
+                        <input type="file" name="ImageFile" accept="image/*" id="imageInput" />
+                        <div class="dz-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div class="dz-label">Reemplazar imagen</div>
+                        <div class="dz-hint">PNG, JPG, WEBP · Máx. 5 MB · Opcional</div>
+                    </div>
+
+                    <div class="img-new-preview" id="previewWrap">
+                        <img id="imgPreview" src="" alt="Nueva imagen" />
+                        <div class="img-name" id="imgName"></div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+
+    function actualizarNumeroUnidad() {
+
+        const edificio = document.getElementById("bloqueUnidad").value;
+        const piso = document.getElementById("pisoUnidad").value;
+        const apartamento = document.getElementById("apartamentoUnidad").value;
+
+        if (!edificio || !piso || !apartamento) {
+            document.getElementById("Numero").value = "";
+            return;
+        }
+
+        document.getElementById("Numero").value =
+            `${edificio}-${piso.padStart(2,'0')}-${apartamento.padStart(2,'0')}`;
+    }
+
+    document.getElementById("bloqueUnidad")
+        .addEventListener("change", actualizarNumeroUnidad);
+
+    document.getElementById("pisoUnidad")
+        .addEventListener("input", actualizarNumeroUnidad);
+
+    document.getElementById("apartamentoUnidad")
+        .addEventListener("input", actualizarNumeroUnidad);
+
+    // Muy importante:
+    actualizarNumeroUnidad();
+
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const previewWrap = document.getElementById('previewWrap');
+        const imgPreview = document.getElementById('imgPreview');
+        const imgName = document.getElementById('imgName');
+        const dropZone = document.getElementById('dropZone');
+
+        imageInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            showPreview(file);
+        });
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                imageInput.files = dt.files;
+                showPreview(file);
+            }
+        });
+
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                imgPreview.src = e.target.result;
+                imgName.textContent = '✓ Nueva imagen: ' + file.name;
+                previewWrap.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+}

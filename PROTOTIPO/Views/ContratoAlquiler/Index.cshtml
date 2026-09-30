@@ -1,0 +1,1017 @@
+﻿@model IEnumerable<PROTOTIPO.Models.ContratoAlquiler>
+
+
+@{
+    ViewData["Title"] = "Contratos de Alquiler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    
+
+    var total = ViewBag.TotalContratos;
+    var activos = ViewBag.ContratosActivos;
+    var finalizados = ViewBag.ContratosFinalizados;
+    var montoTotal = ViewBag.IngresosMensuales;
+}
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Finish confirm modal -->
+<div class="confirm-overlay" id="finishOverlay">
+    <div class="confirm-box">
+        <div class="confirm-header">
+            <h5 class="confirm-title">
+                <i class="bi bi-slash-circle me-2"></i>
+                Finalizar contrato
+            </h5>
+            <button type="button" class="btn-close-white-custom" onclick="closeModal('finishOverlay')">&times;</button>
+        </div>
+        <div class="confirm-body">
+            ¿Estás seguro de que deseas finalizar este contrato? El estado cambiará a <strong>Finalizado</strong> y esta acción no se podrá revertir.
+        </div>
+        <div class="confirm-footer">
+            <button class="btn-gac" style="background:var(--gac-surface); color:#64748b; border:1px solid var(--gac-border);" onclick="closeModal('finishOverlay')">
+                Cancelar
+            </button>
+            <form id="finishForm" method="post" style="margin:0;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-gac" style="background:var(--gac-navy); color:#fff;">
+                    <i class="bi bi-check-lg"></i> Finalizar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="confirm-overlay" id="deleteOverlay">
+    <div class="confirm-box">
+        <div class="confirm-header" style="background: linear-gradient(135deg, var(--gac-danger) 0%, #dc2626 100%);">
+            <h5 class="confirm-title">
+                <i class="bi bi-exclamation-octagon me-2"></i>
+                Eliminar contrato
+            </h5>
+            <button type="button" class="btn-close-white-custom" onclick="closeModal('deleteOverlay')">&times;</button>
+        </div>
+        <div class="confirm-body">
+            ¿Estás seguro de que deseas eliminar este contrato permanentemente? Esta acción no se puede deshacer.
+        </div>
+        <div class="confirm-footer">
+            <button class="btn-gac" style="background:var(--gac-surface); color:#64748b; border:1px solid var(--gac-border);" onclick="closeModal('deleteOverlay')">
+                Cancelar
+            </button>
+            <a id="deleteLink" href="#" class="btn-gac" style="background:var(--gac-danger); color:#fff; text-decoration:none;">
+                <i class="bi bi-trash"></i> Eliminar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="mnt-page">
+    <div class="container-fluid py-4 px-3 px-md-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3><i class="bi bi-file-earmark-text me-2"></i>Contratos de Alquiler</h3>
+                <p>Gestión y administración de contratos vigentes y finalizados del condominio</p>
+            </div>
+
+          
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="row g-3 mb-3">
+
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-info">
+                    <div class="sc-icon ic-blue"><i class="bi bi-file-earmark-text-fill"></i></div>
+                    <div class="sc-label">Total contratos</div>
+                    <div class="sc-value">@total</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-success">
+                    <div class="sc-icon ic-green"><i class="bi bi-check-circle-fill"></i></div>
+                    <div class="sc-label">Activos</div>
+                    <div class="sc-value">@activos</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-slate">
+                    <div class="sc-icon ic-slate"><i class="bi bi-archive-fill"></i></div>
+                    <div class="sc-label">Finalizados</div>
+                    <div class="sc-value">@finalizados</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-warning">
+                    <div class="sc-icon ic-amber"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="sc-label">Renta activa</div>
+                    <div class="sc-value-currency">RD$ @String.Format("{0:N0}", montoTotal)</div>
+                </div>
+            </div>
+
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <i class="bi bi-file-earmark-x"></i>
+                <p>No hay contratos de alquiler registrados todavía.</p>
+            </div>
+        }
+        else
+        {
+            <!-- TOOLBAR -->
+            <div class="toolbar">
+                <div class="filter-pills">
+                    <span class="fp all active" data-filter="all">
+                        <i class="bi bi-grid-fill"></i> Todos
+                        <span class="fp-count">@total</span>
+                    </span>
+                    <span class="fp green" data-filter="activo">
+                        <i class="bi bi-check-circle-fill"></i> Activos
+                        <span class="fp-count">@activos</span>
+                    </span>
+                    <span class="fp slate" data-filter="finalizado">
+                        <i class="bi bi-archive-fill"></i> Finalizados
+                        <span class="fp-count">@finalizados</span>
+                    </span>
+                </div>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar inquilino…" autocomplete="off">
+                </div>
+            </div>
+
+            <!-- TABLE CARD -->
+            <div class="table-card">
+
+                <div class="table-card-head">
+                    <p class="tc-title"><i class="bi bi-table"></i> Listado de contratos</p>
+                    <span class="tc-count">@total contrato@(total == 1 ? "" : "s")</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="inc-table" id="ctTable">
+                        <thead>
+                            <tr>
+                                <th class="hide-sm">#</th>
+                                <th>Inquilino</th>
+                                <th class="hide-sm">Unidad</th>
+                                <th class="hide-md">F. Inicio</th>
+                                <th class="hide-md">F. Fin</th>
+                                <th class="hide-md" style="text-align:right;">Mensualidad</th>
+                                <th>Estado</th>
+                                <th class="center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var contrato in Model)
+                            {
+                                var esActivo = string.Equals(contrato.Estado, "activo", StringComparison.OrdinalIgnoreCase);
+                                var estadoClass = esActivo ? "activo" : "finalizado";
+                                var rowClass = esActivo ? "row-activo" : "row-finalizado";
+
+                                var nombreCompleto = contrato.IdUsuarioNavigation != null
+                                    ? $"{contrato.IdUsuarioNavigation.Nombre} {contrato.IdUsuarioNavigation.Apellido}".Trim()
+                                    : "Sin inquilino";
+
+                                var initials = string.Join("",
+                                    nombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                    .Take(2).Select(w => w[0].ToString().ToUpper()));
+
+                                <tr class="ct-row @rowClass"
+                                    data-estado="@estadoClass"
+                                    data-nombre="@nombreCompleto.ToLower()">
+
+                                    <td class="hide-sm">
+                                        <span class="id-chip">#@contrato.IdContrato</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="user-chip">
+                                            <div class="user-avatar">@initials</div>
+                                            <span class="user-name">@nombreCompleto</span>
+                                        </div>
+                                    </td>
+
+                                    <td class="hide-sm">
+                                        <span class="unit-pill">
+                                            <i class="bi bi-door-open-fill me-1"></i>
+                                            @(contrato.IdUnidadNavigation?.Numero ?? "—")
+                                        </span>
+                                    </td>
+
+                                    <td class="hide-md">
+                                        <span class="date-cell">
+                                            <i class="bi bi-calendar me-1"></i>@(contrato.FechaInicio?.ToString("dd/MM/yyyy") ?? "—")
+                                        </span>
+                                    </td>
+
+                                    <td class="hide-md">
+                                        <span class="date-cell">
+                                            <i class="bi bi-calendar-event me-1"></i>@(contrato.FechaFin?.ToString("dd/MM/yyyy") ?? "—")
+                                        </span>
+                                    </td>
+
+                                    <td class="hide-md" style="text-align:right;">
+                                        <span class="monto-cell">
+                                            RD$ @String.Format("{0:N2}", contrato.MontoRenta)
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge-estado @(esActivo ? "badge-resuelta" : "badge-otro")">
+                                            <span class="dot"></span>
+                                            @(esActivo ? "Activo" : "Finalizado")
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="actions-wrap">
+                                            <a asp-action="Details" asp-route-id="@contrato.IdContrato"
+                                               class="btn-tbl btn-tbl-info" title="Ver detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+
+                                            <a asp-action="Edit" asp-route-id="@contrato.IdContrato"
+                                               class="btn-tbl btn-tbl-edit" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+
+                                            @if (esActivo)
+                                            {
+                                                <button type="button" class="btn-tbl btn-tbl-warning" title="Finalizar"
+                                                        onclick="openFinish(@contrato.IdContrato)">
+                                                    <i class="bi bi-slash-circle"></i>
+                                                </button>
+                                            }
+                                            
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @if (ViewBag.TotalPaginas > 1)
+                    {
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+
+                                @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.PaginaActual ? "active" : "")">
+
+                                        <a class="page-link"
+                                           asp-action="Index"
+                                           asp-route-page="@i">
+                                            @i
+                                        </a>
+
+                                    </li>
+                                }
+
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.2rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        cursor: pointer;
+    }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-gac-primary:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    /* ── STAT CARDS ── */
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.4rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .stat-card.sc-info::after {
+            background: var(--gac-primary);
+        }
+
+        .stat-card.sc-success::after {
+            background: var(--gac-success);
+        }
+
+        .stat-card.sc-warning::after {
+            background: var(--gac-warning);
+        }
+
+        .stat-card.sc-slate::after {
+            background: #94a3b8;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15,22,35,.07);
+        }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        margin-bottom: .85rem;
+    }
+
+    .ic-blue {
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+    }
+
+    .ic-amber {
+        background: rgba(245,158,11,.1);
+        color: #d97706;
+    }
+
+    .ic-green {
+        background: rgba(34,197,94,.1);
+        color: #16a34a;
+    }
+
+    .ic-slate {
+        background: rgba(148, 163, 184, 0.1);
+        color: #64748b;
+    }
+
+    .sc-label {
+        font-size: .77rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .sc-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+    }
+
+    .sc-value-currency {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.4;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 1.2rem;
+    }
+
+    .filter-pills {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .fp {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: 7px 14px;
+        border-radius: 50px;
+        border: 1px solid var(--gac-border);
+        background: #fff;
+        color: var(--gac-navy);
+        cursor: pointer;
+        user-select: none;
+        transition: all .2s ease;
+    }
+
+        .fp:hover {
+            background: var(--gac-navy);
+            color: #fff;
+            border-color: var(--gac-navy);
+        }
+
+        .fp.active {
+            background: var(--gac-navy);
+            color: #fff;
+            border-color: var(--gac-navy);
+        }
+
+        .fp.green.active {
+            background: var(--gac-success);
+            color: #fff;
+            border-color: var(--gac-success);
+            box-shadow: 0 3px 10px rgba(34,197,94,.25);
+        }
+
+        .fp.slate.active {
+            background: #64748b;
+            color: #fff;
+            border-color: #64748b;
+            box-shadow: 0 3px 10px rgba(100,116,139,.25);
+        }
+
+    .fp-count {
+        background: rgba(255,255,255,.2);
+        border-radius: 50px;
+        font-size: .68rem;
+        font-weight: 700;
+        padding: 1px 7px;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .fp:not(.active) .fp-count {
+        background: var(--gac-surface);
+        color: #64748b;
+        border: 1px solid var(--gac-border);
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: .88rem;
+            pointer-events: none;
+        }
+
+        .search-box input {
+            padding: 8px 14px 8px 36px;
+            border: 1.5px solid var(--gac-border);
+            border-radius: 50px;
+            background: #fff;
+            font-size: .83rem;
+            color: var(--gac-navy);
+            width: 240px;
+            outline: none;
+            transition: all .2s ease;
+        }
+
+            .search-box input:focus {
+                border-color: var(--gac-primary);
+                box-shadow: 0 0 0 4px rgba(37,140,251,.1);
+            }
+
+    /* ── TABLE CARD ── */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-card-head {
+        padding: 1rem 1.4rem;
+        border-bottom: 1px solid var(--gac-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .tc-title {
+        font-weight: 700;
+        font-size: .95rem;
+        color: var(--gac-navy);
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: 0;
+    }
+
+        .tc-title i {
+            color: var(--gac-primary);
+        }
+
+    .tc-count {
+        font-size: .75rem;
+        font-weight: 600;
+        color: #64748b;
+        background: var(--gac-surface);
+        border: 1px solid var(--gac-border);
+        border-radius: 20px;
+        padding: 3px 11px;
+    }
+
+    .inc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .inc-table thead {
+            background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        }
+
+            .inc-table thead th {
+                font-size: .73rem;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: rgba(255,255,255,.7);
+                font-weight: 700;
+                padding: .9rem 1.1rem;
+                border: none;
+                white-space: nowrap;
+                text-align: left;
+            }
+
+                .inc-table thead th.center {
+                    text-align: center;
+                }
+
+        .inc-table tbody td {
+            padding: .85rem 1.1rem;
+            color: #334155;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f4f9;
+            font-size: .9rem;
+        }
+
+        .inc-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inc-table tbody tr {
+            border-left: 3px solid transparent;
+            transition: background .15s ease;
+        }
+
+            .inc-table tbody tr:hover {
+                background: #fafcff;
+            }
+
+            .inc-table tbody tr.row-activo {
+                border-left-color: var(--gac-success);
+            }
+
+            .inc-table tbody tr.row-finalizado {
+                border-left-color: #cbd5e1;
+            }
+
+    .id-chip {
+        display: inline-flex;
+        align-items: center;
+        background: var(--gac-surface);
+        border: 1px solid var(--gac-border);
+        border-radius: 8px;
+        padding: 3px 9px;
+        font-size: .75rem;
+        font-weight: 700;
+        color: #64748b;
+    }
+
+    .user-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(37,140,251,.12);
+        color: var(--gac-primary);
+        font-size: .75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--gac-navy);
+        font-size: .88rem;
+    }
+
+    .unit-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(15,22,35,.05);
+        border-radius: 50px;
+        padding: .3rem .75rem;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    .date-cell {
+        font-size: .83rem;
+        color: #64748b;
+        white-space: nowrap;
+    }
+
+    .monto-cell {
+        font-weight: 700;
+        font-size: .9rem;
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    /* ── BADGES ── */
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        font-size: .73rem;
+        padding: .35rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+        .badge-estado .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .badge-resuelta {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+        .badge-resuelta .dot {
+            background: var(--gac-success);
+        }
+
+    .badge-otro {
+        background: rgba(15,22,35,.07);
+        color: var(--gac-navy);
+    }
+
+        .badge-otro .dot {
+            background: #94a3b8;
+        }
+
+    /* ── ACTION BUTTONS ── */
+    .actions-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-tbl {
+        border-radius: 8px;
+        font-size: .78rem;
+        font-weight: 700;
+        padding: .4rem .75rem;
+        transition: all .15s ease;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-width: 34px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .btn-tbl-edit {
+        border: 1.5px solid var(--gac-warning);
+        color: #b45309;
+        background: rgba(245,158,11,.14);
+    }
+
+        .btn-tbl-edit:hover {
+            background: var(--gac-warning);
+            color: #fff;
+            border-color: var(--gac-warning);
+            box-shadow: 0 3px 10px rgba(245,158,11,.35);
+        }
+
+    .btn-tbl-info {
+        border: 1.5px solid var(--gac-primary);
+        color: var(--gac-primary);
+        background: rgba(37,140,251,.1);
+    }
+
+        .btn-tbl-info:hover {
+            background: var(--gac-primary);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(37,140,251,.35);
+        }
+
+    .btn-tbl-warning {
+        border: 1.5px solid var(--gac-warning);
+        color: #b45309;
+        background: rgba(245,158,11,.1);
+    }
+
+        .btn-tbl-warning:hover {
+            background: var(--gac-warning);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(245,158,11,.35);
+        }
+
+    .btn-tbl-danger {
+        border: 1.5px solid var(--gac-danger);
+        color: var(--gac-danger);
+        background: rgba(239,68,68,.1);
+    }
+
+        .btn-tbl-danger:hover {
+            background: var(--gac-danger);
+            color: #fff;
+            border-color: var(--gac-danger);
+            box-shadow: 0 3px 10px rgba(239,68,68,.35);
+        }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+        padding: 3.5rem;
+        text-align: center;
+        color: #94a3b8;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: .75rem;
+            opacity: .4;
+            display: block;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: .9rem;
+        }
+
+    /* ── CONFIRM OVERLAYS (MODALS) ── */
+    .confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,22,35,.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 8000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease;
+    }
+
+        .confirm-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+    .confirm-box {
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 20px 45px rgba(15,22,35,.25);
+        transform: scale(.95);
+        transition: transform .2s ease;
+    }
+
+    .confirm-overlay.open .confirm-box {
+        transform: scale(1);
+    }
+
+    .confirm-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        color: #fff;
+        padding: 1.1rem 1.4rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .confirm-title {
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-close-white-custom {
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 1.4rem;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity .15s;
+    }
+
+        .btn-close-white-custom:hover {
+            opacity: 1;
+        }
+
+    .confirm-body {
+        padding: 1.4rem;
+        color: #334155;
+        font-size: .9rem;
+        line-height: 1.5;
+    }
+
+    .confirm-footer {
+        padding: 0.9rem 1.4rem;
+        border-top: 1px solid var(--gac-border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: #fafcff;
+    }
+
+    /* ── RESPONSIVE COLUMNS ── */
+    @@media (max-width: 900px) {
+        .inc-table th.hide-md,
+        .inc-table td.hide-md {
+            display: none !important;
+        }
+
+        .toolbar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .inc-table th.hide-sm,
+        .inc-table td.hide-sm {
+            display: none !important;
+        }
+    }
+</style>
+
+<script>
+    /* ── Filter pills ── */
+    document.querySelectorAll('.fp').forEach(pill => {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('.fp').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            filterTable();
+        });
+    });
+
+    /* ── Search ── */
+    document.getElementById('searchInput')?.addEventListener('input', filterTable);
+
+    function filterTable() {
+        const filter = document.querySelector('.fp.active')?.dataset.filter ?? 'all';
+        const query = document.getElementById('searchInput')?.value.toLowerCase().trim() ?? '';
+        document.querySelectorAll('.ct-row').forEach(row => {
+            const matchFilter = filter === 'all' || row.dataset.estado === filter;
+            const matchQuery = !query || (row.dataset.nombre ?? '').includes(query);
+            row.style.display = matchFilter && matchQuery ? '' : 'none';
+        });
+    }
+
+    /* ── Modals ── */
+    function openFinish(id) {
+        document.getElementById('finishForm').action =
+            '/ContratoAlquiler/FinalizarContrato/' + id;
+        document.getElementById('finishOverlay').classList.add('open');
+    }
+
+    function openDelete(url) {
+        document.getElementById('deleteLink').href = url;
+        document.getElementById('deleteOverlay').classList.add('open');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    document.querySelectorAll('.confirm-overlay').forEach(ov => {
+        ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('open'); });
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') document.querySelectorAll('.confirm-overlay.open')
+            .forEach(ov => ov.classList.remove('open'));
+    });
+</script>

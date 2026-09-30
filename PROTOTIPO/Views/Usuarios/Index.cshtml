@@ -1,0 +1,1958 @@
+﻿@using System.Collections.Generic
+
+@model IEnumerable<PROTOTIPO.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Residentes";
+
+    var totalResidentes = ViewBag.TotalResidentes;
+
+    var conUnidad = ViewBag.ConUnidad;
+
+    var sinUnidad = ViewBag.SinUnidad;
+
+    var roleGroups =
+        ((IEnumerable<dynamic>)ViewBag.RoleGroups).ToList();
+
+    var roleLabels = string.Join(",",
+        roleGroups.Select(r => $"\"{r.Nombre}\""));
+
+    var roleData = string.Join(",",
+        roleGroups.Select(r => r.Count));
+
+    var roleColorPalette = new[]
+    {
+        "#a855f7",
+        "#258cfb",
+        "#22c55e",
+        "#f97316",
+        "#ef4444",
+        "#0ea5e9"
+    };
+
+    var roleColors = string.Join(",",
+        roleGroups.Select((r, i) =>
+            $"\"{roleColorPalette[i % roleColorPalette.Length]}\""));
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="gac-toast show" id="gacToast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>@TempData["SuccessMessage"]</span>
+    </div>
+}
+
+<div class="gac-page">
+
+    <!-- ══════════════ PAGE HEADER ══════════════ -->
+    <div class="gac-header">
+        <div class="gac-header-left">
+            <div class="gac-header-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+                <h1 class="gac-title">Residentes</h1>
+                <p class="gac-subtitle">Gestión de usuarios del condominio</p>
+            </div>
+        </div>
+        <button class="gac-btn-primary"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#residentModal">
+            <i class="fa-solid fa-plus"></i>
+            Nuevo residente
+        </button>
+    </div>
+
+    <!-- ══════════════ STAT CARDS ══════════════ -->
+    <div class="gac-stats">
+
+        <div class="gac-stat-card">
+            <div class="gac-stat-icon" style="background:#eff6ff;">
+                <i class="fa-solid fa-users" style="color:#3b82f6;"></i>
+            </div>
+            <div>
+                <p class="gac-stat-label">Total residentes</p>
+                <p class="gac-stat-value">@totalResidentes</p>
+            </div>
+        </div>
+
+        <div class="gac-stat-card">
+            <div class="gac-stat-icon" style="background:#f0fdf4;">
+                <i class="fa-solid fa-house-circle-check" style="color:#22c55e;"></i>
+            </div>
+            <div>
+                <p class="gac-stat-label">Con unidad asignada</p>
+                <p class="gac-stat-value">@conUnidad</p>
+            </div>
+        </div>
+
+        <div class="gac-stat-card">
+            <div class="gac-stat-icon" style="background:#fdf4ff;">
+                <i class="fa-solid fa-id-badge" style="color:#a855f7;"></i>
+            </div>
+            <div>
+                <p class="gac-stat-label">Roles distintos</p>
+                <p class="gac-stat-value">@roleGroups.Count</p>
+            </div>
+        </div>
+
+        <div class="gac-stat-card">
+            <div class="gac-stat-icon" style="background:#fff7ed;">
+                <i class="fa-solid fa-user-slash" style="color:#f97316;"></i>
+            </div>
+            <div>
+                <p class="gac-stat-label">Sin unidad</p>
+                <p class="gac-stat-value">@sinUnidad</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══════════════ MAIN CONTENT (tabla + panel) ══════════════ -->
+    <div class="gac-content-grid">
+
+        <!-- ── TABLA ── -->
+        <div class="gac-card gac-table-col">
+
+            <div class="gac-table-toolbar">
+                <div class="gac-search-wrap">
+                    <i class="fa-solid fa-magnifying-glass gac-search-icon"></i>
+                    <input type="text"
+                           id="searchInput"
+                           class="gac-search"
+                           placeholder="Buscar residente, email, unidad…" />
+                </div>
+                <span class="gac-count-pill">
+                    <span id="countLabel">@totalResidentes</span> registros
+                </span>
+            </div>
+
+            <div class="gac-table-wrapper">
+                <table class="gac-table" id="residentesTable">
+                    <thead>
+                        <tr>
+                            <th>Residente</th>
+                            <th>Contacto</th>
+                            <th>Unidad</th>
+                            <th>Rol</th>
+                            <th style="text-align:right;">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var nombreCompleto = $"{item.Nombre} {item.Apellido}".Trim();
+
+                            var initials = string.Concat(
+                                nombreCompleto
+                                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                    .Take(2)
+                                    .Select(w => w[0].ToString().ToUpper())
+                            );
+
+                            var unidad = item.ContratoAlquilers
+                                    .Where(c => c.Estado != null &&
+                                                c.Estado.ToLower() == "activo" &&
+                                                c.IdUnidadNavigation != null)
+                                    .Select(c => c.IdUnidadNavigation.Numero)
+                                    .FirstOrDefault();
+
+                            var rol = item.IdRolNavigation?.Nombre ?? "Sin rol";
+
+                            <tr class="gac-row"
+                                data-search="@(nombreCompleto.ToLower()) @(item.Email?.ToLower()) @(unidad?.ToLower()) @(rol.ToLower())">
+
+                                <td>
+                                    <div class="gac-avatar-row">
+                                        <div class="gac-avatar">@initials</div>
+
+                                        <div>
+                                            <p class="gac-name">@nombreCompleto</p>
+                                            <p class="gac-email-sub">@item.Email</p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="gac-phone">
+                                        <i class="fa-solid fa-phone"></i>
+                                        @(item.Telefono ?? "—")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if (unidad != null)
+                                    {
+                                        <span class="gac-badge gac-badge-blue">
+                                            <i class="fa-solid fa-house"></i>
+                                            @unidad
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="gac-badge gac-badge-gray">Sin unidad</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="gac-badge gac-badge-purple">@rol</span>
+                                </td>
+
+                                <td>
+                                    <div class="gac-actions">
+                                        <a asp-action="Details" asp-route-id="@item.IdUsuario"
+                                           class="gac-action-btn gac-btn-view">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+
+                                        <a asp-action="Edit" asp-route-id="@item.IdUsuario"
+                                           class="gac-action-btn gac-btn-edit">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+
+                                        <button type="button"
+                                                class="gac-action-btn gac-btn-delete"
+                                                onclick="eliminarUsuario(@item.IdUsuario, '@Html.Raw(item.Nombre) @Html.Raw(item.Apellido)')">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                @if (ViewBag.TotalPages > 1)
+{
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+
+    <nav aria-label="Navegación de residentes" class="d-flex justify-content-center mt-4">
+        <ul class="pagination pagination-md">
+
+            @* Botón Anterior *@
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" 
+                   href="@Url.Action("Index", new { page = currentPage - 1 })" 
+                   aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            @* Números de Página *@
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("Index", new { page = i })">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @* Botón Siguiente *@
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" 
+                   href="@Url.Action("Index", new { page = currentPage + 1 })" 
+                   aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
+
+                <div class="gac-empty" id="emptyState" style="display:none;">
+                    <i class="fa-solid fa-user-magnifying-glass"></i>
+                    <p>No se encontraron residentes</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── PANEL DE GRÁFICOS ── -->
+        <div class="gac-panel-col">
+
+            <!-- Gráfico 1: Donut — ocupación -->
+            <div class="gac-card gac-chart-card">
+                <div class="gac-chart-header">
+                    <div class="gac-chart-icon" style="background:#eff6ff; color:#3b82f6;">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <p class="gac-chart-title">Ocupación de unidades</p>
+                        <p class="gac-chart-sub">Con y sin unidad asignada</p>
+                    </div>
+                </div>
+                <div class="gac-donut-wrap">
+                    <canvas id="chartOcupacion"></canvas>
+                    <div class="gac-donut-center">
+                        <span class="gac-donut-num">@totalResidentes</span>
+                        <span class="gac-donut-lbl">Total</span>
+                    </div>
+                </div>
+                <div class="gac-legend">
+                    <div class="gac-legend-item">
+                        <span class="gac-legend-dot" style="background:#258cfb;"></span>
+                        <span>Con unidad</span>
+                        <strong>@conUnidad</strong>
+                    </div>
+                    <div class="gac-legend-item">
+                        <span class="gac-legend-dot" style="background:#f97316;"></span>
+                        <span>Sin unidad</span>
+                        <strong>@sinUnidad</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 2: Barras horizontales — roles -->
+            <div class="gac-card gac-chart-card">
+                <div class="gac-chart-header">
+                    <div class="gac-chart-icon" style="background:#fdf4ff; color:#a855f7;">
+                        <i class="fa-solid fa-chart-bar"></i>
+                    </div>
+                    <div>
+                        <p class="gac-chart-title">Distribución por rol</p>
+                        <p class="gac-chart-sub">Residentes agrupados por rol</p>
+                    </div>
+                </div>
+                <div class="gac-bar-wrap">
+                    <canvas id="chartRoles"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 3: Progreso visual — resumen -->
+            <div class="gac-card gac-chart-card">
+                <div class="gac-chart-header">
+                    <div class="gac-chart-icon" style="background:#f0fdf4; color:#22c55e;">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <p class="gac-chart-title">Resumen general</p>
+                        <p class="gac-chart-sub">Indicadores clave</p>
+                    </div>
+                </div>
+                <div class="gac-progress-list">
+
+                    <div class="gac-progress-item">
+                        <div class="gac-progress-top">
+                            <span>Con unidad</span>
+                            <span class="gac-progress-pct" id="pctConUnidad">
+                                @(totalResidentes > 0 ? (int)Math.Round(conUnidad * 100.0 / totalResidentes) : 0)%
+                            </span>
+                        </div>
+                        <div class="gac-progress-track">
+                            <div class="gac-progress-fill" style="background:#258cfb; width:@(totalResidentes > 0 ? conUnidad * 100 / totalResidentes : 0)%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="gac-progress-item">
+                        <div class="gac-progress-top">
+                            <span>Sin unidad</span>
+                            <span class="gac-progress-pct">
+                                @(totalResidentes > 0 ? (int)Math.Round(sinUnidad * 100.0 / totalResidentes) : 0)%
+                            </span>
+                        </div>
+                        <div class="gac-progress-track">
+                            <div class="gac-progress-fill" style="background:#f97316; width:@(totalResidentes > 0 ? sinUnidad * 100 / totalResidentes : 0)%;"></div>
+                        </div>
+                    </div>
+
+                    @foreach (var rg in roleGroups)
+                    {
+                        var pct = totalResidentes > 0 ? (int)Math.Round(rg.Count * 100.0 / totalResidentes) : 0;
+                        <div class="gac-progress-item">
+                            <div class="gac-progress-top">
+                                <span>@rg.Nombre</span>
+                                <span class="gac-progress-pct">@pct%</span>
+                            </div>
+                            <div class="gac-progress-track">
+                                <div class="gac-progress-fill" style="background:#a855f7; width:@pct%;"></div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ══════════════ OFFCANVAS ══════════════ -->
+<div class="offcanvas offcanvas-end gac-offcanvas"
+     tabindex="-1"
+     id="residentModal">
+
+   
+
+    <div class="gac-oc-header">
+        <div class="gac-oc-header-icon">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div>
+            <h2 class="gac-oc-title">Nuevo Residente</h2>
+            <p class="gac-oc-sub">Completa la información del residente</p>
+        </div>
+        <button type="button"
+                class="btn-close ms-auto shadow-none"
+                data-bs-dismiss="offcanvas">
+        </button>
+    </div>
+
+    <div class="gac-oc-body">
+
+        <button type="button"
+                class="btn btn-outline-primary mb-3"
+                id="btnCargarSolicitud">
+            <i class="fa-solid fa-file-import"></i>
+            Cargar desde solicitud
+        </button>
+        <form asp-action="Create"
+              asp-controller="Usuarios"
+              method="post">
+            <input type="hidden" id="IdSolicitud" name="IdSolicitud" />
+
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="FromIndex" value="true" />
+
+            @await Html.PartialAsync("~/Views/Shared/_UsuarioForm.cshtml", new PROTOTIPO.Models.Usuario())
+
+            <div class="gac-oc-footer">
+                <button type="button"
+                        class="gac-btn-cancel"
+                        data-bs-dismiss="offcanvas">
+                    Cancelar
+                </button>
+                <button type="submit" class="gac-btn-save">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Guardar
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<!-- OFFCANVAS Nuevo Residente -->
+<div class="offcanvas offcanvas-end gac-offcanvas">
+    ...
+</div>
+
+
+<!-- MODAL Solicitudes -->
+<div class="modal fade" id="solicitudesModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-1">
+                        Seleccionar solicitud aprobada
+                    </h5>
+                    <small class="text-muted">
+                        Seleccione un solicitante para cargar sus datos
+                    </small>
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+
+            <div class="modal-body p-0">
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Solicitante</th>
+                                <th>Contacto</th>
+                                <th>Unidad</th>
+                                <th class="text-center">Acción</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="listaSolicitudes">
+
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    Cargando solicitudes...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Scripts -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const btn = document.getElementById("btnCargarSolicitud");
+        const modalElement = document.getElementById("solicitudesModal");
+        const lista = document.getElementById("listaSolicitudes");
+
+        const modal = new bootstrap.Modal(modalElement);
+
+        const tipoCliente = document.getElementById("tipoClienteUsuario");
+        const campoCedula = document.getElementById("campoCedula");
+        const campoPasaporte = document.getElementById("campoPasaporte");
+        const campoRnc = document.getElementById("campoRnc");
+        const campoNacionalidad = document.getElementById("campoNacionalidad");
+        const campoNombreEmpresa = document.getElementById("campoNombreEmpresa");
+        const campoPersonaAlojada = document.getElementById("campoPersonaAlojada");
+
+
+        // ============================================================
+        // MOSTRAR / OCULTAR CAMPOS SEGÚN TIPO DE CLIENTE
+        // ============================================================
+
+        function actualizarTipoCliente(tipo) {
+
+            if (tipoCliente)
+                tipoCliente.value = tipo ?? "";
+
+            // Ocultar todos
+            if (campoCedula)
+                campoCedula.style.display = "none";
+
+            if (campoPasaporte)
+                campoPasaporte.style.display = "none";
+
+            if (campoRnc)
+                campoRnc.style.display = "none";
+
+            if (campoNacionalidad)
+                campoNacionalidad.style.display = "none";
+
+            if (campoNombreEmpresa)
+                campoNombreEmpresa.style.display = "none";
+
+            if (campoPersonaAlojada)
+                campoPersonaAlojada.style.display = "none";
+
+
+            // DOMINICANO
+            if (tipo === "Dominicano") {
+
+                if (campoCedula)
+                    campoCedula.style.display = "block";
+            }
+
+
+            // EXTRANJERO
+            else if (tipo === "Extranjero") {
+
+                if (campoPasaporte)
+                    campoPasaporte.style.display = "block";
+
+                if (campoNacionalidad)
+                    campoNacionalidad.style.display = "block";
+            }
+
+
+            // JURÍDICO
+            else if (tipo === "Juridico") {
+
+                if (campoRnc)
+                    campoRnc.style.display = "block";
+
+                if (campoNombreEmpresa)
+                    campoNombreEmpresa.style.display = "block";
+
+                if (campoPersonaAlojada)
+                    campoPersonaAlojada.style.display = "block";
+            }
+        }
+
+
+        // ============================================================
+        // CAMBIO MANUAL DEL TIPO DE CLIENTE
+        // ============================================================
+
+        if (tipoCliente) {
+
+            tipoCliente.addEventListener("change", function() {
+
+                actualizarTipoCliente(this.value);
+
+                // Limpiar documentos anteriores
+                const cedula = document.querySelector("#Cedula");
+                const pasaporte = document.querySelector("#Pasaporte");
+                const rnc = document.querySelector("#RNC");
+                const nacionalidad = document.querySelector("#Nacionalidad");
+                const personaAlojada = document.querySelector("#PersonaAlojada");
+
+                if (cedula)
+                    cedula.value = "";
+
+                if (pasaporte)
+                    pasaporte.value = "";
+
+                if (rnc)
+                    rnc.value = "";
+
+                if (nacionalidad)
+                    nacionalidad.value = "";
+            });
+        }
+
+
+        // ============================================================
+        // CARGAR SOLICITUD
+        // ============================================================
+
+        if (btn) {
+
+            btn.addEventListener("click", async function() {
+
+                modal.show();
+
+                lista.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                Cargando solicitudes...
+                            </td>
+                        </tr>
+                    `;
+
+
+                try {
+
+                    const response = await fetch(
+                        "/Usuarios/ObtenerSolicitudesPendientes"
+                    );
+
+                    if (!response.ok)
+                        throw new Error("Error al obtener solicitudes.");
+
+                    const solicitudes = await response.json();
+
+
+                    // ====================================================
+                    // NO HAY SOLICITUDES
+                    // ====================================================
+
+                    if (solicitudes.length === 0) {
+
+                        lista.innerHTML = `
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">
+                                        <div class="text-muted">
+                                            No hay solicitudes aprobadas disponibles.
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+
+                        return;
+                    }
+
+
+                    lista.innerHTML = "";
+
+
+                    // ====================================================
+                    // MOSTRAR SOLICITUDES
+                    // ====================================================
+
+                    solicitudes.forEach(s => {
+
+                        lista.innerHTML += `
+                                <tr class="solicitud-item"
+                                    data-id="${s.id}"
+                                    style="cursor:pointer">
+
+                                    <td>
+                                        <div class="fw-semibold">
+                                            ${s.nombre ?? ""} ${s.apellido ?? ""}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div>
+                                            ${s.contacto ?? ""}
+                                        </div>
+
+                                        <small class="text-muted">
+                                            <i class="fa-solid fa-phone"></i>
+                                            ${s.telefono ?? ""}
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            Unidad ${s.unidad}
+                                        </span>
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary">
+
+                                            <i class="fa-solid fa-check"></i>
+                                            Seleccionar
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+                            `;
+                    });
+
+
+                    // ====================================================
+                    // SELECCIONAR SOLICITUD
+                    // ====================================================
+
+                    document.querySelectorAll(".solicitud-item")
+                        .forEach(row => {
+
+                            row.addEventListener("click", async function() {
+
+                                const id = this.dataset.id;
+
+
+                                // Guardar ID de solicitud
+                                const idSolicitud =
+                                    document.querySelector("#IdSolicitud");
+
+                                if (idSolicitud)
+                                    idSolicitud.value = id;
+
+
+                                // Obtener información completa
+                                const response = await fetch(
+                                    `/Usuarios/ObtenerSolicitud?id=${id}`
+                                );
+
+                                if (!response.ok)
+                                    throw new Error(
+                                        "No se pudo obtener la solicitud."
+                                    );
+
+                                const data = await response.json();
+
+
+                                // =================================================
+                                // DATOS GENERALES
+                                // =================================================
+
+                                const nombre =
+                                    document.querySelector("#Nombre");
+
+                                const apellido =
+                                    document.querySelector("#Apellido");
+
+                                const email =
+                                    document.querySelector("#Email");
+
+                                const telefono =
+                                    document.querySelector("#Telefono");
+
+
+                                if (nombre)
+                                    nombre.value = data.nombre ?? "";
+
+                                if (apellido)
+                                    apellido.value = data.apellido ?? "";
+
+                                if (email)
+                                    email.value = data.email ?? "";
+
+                                if (telefono)
+                                    telefono.value = data.telefono ?? "";
+
+
+                                const nombreEmpresa =
+                                    document.querySelector("#NombreEmpresa");
+
+                                const personaAlojada =
+                                    document.querySelector("#PersonaAlojada");
+
+                                if (nombreEmpresa)
+                                    nombreEmpresa.value = data.nombreEmpresa ?? "";
+
+                                if (personaAlojada)
+                                    personaAlojada.value = data.personaAlojada ?? "";
+
+                                // =================================================
+                                // CAMPOS DE DOCUMENTOS
+                                // =================================================
+
+                                const cedula =
+                                    document.querySelector("#Cedula");
+
+                                const pasaporte =
+                                    document.querySelector("#Pasaporte");
+
+                                const rnc =
+                                    document.querySelector("#RNC");
+
+                                const nacionalidad =
+                                    document.querySelector("#Nacionalidad");
+
+
+                                // Limpiar primero
+                                if (cedula)
+                                    cedula.value = "";
+
+                                if (pasaporte)
+                                    pasaporte.value = "";
+
+                                if (rnc)
+                                    rnc.value = "";
+
+                                if (nacionalidad)
+                                    nacionalidad.value = "";
+
+
+                                // =================================================
+                                // TIPO DE CLIENTE
+                                // =================================================
+
+                                actualizarTipoCliente(data.tipoCliente);
+
+
+                                // =================================================
+                                // CARGAR DOCUMENTO CORRESPONDIENTE
+                                // =================================================
+
+                                if (data.tipoCliente === "Dominicano") {
+
+                                    if (cedula)
+                                        cedula.value = data.cedula ?? "";
+                                }
+
+                                else if (data.tipoCliente === "Extranjero") {
+
+                                    if (pasaporte)
+                                        pasaporte.value =
+                                            data.pasaporte ?? "";
+
+                                    if (nacionalidad)
+                                        nacionalidad.value =
+                                            data.nacionalidad ?? "";
+                                }
+
+                                else if (data.tipoCliente === "Juridico") {
+
+                                    if (rnc)
+                                        rnc.value = data.rnc ?? "";
+                                }
+
+
+                                // =================================================
+                                // CERRAR MODAL
+                                // =================================================
+
+                                modal.hide();
+
+                            });
+
+                        });
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Error cargando solicitudes:",
+                        error
+                    );
+
+                    lista.innerHTML = `
+                            <tr>
+                                <td colspan="4"
+                                    class="text-center text-danger py-4">
+
+                                    No se pudieron cargar las solicitudes.
+
+                                </td>
+                            </tr>
+                        `;
+                }
+
+            });
+        }
+
+
+        // ============================================================
+        // ESTADO INICIAL
+        // ============================================================
+
+        if (tipoCliente)
+            actualizarTipoCliente(tipoCliente.value);
+
+    });
+</script>
+<!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+                    Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p id="deleteMessage" style="font-size: 14px; color: #475569; line-height: 1.6;">
+                    ¿Estás seguro de que deseas eliminar este usuario?
+                </p>
+            </div>
+
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+    MODAL DE ERROR — CORREGIDO
+    Antes tenía el mensaje "tiene un contrato activo" escrito fijo en el HTML,
+    así que se mostraba para CUALQUIER error (token CSRF inválido, excepción,
+    fallo de red, etc.), no solo cuando el backend rechazaba por contrato activo.
+    Ahora el texto se llena dinámicamente vía JS con el mensaje real del servidor
+    (id="errorUserMessage"), y el título/ícono quedan genéricos.
+-->
+<div class="modal fade" id="errorUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+            <div class="modal-body" style="padding: 32px; background: #ffffff;">
+                <div style="background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; padding: 20px; text-align: center;">
+                    <i class="fa-solid fa-circle-exclamation" style="color: #ef4444; font-size: 32px; display: block; margin-bottom: 12px;"></i>
+                    <p id="errorUserMessage" style="margin: 0; font-weight: 600; font-size: 16px; color: #dc2626; line-height: 1.5;">
+                        No se pudo eliminar el usuario.
+                    </p>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="border-top: 1px solid #e5e7eb; padding: 16px 32px; background: #ffffff;">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width: 100%; border-radius: 8px;">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        /* ── Reopen offcanvas on validation error ── */
+        (function() {
+            var show = '@(ViewBag.ShowResidentModal ?? false)'.toLowerCase();
+            if (show === 'true') {
+                bootstrap.Offcanvas.getOrCreateInstance(
+                    document.getElementById('residentModal')
+                ).show();
+            }
+        })();
+
+        /* ── Live search ── */
+        const searchInput = document.getElementById('searchInput');
+        const rows = document.querySelectorAll('#residentesTable .gac-row');
+        const countLabel = document.getElementById('countLabel');
+        const emptyState = document.getElementById('emptyState');
+
+        searchInput.addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            let visible = 0;
+            rows.forEach(row => {
+                const match = !q || row.dataset.search.includes(q);
+                row.style.display = match ? '' : 'none';
+                if (match) visible++;
+            });
+            countLabel.textContent = visible;
+            emptyState.style.display = visible === 0 ? 'flex' : 'none';
+        });
+
+        /* ── Toast auto-dismiss ── */
+        const toast = document.getElementById('gacToast');
+        if (toast) setTimeout(() => toast.classList.remove('show'), 4000);
+
+        /* ── Password toggle ── */
+        document.querySelectorAll('.pwd-toggle').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const input = this.parentElement.querySelector('.pwd-input');
+                const icon = this.querySelector('i');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                    this.classList.add('active');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        /* ── Eliminar usuario ── */
+        let usuarioIdToDelete = null;
+        let usuarioNombreToDelete = null;
+
+        function eliminarUsuario(id, nombre) {
+            usuarioIdToDelete = id;
+            usuarioNombreToDelete = nombre;
+
+            // Mostrar modal de confirmación
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+            document.getElementById('deleteMessage').textContent =
+                `¿Estás seguro de que deseas eliminar a ${nombre}?`;
+            deleteModal.show();
+        }
+
+        // Muestra el modal de error con el mensaje REAL recibido
+        // (antes el texto estaba fijo en el HTML y aparecía para
+        // cualquier tipo de fallo, incluyendo errores de red o de CSRF)
+        function mostrarErrorEliminar(mensaje) {
+            const errorMsgEl = document.getElementById('errorUserMessage');
+            if (errorMsgEl) errorMsgEl.textContent = mensaje;
+
+            const errorModal = new bootstrap.Modal(document.getElementById('errorUserModal'));
+            errorModal.show();
+        }
+
+        // Manejar confirmación de eliminación
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            if (!usuarioIdToDelete) return;
+
+            try {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                const response = await fetch(`/Usuarios/Delete/${usuarioIdToDelete}`, {
+                    method: 'POST',
+                    headers: {
+                        // IMPORTANTE: el nombre por defecto que ASP.NET Core espera
+                        // para el token antifalsificación enviado por header es
+                        // "RequestVerificationToken", NO "X-CSRF-TOKEN".
+                        // Si tu Program.cs configura AntiforgeryOptions.HeaderName
+                        // con otro nombre, ajusta esto para que coincida.
+                        'RequestVerificationToken': token,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                // Cerrar modal de confirmación
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
+                if (deleteModal) {
+                    deleteModal.hide();
+                }
+
+                if (!response.ok) {
+                    // La petición no llegó a completarse como se esperaba:
+                    // token antifalsificación inválido, error 500, etc.
+                    // Antes esto caía silenciosamente en el mismo modal
+                    // genérico de "contrato activo".
+                    console.error('Delete request failed with status', response.status);
+                    mostrarErrorEliminar(
+                        `No se pudo procesar la solicitud (código ${response.status}). ` +
+                        `Verifica el token de seguridad o intenta recargar la página.`
+                    );
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Mostrar toast de éxito
+                    if (toast) {
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 3000);
+                    }
+
+                    // Recargar la página después de 1 segundo
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    // Mostrar el MENSAJE REAL que envía el controlador
+                    // (antes se ignoraba data.message por completo)
+                    mostrarErrorEliminar(data.message || 'No se pudo eliminar el usuario.');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
+                if (deleteModal) {
+                    deleteModal.hide();
+                }
+                mostrarErrorEliminar('Ocurrió un error de red al intentar eliminar el usuario.');
+            }
+        });
+
+        /* ══════════ CHARTS ══════════ */
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+
+        /* Donut — ocupación */
+        new Chart(document.getElementById('chartOcupacion'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Con unidad', 'Sin unidad'],
+                datasets: [{
+                    data: [@conUnidad, @sinUnidad],
+                    backgroundColor: ['#258cfb', '#f97316'],
+                    hoverBackgroundColor: ['#1a6fd4', '#ea7221'],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                cutout: '72%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` ${ctx.label}: ${ctx.parsed} residente${ctx.parsed !== 1 ? 's' : ''}`
+                        }
+                    }
+                }
+            }
+        });
+
+        /* Barras horizontales — roles */
+        new Chart(document.getElementById('chartRoles'), {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(roleLabels)],
+                datasets: [{
+                    data: [@roleData],
+                    backgroundColor: [@Html.Raw(roleColors)],
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barThickness: 22
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }, tooltip: {
+                        callbacks: { label: ctx => ` ${ctx.parsed.x} residente${ctx.parsed.x !== 1 ? 's' : ''}` }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#f1f5f9' },
+                        ticks: { color: '#64748b', font: { size: 11 }, stepSize: 1, precision: 0 }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#374151', font: { size: 12, weight: '600' } }
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+<style>
+
+    /* ════════════════════════════════════════
+       GAC — Residentes · Design System v2
+    ════════════════════════════════════════ */
+    :root {
+        --gac-blue: #258cfb;
+        --gac-blue-dark: #1a6fd4;
+        --gac-blue-light: #eff6ff;
+        --gac-purple: #a855f7;
+        --gac-text: #0f172a;
+        --gac-muted: #64748b;
+        --gac-border: #e2e8f0;
+        --gac-surface: #f8fafc;
+        --gac-white: #ffffff;
+        --gac-radius: 14px;
+        --gac-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+        --gac-shadow-blue: 0 8px 24px rgba(37,140,251,.22);
+    }
+
+    /* PAGE */
+    .gac-page {
+        padding: 28px 32px;
+    }
+
+    /* HEADER */
+    .gac-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .gac-header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .gac-header-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #258cfb, #60affe);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 22px;
+        flex-shrink: 0;
+        box-shadow: var(--gac-shadow-blue);
+    }
+
+    .gac-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gac-text);
+        margin: 0;
+    }
+
+    .gac-subtitle {
+        font-size: 13px;
+        color: var(--gac-muted);
+        margin: 2px 0 0;
+    }
+
+    /* PRIMARY BUTTON */
+    .gac-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 22px;
+        height: 44px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #258cfb, #1a6fd4);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s;
+        box-shadow: var(--gac-shadow-blue);
+        white-space: nowrap;
+    }
+
+        .gac-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(37,140,251,.32);
+        }
+
+    /* STAT CARDS */
+    .gac-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .gac-stat-card {
+        background: var(--gac-white);
+        border: 1px solid var(--gac-border);
+        border-radius: var(--gac-radius);
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: var(--gac-shadow);
+        transition: .2s;
+    }
+
+        .gac-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+        }
+
+    .gac-stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+
+    .gac-stat-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        color: var(--gac-muted);
+        margin: 0 0 2px;
+    }
+
+    .gac-stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--gac-text);
+        margin: 0;
+        line-height: 1;
+    }
+
+    /* ══ MAIN GRID ══ */
+    .gac-content-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 20px;
+        align-items: start;
+    }
+
+    /* TABLE COLUMN */
+    .gac-table-col {
+        min-width: 0;
+    }
+
+    /* PANEL COLUMN */
+    .gac-panel-col {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    /* CARD BASE */
+    .gac-card {
+        background: var(--gac-white);
+        border: 1px solid var(--gac-border);
+        border-radius: var(--gac-radius);
+        box-shadow: var(--gac-shadow);
+        overflow: hidden;
+    }
+
+    /* TABLE TOOLBAR */
+    .gac-table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--gac-border);
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .gac-search-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .gac-search-icon {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gac-muted);
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+    .gac-search {
+        width: 100%;
+        height: 38px;
+        border: 1px solid var(--gac-border);
+        border-radius: 10px;
+        padding: 0 12px 0 36px;
+        font-size: 13px;
+        color: var(--gac-text);
+        background: var(--gac-surface);
+        outline: none;
+        transition: .2s;
+    }
+
+        .gac-search:focus {
+            border-color: var(--gac-blue);
+            box-shadow: 0 0 0 3px rgba(37,140,251,.12);
+            background: var(--gac-white);
+        }
+
+    .gac-count-pill {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gac-muted);
+        background: var(--gac-surface);
+        border: 1px solid var(--gac-border);
+        border-radius: 20px;
+        padding: 4px 12px;
+        white-space: nowrap;
+    }
+
+    /* TABLE */
+    .gac-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .gac-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+        .gac-table thead tr {
+            border-bottom: 1px solid var(--gac-border);
+            background: var(--gac-surface);
+        }
+
+        .gac-table thead th {
+            padding: 11px 14px;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--gac-muted);
+            white-space: nowrap;
+        }
+
+        .gac-table tbody tr {
+            border-bottom: 1px solid var(--gac-border);
+            transition: background .15s;
+        }
+
+            .gac-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .gac-table tbody tr:hover {
+                background: #f8fbff;
+            }
+
+        .gac-table td {
+            padding: 12px 14px;
+            vertical-align: middle;
+        }
+
+    /* AVATAR */
+    .gac-avatar-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .gac-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #258cfb, #60affe);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        letter-spacing: .5px;
+    }
+
+    .gac-name {
+        font-weight: 600;
+        color: var(--gac-text);
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .gac-email-sub {
+        font-size: 11.5px;
+        color: var(--gac-muted);
+        margin: 1px 0 0;
+    }
+
+    /* PHONE */
+    .gac-phone {
+        color: var(--gac-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+    }
+
+        .gac-phone i {
+            font-size: 10px;
+        }
+
+    /* BADGES */
+    .gac-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .gac-badge-blue {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .gac-badge-purple {
+        background: #faf5ff;
+        color: #7e22ce;
+    }
+
+    .gac-badge-gray {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .gac-badge i {
+        font-size: 10px;
+    }
+
+    /* ACTIONS */
+    .gac-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 5px;
+    }
+
+    .gac-action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        transition: .18s;
+        border: 1px solid transparent;
+    }
+
+    .gac-btn-view {
+        background: #eff6ff;
+        color: #258cfb;
+        border-color: #bfdbfe;
+    }
+
+        .gac-btn-view:hover {
+            background: #258cfb;
+            color: #fff;
+            border-color: #258cfb;
+        }
+
+    .gac-btn-edit {
+        background: #fefce8;
+        color: #ca8a04;
+        border-color: #fde68a;
+    }
+
+        .gac-btn-edit:hover {
+            background: #f59e0b;
+            color: #fff;
+            border-color: #f59e0b;
+        }
+
+    .gac-btn-delete {
+        background: #fef2f2;
+        color: #ef4444;
+        border-color: #fecaca;
+    }
+
+        .gac-btn-delete:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+
+    /* EMPTY */
+    .gac-empty {
+        padding: 50px 20px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        gap: 10px;
+    }
+
+        .gac-empty i {
+            font-size: 36px;
+        }
+
+        .gac-empty p {
+            font-size: 13px;
+            margin: 0;
+        }
+
+    /* ══ CHART CARDS ══ */
+    .gac-chart-card {
+        padding: 18px;
+        overflow: visible;
+    }
+
+    .gac-chart-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .gac-chart-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+    .gac-chart-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gac-text);
+        margin: 0;
+    }
+
+    .gac-chart-sub {
+        font-size: 11px;
+        color: var(--gac-muted);
+        margin: 2px 0 0;
+    }
+
+    /* Donut */
+    .gac-donut-wrap {
+        position: relative;
+        width: 160px;
+        height: 160px;
+        margin: 0 auto 16px;
+    }
+
+        .gac-donut-wrap canvas {
+            width: 160px !important;
+            height: 160px !important;
+        }
+
+    .gac-donut-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+    .gac-donut-num {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--gac-text);
+        line-height: 1;
+    }
+
+    .gac-donut-lbl {
+        font-size: 11px;
+        color: var(--gac-muted);
+        margin-top: 2px;
+    }
+
+    /* Legend */
+    .gac-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .gac-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        color: var(--gac-muted);
+    }
+
+        .gac-legend-item strong {
+            margin-left: auto;
+            color: var(--gac-text);
+            font-weight: 700;
+        }
+
+    .gac-legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    /* Bar chart */
+    .gac-bar-wrap {
+        height: 140px;
+    }
+
+        .gac-bar-wrap canvas {
+            width: 100% !important;
+            height: 140px !important;
+        }
+
+    /* Progress */
+    .gac-progress-list {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .gac-progress-item {
+    }
+
+    .gac-progress-top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--gac-muted);
+        margin-bottom: 5px;
+    }
+
+    .gac-progress-pct {
+        font-weight: 700;
+        color: var(--gac-text);
+    }
+
+    .gac-progress-track {
+        height: 7px;
+        border-radius: 99px;
+        background: #f1f5f9;
+        overflow: hidden;
+    }
+
+    .gac-progress-fill {
+        height: 100%;
+        border-radius: 99px;
+        min-width: 4px;
+        transition: width .8s ease;
+    }
+
+    /* ══ OFFCANVAS ══ */
+    .gac-offcanvas {
+        width: 600px !important;
+        background: var(--gac-surface);
+        border-left: 1px solid var(--gac-border) !important;
+    }
+
+    .gac-oc-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 24px 26px;
+        background: var(--gac-white);
+        border-bottom: 1px solid var(--gac-border);
+    }
+
+    .gac-oc-header-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--gac-blue-light);
+        color: var(--gac-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+
+    .gac-oc-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--gac-text);
+        margin: 0;
+    }
+
+    .gac-oc-sub {
+        font-size: 12px;
+        color: var(--gac-muted);
+        margin: 2px 0 0;
+    }
+
+    .gac-oc-body {
+        padding: 26px;
+        overflow-y: auto;
+        height: calc(100% - 96px);
+    }
+
+        .gac-oc-body .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .gac-oc-body .form-control,
+        .gac-oc-body .form-select {
+            height: 48px;
+            border-radius: 12px;
+            border: 1px solid var(--gac-border);
+            font-size: 14px;
+            background: var(--gac-white);
+            box-shadow: none !important;
+            transition: .2s;
+        }
+
+            .gac-oc-body .form-control:focus,
+            .gac-oc-body .form-select:focus {
+                border-color: var(--gac-blue);
+                box-shadow: 0 0 0 3px rgba(37,140,251,.12) !important;
+            }
+
+    .gac-oc-footer {
+        display: flex;
+        gap: 12px;
+        margin-top: 26px;
+    }
+
+    .gac-btn-cancel {
+        flex: 1;
+        height: 46px;
+        border-radius: 12px;
+        border: 1px solid var(--gac-border);
+        background: var(--gac-white);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--gac-muted);
+        cursor: pointer;
+        transition: .2s;
+    }
+
+        .gac-btn-cancel:hover {
+            background: var(--gac-surface);
+            color: var(--gac-text);
+        }
+
+    .gac-btn-save {
+        flex: 1;
+        height: 46px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #258cfb, #1a6fd4);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: .2s;
+        box-shadow: var(--gac-shadow-blue);
+    }
+
+        .gac-btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(37,140,251,.30);
+        }
+
+    /* ══ TOAST ══ */
+    .gac-toast {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        z-index: 9999;
+        background: #fff;
+        border: 1px solid #bbf7d0;
+        border-left: 4px solid #22c55e;
+        border-radius: 12px;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #166534;
+        box-shadow: 0 8px 28px rgba(0,0,0,.10);
+        opacity: 0;
+        transform: translateY(12px);
+        transition: .35s ease;
+        pointer-events: none;
+    }
+
+        .gac-toast i {
+            font-size: 16px;
+            color: #22c55e;
+        }
+
+        .gac-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    /* ══ RESPONSIVE ══ */
+    @@media (max-width: 1100px) {
+        .gac-content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .gac-panel-col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        .gac-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .gac-page {
+            padding: 16px;
+        }
+
+        .gac-offcanvas {
+            width: 100% !important;
+        }
+
+        .gac-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .gac-panel-col {
+            grid-template-columns: 1fr;
+        }
+
+        .gac-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .gac-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>

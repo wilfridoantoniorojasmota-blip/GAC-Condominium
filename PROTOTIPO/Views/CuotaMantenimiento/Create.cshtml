@@ -1,0 +1,645 @@
+﻿@model PROTOTIPO.Models.CuotaMantenimiento
+
+@{
+    ViewData["Title"] = "Crear Cuota";
+}
+
+<style>
+    :root {
+        --ink: #0c1220;
+        --ink-soft: #3d4a5c;
+        --ink-muted: #7a8799;
+        --surface: #f4f6fb;
+        --surface-2: #ffffff;
+        --border: #e4e9f0;
+        --accent: #1a56e8;
+        --accent-light: #eff4ff;
+        --teal: #0fd4b0;
+        --success: #15803d;
+        --success-soft: #f0fdf6;
+        --success-bdr: #bbf7d0;
+        --r-lg: 14px;
+        --r-xl: 20px;
+        --r-2xl: 26px;
+        --r-pill: 999px;
+        --shadow-sm: 0 2px 8px rgba(12,18,32,.07);
+        --ease: .22s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    .cuota-page {
+        max-width: 680px;
+        margin: 36px auto;
+        padding: 0 24px 64px;
+    }
+
+    /* ── Breadcrumb ── */
+    .cuota-bc {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .78rem;
+        font-weight: 500;
+        color: var(--ink-muted);
+        margin-bottom: 26px;
+    }
+
+        .cuota-bc a {
+            color: var(--ink-muted);
+            text-decoration: none;
+            transition: color var(--ease);
+        }
+
+            .cuota-bc a:hover {
+                color: var(--accent);
+            }
+
+    /* ── Header ── */
+    .cuota-hd {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .cuota-hd-ico {
+        width: 52px;
+        height: 52px;
+        border-radius: 15px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+        box-shadow: 0 6px 20px rgba(26,86,232,.32);
+    }
+
+    .cuota-hd-title {
+        font-family: var(--font-d);
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -.035em;
+        color: var(--ink);
+        margin: 0 0 3px;
+    }
+
+    .cuota-hd-sub {
+        font-size: .84rem;
+        color: var(--ink-muted);
+        margin: 0;
+    }
+
+    /* ── Card ── */
+    .cuota-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-2xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    /* ── Band ── */
+    .cuota-band {
+        background: var(--ink);
+        padding: 20px 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .cuota-band::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        .cuota-band::after {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(26,86,232,.22) 0%, transparent 68%);
+            top: -70px;
+            right: -40px;
+            pointer-events: none;
+        }
+
+    .cuota-band-ico {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(26,86,232,.25);
+        border: 1px solid rgba(26,86,232,.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #93c5fd;
+        font-size: 1rem;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cuota-band-title {
+        font-family: var(--font-d);
+        font-size: .95rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cuota-band-sub {
+        font-size: .72rem;
+        color: rgba(255,255,255,.4);
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ── Body ── */
+    .cuota-body {
+        padding: 28px 28px 8px;
+    }
+
+    .cuota-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 18px;
+    }
+
+    /* ── Field ── */
+    .cuota-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cf-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        margin-bottom: 8px;
+    }
+
+        .cf-label i {
+            color: var(--accent);
+            font-size: .82rem;
+        }
+
+        .cf-label .req {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #ef4444;
+            display: inline-block;
+            margin-left: 2px;
+        }
+
+    .cf-wrap {
+        position: relative;
+    }
+
+    .cf-input,
+    .cf-select {
+        width: 100%;
+        padding: 11px 14px 11px 40px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-lg);
+        font-family: var(--font-b);
+        font-size: .875rem;
+        color: var(--ink);
+        background: var(--surface);
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+        transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+    }
+
+        .cf-input:focus, .cf-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(26,86,232,.11);
+            background: #fff;
+        }
+
+        .cf-input::placeholder {
+            color: #b8c4d0;
+        }
+
+    .cf-ico {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #c0cad6;
+        font-size: .88rem;
+        pointer-events: none;
+        transition: color var(--ease);
+    }
+
+    .cf-wrap:focus-within .cf-ico {
+        color: var(--accent);
+    }
+
+    /* Select arrow */
+    .cf-sel-wrap {
+        position: relative;
+    }
+
+        .cf-sel-wrap::after {
+            content: '\F282';
+            font-family: 'bootstrap-icons';
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-muted);
+            pointer-events: none;
+            font-size: .82rem;
+        }
+
+    .cf-select {
+        padding-right: 36px;
+        cursor: pointer;
+    }
+
+    /* Hint */
+    .cf-hint {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .72rem;
+        color: var(--ink-muted);
+        margin-top: 6px;
+    }
+
+        .cf-hint i {
+            color: var(--teal);
+            font-size: .78rem;
+        }
+
+    /* ── Preview ── */
+    .cuota-preview {
+        margin: 24px 0 8px;
+        background: var(--success-soft);
+        border: 1px solid var(--success-bdr);
+        border-radius: var(--r-xl);
+        padding: 16px 20px;
+        display: none;
+        align-items: center;
+        gap: 14px;
+    }
+
+        .cuota-preview.visible {
+            display: flex;
+        }
+
+    .cuota-preview-ico {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: #dcfce7;
+        color: var(--success);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .cuota-preview-label {
+        font-size: .7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .09em;
+        color: var(--success);
+        margin-bottom: 2px;
+    }
+
+    .cuota-preview-value {
+        font-family: var(--font-d);
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--ink);
+        letter-spacing: -.02em;
+    }
+
+        .cuota-preview-value span {
+            color: var(--ink-muted);
+            font-weight: 500;
+            font-size: .875rem;
+        }
+
+    /* ── Footer ── */
+    .cuota-footer {
+        background: #f8fafc;
+        border-top: 1px solid var(--border);
+        padding: 18px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-cuota-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: var(--r-lg);
+        border: 1.5px solid var(--border);
+        background: transparent;
+        color: var(--ink-soft);
+        text-decoration: none;
+        transition: var(--ease);
+    }
+
+        .btn-cuota-cancel:hover {
+            background: var(--surface-2);
+            border-color: #c8d2de;
+            color: var(--ink);
+        }
+
+    .btn-cuota-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-b);
+        font-size: .875rem;
+        font-weight: 700;
+        padding: 10px 26px;
+        border-radius: var(--r-lg);
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: var(--ease);
+        box-shadow: 0 4px 14px rgba(26,86,232,.35);
+    }
+
+        .btn-cuota-save:hover {
+            background: #1447d0;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26,86,232,.45);
+        }
+
+        .btn-cuota-save:active {
+            transform: translateY(0);
+        }
+
+        .btn-cuota-save .spin {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: cuota-rot .7s linear infinite;
+        }
+
+        .btn-cuota-save.loading .cuota-lbl,
+        .btn-cuota-save.loading .cuota-btn-ico {
+            display: none;
+        }
+
+        .btn-cuota-save.loading .spin {
+            display: block;
+        }
+
+    @@keyframes cuota-rot {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    span[data-valmsg-for],
+    .field-validation-error,
+    .field-validation-valid,
+    .text-danger {
+        display: none !important;
+    }
+
+    @@media (max-width: 767px) {
+        .cuota-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 575px) {
+        .cuota-page {
+            padding: 0 16px 48px;
+        }
+
+        .cuota-band, .cuota-body {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .cuota-footer {
+            padding: 16px 20px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-cuota-cancel, .btn-cuota-save {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="cuota-page">
+
+    <!-- Breadcrumb -->
+    <div class="cuota-bc">
+        <a asp-action="Index"><i class="bi bi-receipt"></i> Cuotas</a>
+        <i class="bi bi-chevron-right" style="font-size:.65rem;"></i>
+        <span>Nueva cuota</span>
+    </div>
+
+    <!-- Header -->
+    <div class="cuota-hd">
+        <div class="cuota-hd-ico"><i class="bi bi-plus-circle-fill"></i></div>
+        <div>
+            <h1 class="cuota-hd-title">Crear Cuota de Mantenimiento</h1>
+            <p class="cuota-hd-sub">Registra una nueva cuota para una unidad habitacional.</p>
+        </div>
+    </div>
+
+    <!-- Card -->
+    <div class="cuota-card">
+
+        <!-- Band -->
+        <div class="cuota-band">
+            <div class="cuota-band-ico"><i class="bi bi-receipt-cutoff"></i></div>
+            <div>
+                <div class="cuota-band-title">Datos de la cuota</div>
+                <div class="cuota-band-sub">Completa todos los campos requeridos</div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form asp-action="Create" method="post" id="cuotaForm">
+            <div class="cuota-body">
+
+                <div class="cuota-grid">
+
+                    <!-- Unidad -->
+                    <div class="cuota-field">
+                        <label class="cf-label">
+                            <i class="bi bi-building"></i>
+                            Unidad <span class="req"></span>
+                        </label>
+                        <div class="cf-sel-wrap cf-wrap">
+                            <select asp-for="IdUnidad"
+                                    class="cf-select"
+                                    asp-items="ViewBag.IdUnidad"
+                                    style="padding-left:40px;">
+                                <option value="">— Seleccionar —</option>
+                            </select>
+                            <i class="bi bi-buildings cf-ico"></i>
+                        </div>
+                    </div>
+
+                    <!-- Periodo -->
+                    <div class="cuota-field">
+                        <label class="cf-label">
+                            <i class="bi bi-calendar-month"></i>
+                            Período <span class="req"></span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Periodo"
+                                   class="cf-input"
+                                   placeholder="2026-01"
+                                   maxlength="7"
+                                   id="periodoInput"
+                                   autocomplete="off">
+                            <i class="bi bi-calendar3 cf-ico"></i>
+                        </div>
+                        <div class="cf-hint">
+                            <i class="bi bi-info-circle-fill"></i>
+                            Formato: AAAA-MM
+                        </div>
+                    </div>
+
+                    <!-- Monto -->
+                    <div class="cuota-field">
+                        <label class="cf-label">
+                            <i class="bi bi-cash-coin"></i>
+                            Monto (RD$) <span class="req"></span>
+                        </label>
+                        <div class="cf-wrap">
+                            <input asp-for="Monto"
+                                   type="number"
+                                   step="0.01"
+                                   min="0"
+                                   class="cf-input"
+                                   placeholder="0.00"
+                                   id="montoInput">
+                            <i class="bi bi-currency-dollar cf-ico"></i>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Preview -->
+                <div class="cuota-preview" id="cuotaPreview">
+                    <div class="cuota-preview-ico"><i class="bi bi-check-circle-fill"></i></div>
+                    <div>
+                        <div class="cuota-preview-label">Resumen de la cuota</div>
+                        <div class="cuota-preview-value" id="previewText">—</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--border);margin:0;">
+
+            <!-- Footer -->
+            <div class="cuota-footer">
+                <a asp-action="Index" class="btn-cuota-cancel">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn-cuota-save" id="btnCuota">
+                    <i class="cuota-btn-ico bi bi-floppy-fill"></i>
+                    <span class="cuota-lbl">Guardar cuota</span>
+                    <div class="spin"></div>
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var periodoEl = document.getElementById('periodoInput');
+            var montoEl   = document.getElementById('montoInput');
+            var preview   = document.getElementById('cuotaPreview');
+            var previewTx = document.getElementById('previewText');
+            var form      = document.getElementById('cuotaForm');
+            var btn       = document.getElementById('btnCuota');
+
+            /* Auto-formato período: inserta guión tras 4 dígitos */
+            if (periodoEl) {
+                periodoEl.addEventListener('input', function () {
+                    var v = this.value.replace(/\D/g, '').slice(0, 6);
+                    if (v.length > 4) v = v.slice(0, 4) + '-' + v.slice(4);
+                    this.value = v;
+                    actualizarPreview();
+                });
+            }
+
+            if (montoEl) {
+                montoEl.addEventListener('input', actualizarPreview);
+            }
+
+            function actualizarPreview() {
+                var periodo = periodoEl ? periodoEl.value : '';
+                var monto   = parseFloat(montoEl ? montoEl.value : '');
+
+                if (periodo.length === 7 && !isNaN(monto) && monto > 0) {
+                    var montoFmt = 'RD$ ' + monto.toLocaleString('es-DO', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    previewTx.innerHTML = montoFmt + ' <span>&nbsp;·&nbsp; Período ' + periodo + '</span>';
+                    preview.classList.add('visible');
+                } else {
+                    preview.classList.remove('visible');
+                }
+            }
+
+            /* Submit loader */
+            if (form) {
+                form.addEventListener('submit', function () {
+                    setTimeout(function () {
+                        btn.classList.add('loading');
+                        btn.disabled = true;
+                    }, 0);
+                });
+            }
+        })();
+    </script>
+}

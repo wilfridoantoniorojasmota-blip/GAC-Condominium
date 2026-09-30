@@ -1,0 +1,412 @@
+﻿@model PROTOTIPO.Models.Pago
+
+@{
+    ViewData["Title"] = "Editar Pago";
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+        --gac-muted: #64748b;
+        --gac-warning: #f59e0b;
+    }
+
+    .edit-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header .ph-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-header .ph-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(245,158,11,.2);
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0 0 2px;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    .btn-back {
+        border: 1.5px solid rgba(255,255,255,.25);
+        background: rgba(255,255,255,.08);
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.2rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,.16);
+            color: #fff;
+            border-color: rgba(255,255,255,.45);
+        }
+
+    /* FORM CARD */
+    .form-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,22,35,.04);
+    }
+
+    .form-section {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gac-border);
+    }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+    .section-heading {
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #94a3b8;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .section-heading i {
+            color: var(--gac-primary);
+        }
+
+    /* INPUTS */
+    .form-label {
+        font-size: .85rem;
+        font-weight: 700;
+        color: #2c3a52;
+        margin-bottom: .4rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        min-height: 46px;
+        font-size: .9rem;
+        color: var(--gac-navy);
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--gac-primary);
+            box-shadow: 0 0 0 3px rgba(37,140,251,.12);
+        }
+
+        .form-control::placeholder {
+            color: #a2adbd;
+        }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+        .input-with-icon .form-control,
+        .input-with-icon .form-select {
+            padding-left: 2.75rem;
+        }
+
+        .input-with-icon .input-icon {
+            position: absolute;
+            left: .9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: .9rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+    .field-validation-error,
+    .text-danger {
+        font-size: .8rem;
+        font-weight: 600;
+        color: #dc2626;
+        margin-top: .3rem;
+        display: block;
+    }
+
+    /* EDIT NOTICE */
+    .edit-notice {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+        background: rgba(245,158,11,.07);
+        border: 1px solid rgba(245,158,11,.2);
+        border-radius: 12px;
+        padding: .9rem 1.1rem;
+        margin-bottom: 1.5rem;
+        font-size: .875rem;
+        color: #92400e;
+    }
+
+        .edit-notice i {
+            color: var(--gac-warning);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+    /* FORM ACTIONS */
+    .form-actions {
+        padding: 1.25rem 1.5rem;
+        background: #fafbfd;
+        border-top: 1px solid var(--gac-border);
+        display: flex;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-save {
+        background: var(--gac-warning);
+        border: none;
+        color: #fff;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: .65rem 1.5rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .btn-save:hover {
+            background: #d97706;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245,158,11,.35);
+        }
+
+    .btn-cancel {
+        border: 1.5px solid #e2e8f0;
+        background: #fff;
+        color: var(--gac-muted);
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.25rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        text-decoration: none;
+    }
+
+        .btn-cancel:hover {
+            border-color: var(--gac-primary);
+            color: var(--gac-primary);
+        }
+</style>
+
+<div class="edit-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div class="ph-left">
+                <div class="ph-icon">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <div>
+                    <h3>Editar Pago</h3>
+                    <p>Modifica los datos del registro de pago</p>
+                </div>
+            </div>
+            <a asp-action="Index" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                Volver
+            </a>
+        </div>
+
+        <!-- AVISO EDICIÓN -->
+        <div class="edit-notice">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Estás editando un pago existente. Los cambios se guardarán de forma permanente.</span>
+        </div>
+
+        <div class="form-card">
+            <form asp-action="Edit">
+                <input type="hidden" asp-for="IdPago" />
+                <div asp-validation-summary="ModelOnly" class="text-danger px-4 pt-3"></div>
+
+                <!-- SECCIÓN: INFORMACIÓN GENERAL -->
+                <div class="form-section">
+                    <div class="section-heading">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Información del Pago
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label asp-for="Fecha" class="form-label">Fecha</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-regular fa-calendar"></i>
+                                <input asp-for="Fecha" type="date" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Fecha" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Monto" class="form-label">Monto</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-solid fa-dollar-sign"></i>
+                                <input asp-for="Monto" type="number" step="0.01"
+                                       class="form-control" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="Monto" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="TipoPago" class="form-label">Tipo de Pago</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-solid fa-layer-group"></i>
+                                <input asp-for="TipoPago" class="form-control" placeholder="Ej: Alquiler" />
+                            </div>
+                            <span asp-validation-for="TipoPago" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: MÉTODO Y ESTADO -->
+                <div class="form-section">
+                    <div class="section-heading">
+                        <i class="fa-solid fa-tags"></i>
+                        Método y Estado
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label asp-for="MetodoPago" class="form-label">Método de Pago</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-regular fa-credit-card"></i>
+                                <input asp-for="MetodoPago" class="form-control" placeholder="Ej: Transferencia" />
+                            </div>
+                            <span asp-validation-for="MetodoPago" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="EstadoPago" class="form-label">Estado del Pago</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-solid fa-circle-half-stroke"></i>
+                                <input asp-for="EstadoPago" class="form-control" placeholder="Ej: Pagado" />
+                            </div>
+                            <span asp-validation-for="EstadoPago" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: CONTRATO Y CUOTA -->
+                <div class="form-section">
+                    <div class="section-heading">
+                        <i class="fa-solid fa-file-contract"></i>
+                        Contrato y Cuota
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label asp-for="IdContrato" class="form-label">Contrato</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-solid fa-file-lines"></i>
+                                <select asp-for="IdContrato" class="form-select"
+                                        asp-items="ViewBag.IdContrato">
+                                    <option value="">Seleccione un contrato</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="IdContrato" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="IdCuota" class="form-label">Cuota</label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fa-solid fa-receipt"></i>
+                                <select asp-for="IdCuota" class="form-select"
+                                        asp-items="ViewBag.IdCuota">
+                                    <option value="">Seleccione una cuota</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="IdCuota" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-save">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Guardar Cambios
+                    </button>
+                    <a asp-action="Index" class="btn btn-cancel">
+                        <i class="fa-solid fa-xmark"></i>
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

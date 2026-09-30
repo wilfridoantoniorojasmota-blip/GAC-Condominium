@@ -1,0 +1,121 @@
+﻿@model PROTOTIPO.Models.Aviso
+
+@{
+    ViewData["Title"] = "Detalle del Aviso";
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+    }
+
+    .aviso-detalle-page {
+        background: #f4f6fb;
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    .btn-back {
+        border: 1.5px solid #e2e8f0;
+        color: #64748b;
+        font-weight: 600;
+        border-radius: 10px;
+        background: #fff;
+        transition: all 0.2s ease;
+    }
+
+        .btn-back:hover {
+            border-color: var(--gac-primary);
+            color: var(--gac-primary);
+            background: #fff;
+        }
+
+    .aviso-detail-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #eef1f6;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15, 22, 35, 0.04);
+    }
+
+    .aviso-detail-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        padding: 2rem;
+        color: #fff;
+    }
+
+    .aviso-detail-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(37, 140, 251, 0.15);
+        color: var(--gac-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .aviso-detail-header h3 {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.5rem;
+    }
+
+    .aviso-detail-fecha {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: rgba(255,255,255,0.65);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .aviso-detail-body {
+        padding: 2rem;
+    }
+
+    .aviso-detail-content {
+        white-space: pre-line;
+        color: #334155;
+        line-height: 1.8;
+        font-size: 1rem;
+    }
+</style>
+
+<div class="aviso-detalle-page">
+    <div class="container py-4">
+
+        <a asp-action="Index" class="btn btn-back mb-3">
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            Volver
+        </a>
+
+        <div class="aviso-detail-card">
+
+            <div class="aviso-detail-header">
+                <div class="aviso-detail-icon">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+
+                <h3>@Model.Titulo</h3>
+
+                <div class="aviso-detail-fecha">
+                    <i class="fa-regular fa-calendar"></i>
+                    @Model.FechaPublicacion?.ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
+
+            <div class="aviso-detail-body">
+                <p class="aviso-detail-content mb-0">
+                    @Model.Contenido
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</div>

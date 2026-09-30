@@ -1,0 +1,393 @@
+﻿@model PROTOTIPO.Models.Documento
+
+@{
+    ViewData["Title"] = "Eliminar Documento";
+}
+
+<div class="mnt-page">
+    <div class="container-fluid py-4 px-3 px-md-4" style="max-width: 800px;">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3><i class="bi bi-trash me-2"></i>Eliminar Documento</h3>
+                <p>Confirmación de eliminación definitiva del archivo</p>
+            </div>
+
+            <a asp-action="Index" class="btn-gac btn-gac-secondary-header">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+            </a>
+        </div>
+
+        <!-- FORM CONTAINER -->
+        <div class="form-container">
+
+            <!-- ALERTA ADVERTENCIA -->
+            <div class="delete-warning-box">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>
+                    <strong>¿Seguro que deseas eliminar este documento?</strong>
+                    <p>Esta acción no se puede deshacer y el archivo será borrado permanentemente de los registros.</p>
+                </div>
+            </div>
+
+            <!-- DETALLES Y VISTA PREVIA -->
+            <div class="row g-4 align-items-center mb-4">
+                <div class="col-md-8">
+                    <div class="info-list">
+                        <div class="info-row">
+                            <span class="info-label">Nombre</span>
+                            <span class="info-value">@Model.Nombre</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Tipo</span>
+                            <span class="info-value"><span class="unit-pill">@Model.Tipo</span></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Fecha de subida</span>
+                            <span class="info-value">
+                                @if (Model.FechaSubida != null)
+                                {
+                                    <span class="date-cell"><i class="bi bi-calendar me-1"></i>@Model.FechaSubida?.ToString("dd/MM/yyyy")</span>
+                                }
+                                else
+                                {
+                                    <span class="date-none">Sin fecha</span>
+                                }
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Condominio</span>
+                            <span class="info-value">@(Model.IdCondominioNavigation?.Nombre ?? "No asignado")</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Unidad</span>
+                            <span class="info-value">
+                                @if (Model.IdUnidadNavigation != null)
+                                {
+                                    <span class="badge-estado badge-proceso"><span class="dot"></span>Unidad: @Model.IdUnidadNavigation.Numero</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-estado badge-otro"><span class="dot"></span>No asignada</span>
+                                }
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 text-center">
+                    <div class="delete-icon-box">
+                        <i class="bi bi-file-earmark-x"></i>
+                        @if (!string.IsNullOrEmpty(Model.Archivo))
+                        {
+                            <a href="@Model.Archivo" target="_blank" class="btn-tbl btn-tbl-info mt-3 w-100">
+                                <i class="bi bi-eye"></i> Ver archivo
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMULARIO DE ACCIÓN -->
+            <form asp-action="Delete">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="IdDocumento" />
+
+                <div class="form-actions">
+                    <a asp-action="Index" class="btn-gac btn-gac-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn-gac btn-gac-danger-action">
+                        <i class="bi bi-trash"></i>
+                        Eliminar documento
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    /* ── BUTTONS ── */
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.4rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        cursor: pointer;
+    }
+
+    .btn-gac-secondary-header {
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+    }
+
+        .btn-gac-secondary-header:hover {
+            background: rgba(255,255,255,.2);
+            color: #fff;
+        }
+
+    .btn-gac-secondary {
+        background: var(--gac-surface);
+        border: 1.5px solid var(--gac-border);
+        color: #64748b;
+    }
+
+        .btn-gac-secondary:hover {
+            background: #eef1f6;
+            color: var(--gac-navy);
+        }
+
+    .btn-gac-danger-action {
+        background: var(--gac-danger);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-gac-danger-action:hover {
+            background: #dc2626;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239,68,68,.35);
+        }
+
+    /* ── FORM CONTAINER ── */
+    .form-container {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(15,22,35,.03);
+    }
+
+    /* ── WARNING BOX ── */
+    .delete-warning-box {
+        background: rgba(245,158,11,.08);
+        border: 1px solid rgba(245,158,11,.25);
+        color: #b45309;
+        border-radius: 12px;
+        padding: 1.1rem 1.3rem;
+        font-size: .88rem;
+        display: flex;
+        gap: .75rem;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+
+        .delete-warning-box i {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .delete-warning-box p {
+            margin: 0;
+            font-size: .82rem;
+            color: #b45309;
+            opacity: 0.95;
+            margin-top: .15rem;
+        }
+
+    /* ── INFO DETAILS ── */
+    .info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .info-row {
+        display: flex;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--gac-border);
+        align-items: center;
+    }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+    .info-label {
+        width: 140px;
+        font-size: .85rem;
+        font-weight: 600;
+        color: #64748b;
+        flex-shrink: 0;
+    }
+
+    .info-value {
+        font-size: .92rem;
+        font-weight: 500;
+        color: var(--gac-navy);
+    }
+
+    .unit-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(15,22,35,.05);
+        border-radius: 50px;
+        padding: .3rem .75rem;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    .date-cell {
+        font-size: .83rem;
+        color: #64748b;
+        white-space: nowrap;
+    }
+
+    .date-none {
+        font-size: .78rem;
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    /* ── BADGES ── */
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        font-size: .73rem;
+        padding: .35rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+        .badge-estado .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .badge-proceso {
+        background: rgba(37,140,251,.1);
+        color: #1a5fb4;
+    }
+
+        .badge-proceso .dot {
+            background: var(--gac-primary);
+        }
+
+    .badge-otro {
+        background: rgba(15,22,35,.07);
+        color: var(--gac-navy);
+    }
+
+        .badge-otro .dot {
+            background: #94a3b8;
+        }
+
+    /* ── DELETE PREVIEW BOX ── */
+    .delete-icon-box {
+        background: #fafbfe;
+        border: 1.5px solid var(--gac-border);
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .delete-icon-box i {
+            font-size: 3.5rem;
+            color: var(--gac-danger);
+        }
+
+    .btn-tbl {
+        border-radius: 8px;
+        font-size: .78rem;
+        font-weight: 700;
+        padding: .4rem .75rem;
+        transition: all .15s ease;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        line-height: 1;
+    }
+
+    .btn-tbl-info {
+        border: 1.5px solid var(--gac-primary);
+        color: var(--gac-primary);
+        background: rgba(37,140,251,.1);
+    }
+
+        .btn-tbl-info:hover {
+            background: var(--gac-primary);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(37,140,251,.35);
+        }
+
+    /* ── ACTIONS ── */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--gac-border);
+        padding-top: 1.75rem;
+    }
+</style>

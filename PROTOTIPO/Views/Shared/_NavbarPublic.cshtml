@@ -1,0 +1,605 @@
+﻿<style>
+    /* ============================================================
+       NAVBAR — GAC Condominium
+       Usa los mismos tokens que la landing:
+       --ink #0c1220 · --accent #1a56e8 · --teal #0fd4b0
+       Sora (display) + Inter (body)
+       ============================================================ */
+
+    .gac-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        transition: background .3s ease, box-shadow .3s ease, padding .3s ease;
+        padding: 20px 0;
+        /* starts transparent over the hero */
+        background: transparent;
+    }
+
+        /* Scrolled state — added via JS */
+        .gac-nav.scrolled {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 1px 0 rgba(12, 18, 32, .07), 0 4px 20px rgba(12, 18, 32, .06);
+            padding: 10px 0;
+        }
+
+    .gac-nav-inner {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0 32px;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
+
+    /* ── Brand ─────────────────────────────────────────────── */
+    .gac-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+
+    .gac-brand-icon {
+        width: 38px;
+        height: 38px;
+        background: #1a56e8;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        transition: transform .25s ease;
+    }
+
+    .gac-brand:hover .gac-brand-icon {
+        transform: rotate(-6deg) scale(1.08);
+    }
+
+    .gac-brand-name {
+        font-family: 'Sora', system-ui, sans-serif;
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: -.03em;
+        color: #ffffff; /* white over hero */
+        transition: color .3s ease;
+        line-height: 1;
+    }
+
+    .gac-brand-sub {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: .62rem;
+        font-weight: 600;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.5);
+        transition: color .3s ease;
+        margin-top: 1px;
+    }
+
+    /* Scrolled: text goes dark */
+    .gac-nav.scrolled .gac-brand-name {
+        color: #0c1220;
+    }
+
+    .gac-nav.scrolled .gac-brand-sub {
+        color: #7a8799;
+    }
+
+    /* ── Nav Links ─────────────────────────────────────────── */
+    .gac-links {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        list-style: none;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+        .gac-links a {
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: .875rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .75);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 999px;
+            transition: color .2s ease, background .2s ease;
+            position: relative;
+        }
+
+            .gac-links a:hover,
+            .gac-links a.active {
+                color: #ffffff;
+                background: rgba(255, 255, 255, .1);
+            }
+
+    /* Scrolled: links go dark */
+    .gac-nav.scrolled .gac-links a {
+        color: #3d4a5c;
+    }
+
+        .gac-nav.scrolled .gac-links a:hover,
+        .gac-nav.scrolled .gac-links a.active {
+            color: #0c1220;
+            background: #f4f6fb;
+        }
+
+    /* ── Actions ───────────────────────────────────────────── */
+    .gac-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-nav-ghost {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: .875rem;
+        font-weight: 600;
+        padding: 9px 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, .28);
+        background: transparent;
+        color: rgba(255, 255, 255, .85);
+        text-decoration: none;
+        transition: all .25s ease;
+        white-space: nowrap;
+    }
+
+        .btn-nav-ghost:hover {
+            background: rgba(255, 255, 255, .12);
+            color: #fff;
+            border-color: rgba(255, 255, 255, .4);
+        }
+
+    /* Scrolled ghost */
+    .gac-nav.scrolled .btn-nav-ghost {
+        border-color: #e4e9f0;
+        color: #3d4a5c;
+    }
+
+        .gac-nav.scrolled .btn-nav-ghost:hover {
+            background: #f4f6fb;
+            color: #0c1220;
+        }
+
+    .btn-nav-primary {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: .875rem;
+        font-weight: 700;
+        padding: 9px 20px;
+        border-radius: 12px;
+        border: none;
+        background: #1a56e8;
+        color: #fff;
+        text-decoration: none;
+        transition: all .25s ease;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 4px 14px rgba(26, 86, 232, .35);
+        white-space: nowrap;
+    }
+
+        .btn-nav-primary:hover {
+            background: #1447d0;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26, 86, 232, .45);
+            color: #fff;
+        }
+
+    /* ── Mobile Hamburger ──────────────────────────────────── */
+    .gac-toggler {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, .25);
+        background: transparent;
+        color: rgba(255, 255, 255, .85);
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all .2s ease;
+        margin-left: auto;
+    }
+
+        .gac-toggler:hover {
+            background: rgba(255, 255, 255, .1);
+        }
+
+    .gac-nav.scrolled .gac-toggler {
+        border-color: #e4e9f0;
+        color: #3d4a5c;
+    }
+
+    /* ── Mobile Drawer ─────────────────────────────────────── */
+    .gac-mobile-drawer {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 999;
+    }
+
+    .gac-drawer-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(12, 18, 32, .55);
+        backdrop-filter: blur(4px);
+    }
+
+    .gac-drawer-panel {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(320px, 90vw);
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        gap: 8px;
+        box-shadow: -8px 0 40px rgba(12,18,32,.15);
+        transform: translateX(100%);
+        transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+
+    .gac-mobile-drawer.open {
+        display: flex;
+    }
+
+        .gac-mobile-drawer.open .gac-drawer-panel {
+            transform: translateX(0);
+        }
+
+    .drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    .drawer-brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+    }
+
+    .drawer-brand-icon {
+        width: 34px;
+        height: 34px;
+        background: #1a56e8;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    .drawer-brand-name {
+        font-family: 'Sora', system-ui, sans-serif;
+        font-size: .9rem;
+        font-weight: 800;
+        color: #0c1220;
+        letter-spacing: -.02em;
+    }
+
+    .drawer-close {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        border: 1px solid #e4e9f0;
+        background: #f4f6fb;
+        color: #3d4a5c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: .95rem;
+        transition: all .2s ease;
+    }
+
+        .drawer-close:hover {
+            background: #0c1220;
+            color: #fff;
+            border-color: #0c1220;
+        }
+
+    .drawer-divider {
+        border: none;
+        border-top: 1px solid #e4e9f0;
+        margin: 4px 0;
+    }
+
+    .drawer-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: .9rem;
+        font-weight: 600;
+        color: #3d4a5c;
+        transition: all .2s ease;
+    }
+
+        .drawer-link i {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: #f4f6fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            color: #1a56e8;
+            flex-shrink: 0;
+            transition: all .2s ease;
+        }
+
+        .drawer-link:hover {
+            background: #eff4ff;
+            color: #1a56e8;
+        }
+
+            .drawer-link:hover i {
+                background: #1a56e8;
+                color: #fff;
+            }
+
+    .drawer-actions {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-drawer-ghost {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #e4e9f0;
+        background: transparent;
+        color: #3d4a5c;
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: .9rem;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        transition: all .2s ease;
+        display: block;
+    }
+
+        .btn-drawer-ghost:hover {
+            background: #f4f6fb;
+            color: #0c1220;
+        }
+
+    .btn-drawer-primary {
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+        border: none;
+        background: #1a56e8;
+        color: #fff;
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: .9rem;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(26, 86, 232, .35);
+        transition: all .2s ease;
+    }
+
+        .btn-drawer-primary:hover {
+            background: #1447d0;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @@media (max-width: 991px) {
+        .gac-links,
+        .gac-actions {
+            display: none;
+        }
+
+        .gac-toggler {
+            display: flex;
+        }
+    }
+
+    @@media (max-width: 575px) {
+        .gac-nav-inner {
+            padding: 0 20px;
+        }
+    }
+</style>
+
+<!-- ============================================================
+     NAVBAR
+============================================================ -->
+<nav class="gac-nav" id="gacNav">
+    <div class="gac-nav-inner">
+
+        <!-- Brand -->
+        <a class="gac-brand"
+           asp-controller="Condominios"
+           asp-action="Bienvenida">
+            <div class="gac-brand-icon">
+                <i class="bi bi-buildings-fill"></i>
+            </div>
+            <div>
+                <div class="gac-brand-name">Los Almendros</div>
+                <div class="gac-brand-sub">Portal de bienvenida</div>
+            </div>
+        </a>
+
+        <!-- Desktop links -->
+        <ul class="gac-links">
+            <li><a href="#inicio" class="active">Inicio</a></li>
+            <li><a href="#about">Nosotros</a></li>
+            <li><a href="#unidades">Unidades</a></li>
+            <li><a href="#areas">Áreas Comunes</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+
+        <!-- Desktop actions -->
+        <div class="gac-actions">
+            
+            <a asp-controller="Account"
+               asp-action="Login"
+               class="btn-nav-primary">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Iniciar sesión
+            </a>
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button class="gac-toggler" id="gacToggler" aria-label="Abrir menú">
+            <i class="bi bi-list"></i>
+        </button>
+
+    </div>
+</nav>
+
+<!-- ============================================================
+     MOBILE DRAWER
+============================================================ -->
+<div class="gac-mobile-drawer" id="gacDrawer">
+    <div class="gac-drawer-backdrop" id="gacBackdrop"></div>
+    <div class="gac-drawer-panel">
+
+        <div class="drawer-header">
+            <a class="drawer-brand" asp-controller="Condominios" asp-action="Bienvenida">
+                <div class="drawer-brand-icon"><i class="bi bi-buildings-fill"></i></div>
+                <span class="drawer-brand-name">Los Almendros</span>
+            </a>
+            <button class="drawer-close" id="gacDrawerClose" aria-label="Cerrar menú">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <hr class="drawer-divider">
+
+        <a href="#inicio" class="drawer-link">
+            <i class="bi bi-house-fill"></i>
+            Inicio
+        </a>
+        <a href="#about" class="drawer-link">
+            <i class="bi bi-info-circle-fill"></i>
+            Nosotros
+        </a>
+        <a href="#unidades" class="drawer-link">
+            <i class="bi bi-buildings-fill"></i>
+            Unidades
+        </a>
+        <a href="#areas" class="drawer-link">
+            <i class="bi bi-tree-fill"></i>
+            Áreas Comunes
+        </a>
+        <a href="#contacto" class="drawer-link">
+            <i class="bi bi-envelope-fill"></i>
+            Contacto
+        </a>
+
+        <hr class="drawer-divider">
+
+        <div class="drawer-actions">
+            <a asp-controller="SolicitudesIngreso"
+               asp-action="Create"
+               class="btn-drawer-ghost">
+                Solicitar ingreso
+            </a>
+            <a asp-controller="Account"
+               asp-action="Login"
+               class="btn-drawer-primary">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Iniciar sesión
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================
+     SCRIPT — scroll state + mobile drawer + active link
+============================================================ -->
+<script>
+    (function () {
+        const nav      = document.getElementById('gacNav');
+        const toggler  = document.getElementById('gacToggler');
+        const drawer   = document.getElementById('gacDrawer');
+        const backdrop = document.getElementById('gacBackdrop');
+        const closeBtn = document.getElementById('gacDrawerClose');
+
+        /* Scroll: add/remove .scrolled class */
+        function onScroll() {
+            nav.classList.toggle('scrolled', window.scrollY > 40);
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll(); /* run once on load */
+
+        /* Drawer open / close */
+        function openDrawer() {
+            drawer.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            /* trigger transition */
+            requestAnimationFrame(() => {
+                drawer.querySelector('.gac-drawer-panel').style.transform = 'translateX(0)';
+            });
+        }
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        toggler.addEventListener('click', openDrawer);
+        closeBtn.addEventListener('click', closeDrawer);
+        backdrop.addEventListener('click', closeDrawer);
+
+        /* Close drawer when a link inside it is clicked */
+        drawer.querySelectorAll('.drawer-link').forEach(link => {
+            link.addEventListener('click', closeDrawer);
+        });
+
+        /* Active nav link on scroll (IntersectionObserver) */
+        const sections = document.querySelectorAll('section[id], footer[id]');
+        const navLinks = document.querySelectorAll('.gac-links a, .drawer-link');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.toggle(
+                            'active',
+                            link.getAttribute('href') === '#' + entry.target.id
+                        );
+                    });
+                }
+            });
+        }, { rootMargin: '-40% 0px -55% 0px' });
+
+        sections.forEach(s => observer.observe(s));
+    })();
+</script>

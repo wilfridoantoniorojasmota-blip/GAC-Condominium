@@ -1,0 +1,172 @@
+﻿@model PROTOTIPO.Models.SolicitudIngreso
+
+@{
+    ViewData["Title"] = "Solicitud de Acceso";
+}
+
+<h2>Solicitud de Acceso al Condominio</h2>
+
+<form id="solicitudForm" asp-action="Create" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label for="NombreSolicitante" class="form-label">Nombre completo</label>
+        <input name="NombreSolicitante"
+               id="NombreSolicitante"
+               class="form-control"
+               required />
+    </div>
+
+    <div class="mb-3">
+        <label for="Contacto" class="form-label">Email</label>
+        <input name="Contacto"
+               id="Contacto"
+               class="form-control"
+               type="email"
+               required />
+    </div>
+
+    <div class="mb-3">
+        <label for="Telefono" class="form-label">Teléfono</label>
+        <input name="Telefono"
+               id="Telefono"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="IdUnidad" class="form-label">Unidad de interés opcional</label>
+        <select name="IdUnidad" id="IdUnidad" class="form-control">
+            <option value="">Seleccione una unidad</option>
+
+            @if (ViewBag.Unidades != null)
+            {
+                foreach (var u in ViewBag.Unidades)
+                {
+                    <option value="@u.IdUnidad">Unidad @u.Numero</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="Observaciones" class="form-label">Observaciones</label>
+        <textarea name="Observaciones"
+                  id="Observaciones"
+                  class="form-control"
+                  rows="4"></textarea>
+    </div>
+
+    <div id="formAlert" class="alert d-none" role="alert"></div>
+
+    <button type="submit" id="submitBtn" class="btn btn-primary w-100">
+        Enviar solicitud
+    </button>
+
+</form>
+
+<script>
+    (function () {
+        const form = document.getElementById('solicitudForm');
+        const alertBox = document.getElementById('formAlert');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (!form || !alertBox || !submitBtn) {
+            return;
+        }
+
+        function showAlert(type, message) {
+            alertBox.classList.remove('d-none', 'alert-success', 'alert-danger');
+            alertBox.classList.add(type);
+            alertBox.textContent = message;
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            alertBox.classList.add('d-none');
+            alertBox.textContent = '';
+
+            const nombre = document.getElementById('NombreSolicitante').value.trim();
+            const contacto = document.getElementById('Contacto').value.trim();
+            const telefono = document.getElementById('Telefono').value.trim();
+
+            if (!nombre || !contacto) {
+                showAlert('alert-danger', 'Por favor complete los campos obligatorios.');
+                return;
+            }
+
+            const emailRegex = new RegExp('^[^\\s\\x40]+\\x40[^\\s\\x40]+\\.[^\\s\\x40]+$');
+            const isEmail = emailRegex.test(contacto);
+            const isPhone = telefono.replace(/\D/g, '').length >= 7;
+
+            if (!isEmail && !isPhone) {
+                showAlert('alert-danger', 'Ingrese un email válido o un teléfono con al menos 7 dígitos.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            const token = tokenInput ? tokenInput.value : '';
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'RequestVerificationToken': token
+                },
+                body: new URLSearchParams(formData)
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (json) {
+                if (json && json.success) {
+                    // Mostrar modal de éxito con fondo blanco y check verde
+                    const modalHtml = `
+                        <div class="modal fade" id="successSolicitudModal" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="background:#ffffff;border-radius:16px;padding:28px;text-align:center;">
+                              <div style="font-size:48px;color:#16a34a;margin-bottom:12px;">&#10003;</div>
+                              <h5 style="margin:0 0 8px;font-weight:800;color:#0c1220;">Solicitud Enviada</h5>
+                              <p style="margin:0;color:#475569;">Gracias. Hemos recibido tu solicitud y nos pondremos en contacto contigo.</p>
+                            </div>
+                          </div>
+                        </div>`;
+
+                    // Añadir al DOM y mostrar
+                    let existing = document.getElementById('successSolicitudModal');
+                    if (existing) existing.remove();
+                    const div = document.createElement('div');
+                    div.innerHTML = modalHtml;
+                    document.body.appendChild(div.firstElementChild);
+
+                    const modalEl = document.getElementById('successSolicitudModal');
+                    const bsModal = new bootstrap.Modal(modalEl);
+                    bsModal.show();
+
+                    // Cerrar y limpiar después de 2.5s
+                    setTimeout(function () {
+                        try { bsModal.hide(); } catch(e){}
+                        const el = document.getElementById('successSolicitudModal');
+                        if (el) el.remove();
+                    }, 2500);
+
+                    form.reset();
+                } else {
+                    showAlert('alert-danger', json && json.message ? json.message : 'Error al enviar la solicitud.');
+                }
+            })
+            .catch(function () {
+                showAlert('alert-danger', 'Error de conexión. Intenta nuevamente.');
+            })
+            .finally(function () {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar solicitud';
+            });
+        });
+    })();
+</script>

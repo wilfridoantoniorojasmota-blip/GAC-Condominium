@@ -1,0 +1,260 @@
+﻿
+@model PROTOTIPO.Models.ContratoAlquiler
+
+@{
+    ViewData["Title"] = "Editar Contrato";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="mnt-page">
+    <div class="container-fluid py-4 px-3 px-md-4" style="max-width: 800px;">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3><i class="bi bi-pencil-square me-2"></i>Editar Contrato</h3>
+                <p>Modifica los términos, plazos o el inquilino asociado a este contrato</p>
+            </div>
+
+            <a asp-action="Index" class="btn-gac btn-gac-secondary-header">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+            </a>
+        </div>
+
+        <!-- FORM CONTAINER -->
+        <div class="form-container">
+            <form asp-action="Edit" method="post" class="modern-form">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="IdContrato" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger-gac mb-3"></div>
+
+                <!-- Fila 1: Inquilino y Unidad -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="IdUsuario" class="form-label-gac">Inquilino</label>
+                        <select asp-for="IdUsuario" class="form-select-gac" asp-items="ViewBag.IdUsuario">
+                            <option value="">Seleccione inquilino</option>
+                        </select>
+                        <span asp-validation-for="IdUsuario" class="text-danger-gac"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="IdUnidad" class="form-label-gac">Unidad Habitacional</label>
+                        <select asp-for="IdUnidad" class="form-select-gac" asp-items="ViewBag.IdUnidad">
+                            <option value="">Seleccione unidad</option>
+                        </select>
+                        <span asp-validation-for="IdUnidad" class="text-danger-gac"></span>
+                    </div>
+                </div>
+
+                <!-- Fila 2: Fechas de Inicio y Fin -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="FechaInicio" class="form-label-gac">Fecha de inicio</label>
+                        <input asp-for="FechaInicio" type="date" class="form-control-gac" />
+                        <span asp-validation-for="FechaInicio" class="text-danger-gac"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="FechaFin" class="form-label-gac">Fecha de finalización</label>
+                        <input asp-for="FechaFin" type="date" class="form-control-gac" />
+                        <span asp-validation-for="FechaFin" class="text-danger-gac"></span>
+                    </div>
+                </div>
+
+                <!-- Fila 3: Renta y Estado -->
+                <div class="row g-3 mb-5">
+                    <div class="col-md-6">
+                        <label asp-for="MontoRenta" class="form-label-gac">Monto de Renta (RD$)</label>
+                        <input asp-for="MontoRenta" type="number" step="0.01" class="form-control-gac" placeholder="0.00" />
+                        <span asp-validation-for="MontoRenta" class="text-danger-gac"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Estado" class="form-label-gac">Estado del contrato</label>
+                        <select asp-for="Estado" class="form-select-gac">
+                            <option value="activo">Activo</option>
+                            <option value="finalizado">Finalizado</option>
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger-gac"></span>
+                    </div>
+                </div>
+
+                <!-- ACCIONES -->
+                <div class="form-actions">
+                    <a asp-action="Index" class="btn-gac btn-gac-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn-gac btn-gac-primary">
+                        <i class="bi bi-save"></i>
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    /* ── BUTTONS ── */
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.4rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        cursor: pointer;
+    }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-gac-primary:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    .btn-gac-secondary-header {
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+    }
+
+        .btn-gac-secondary-header:hover {
+            background: rgba(255,255,255,.2);
+            color: #fff;
+        }
+
+    .btn-gac-secondary {
+        background: var(--gac-surface);
+        border: 1.5px solid var(--gac-border);
+        color: #64748b;
+    }
+
+        .btn-gac-secondary:hover {
+            background: #eef1f6;
+            color: var(--gac-navy);
+        }
+
+    /* ── FORM CONTAINER ── */
+    .form-container {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(15,22,35,.03);
+    }
+
+    /* ── FORM CONTROLS ── */
+    .form-label-gac {
+        display: block;
+        font-size: .85rem;
+        font-weight: 600;
+        color: var(--gac-navy);
+        margin-bottom: .5rem;
+    }
+
+    .form-control-gac,
+    .form-select-gac {
+        width: 100%;
+        border-radius: 10px;
+        border: 1.5px solid var(--gac-border);
+        padding: .75rem 1rem;
+        font-size: .9rem;
+        color: var(--gac-navy);
+        background-color: #fff;
+        transition: all .15s ease;
+        outline: none;
+    }
+
+        .form-control-gac:focus,
+        .form-select-gac:focus {
+            border-color: var(--gac-primary);
+            box-shadow: 0 0 0 4px rgba(37,140,251,.1);
+        }
+
+    .text-danger-gac {
+        display: block;
+        font-size: .78rem;
+        color: var(--gac-danger);
+        margin-top: .4rem;
+        font-weight: 500;
+    }
+
+    /* ── ACTIONS ── */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--gac-border);
+        padding-top: 1.75rem;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

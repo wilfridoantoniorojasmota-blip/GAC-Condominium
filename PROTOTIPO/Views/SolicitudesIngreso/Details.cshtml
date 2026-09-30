@@ -1,0 +1,1343 @@
+﻿@model PROTOTIPO.Models.SolicitudIngreso
+
+@{
+    ViewData["Title"] = "Detalle de Solicitud";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var isPending = Model.Estado == "pendiente";
+    var isApproved = Model.Estado == "procesada";
+    var isRejected = Model.Estado == "rechazada";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    /* ==============================
+           TOKENS — mirror the landing system
+        ============================== */
+    :root {
+        --ink: #0c1220;
+        --ink-soft: #3d4a5c;
+        --ink-muted: #7a8799;
+        --surface: #f5f7fa;
+        --surface-2: #ffffff;
+        --border: #e4e9f0;
+        --accent: #1a56e8;
+        --accent-2: #0fd4b0;
+        --pending-bg: #fffbeb;
+        --pending-ink: #92400e;
+        --pending-bdr: #fde68a;
+        --pending-acc: #f59e0b;
+        --ok-bg: #f0fdf6;
+        --ok-ink: #15803d;
+        --ok-bdr: #bbf7d0;
+        --ok-acc: #22c55e;
+        --no-bg: #fff1f0;
+        --no-ink: #b91c1c;
+        --no-bdr: #fecaca;
+        --no-acc: #ef4444;
+        --r-lg: 16px;
+        --r-xl: 20px;
+        --r-2xl: 28px;
+        --r-pill: 999px;
+        --shadow-sm: 0 1px 3px rgba(12,18,32,.06), 0 1px 2px rgba(12,18,32,.04);
+        --shadow-md: 0 4px 16px rgba(12,18,32,.08), 0 2px 6px rgba(12,18,32,.05);
+        --shadow-lg: 0 16px 40px rgba(12,18,32,.10), 0 4px 12px rgba(12,18,32,.06);
+        --tr: .22s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+    }
+
+    body {
+        font-family: var(--font-b);
+        background: var(--surface);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==============================
+           STATUS BANNER — signature element
+           Full-bleed stripe that sets the
+           emotional tone of the whole page.
+        ============================== */
+    .status-banner {
+        width: 100%;
+        padding: 22px 0 20px;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid transparent;
+    }
+
+        /* Pending: amber pulse */
+        .status-banner.pending {
+            background: var(--pending-bg);
+            border-color: var(--pending-bdr);
+        }
+
+            .status-banner.pending .sb-dot {
+                background: var(--pending-acc);
+                box-shadow: 0 0 0 0 rgba(245,158,11,.6);
+                animation: pulse-amber 1.8s infinite;
+            }
+    @@keyframes pulse-amber {
+        0% {
+            box-shadow: 0 0 0 0 rgba(245,158,11,.55);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(245,158,11,0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(245,158,11,0);
+        }
+    }
+
+    .status-banner.pending .sb-label {
+        color: var(--pending-ink);
+    }
+
+    .status-banner.pending .sb-pill {
+        background: var(--pending-acc);
+        color: #ffffff;
+    }
+
+    /* Approved: solid green */
+    .status-banner.approved {
+        background: var(--ok-bg);
+        border-color: var(--ok-bdr);
+    }
+
+        .status-banner.approved .sb-dot {
+            background: var(--ok-acc);
+        }
+
+        .status-banner.approved .sb-label {
+            color: var(--ok-ink);
+        }
+
+        .status-banner.approved .sb-pill {
+            background: var(--ok-acc);
+            color: #ffffff;
+        }
+
+    /* Rejected: red */
+    .status-banner.rejected {
+        background: var(--no-bg);
+        border-color: var(--no-bdr);
+    }
+
+        .status-banner.rejected .sb-dot {
+            background: var(--no-acc);
+        }
+
+        .status-banner.rejected .sb-label {
+            color: var(--no-ink);
+        }
+
+        .status-banner.rejected .sb-pill {
+            background: var(--no-acc);
+            color: #ffffff;
+        }
+
+    .sb-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .sb-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .sb-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .sb-title {
+        font-family: var(--font-d);
+        font-size: .8rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        margin-bottom: 1px;
+    }
+
+    .sb-label {
+        font-family: var(--font-d);
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -.02em;
+    }
+
+    .sb-pill {
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        padding: 6px 16px;
+        border-radius: var(--r-pill);
+    }
+
+    .sb-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: .82rem;
+        font-weight: 600;
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: color var(--tr);
+    }
+
+        .sb-back:hover {
+            color: var(--ink);
+        }
+
+    /* ==============================
+           PAGE SHELL
+        ============================== */
+    .detail-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 36px 24px 64px;
+    }
+
+    .page-title {
+        font-family: var(--font-d);
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -.03em;
+        color: var(--ink);
+        margin: 0;
+    }
+
+    .page-sub {
+        font-size: .875rem;
+        color: var(--ink-muted);
+        margin: 4px 0 0;
+    }
+
+    /* ==============================
+           CARDS
+        ============================== */
+    .det-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    .det-card-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 24px 0;
+        margin-bottom: 20px;
+    }
+
+    .det-card-head-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: #eff6ff;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .95rem;
+        flex-shrink: 0;
+    }
+
+    .det-card-head h2 {
+        font-family: var(--font-d);
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: -.02em;
+        color: var(--ink);
+        margin: 0;
+    }
+
+    .det-card-head span {
+        font-size: .75rem;
+        color: var(--ink-muted);
+        margin-left: auto;
+    }
+
+    .det-card-body {
+        padding: 0 24px 24px;
+    }
+
+    /* ==============================
+           FIELD ROWS — two-column grid
+        ============================== */
+    .field-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        overflow: hidden;
+    }
+    @@media (max-width: 575px) {
+        .field-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .field-cell {
+        padding: 16px 20px;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        transition: background var(--tr);
+    }
+
+        .field-cell:hover {
+            background: #fafbfd;
+        }
+
+        /* Remove right border on even cells and bottom border on last row */
+        .field-cell:nth-child(2n) {
+            border-right: none;
+        }
+
+        .field-cell:nth-last-child(-n+2) {
+            border-bottom: none;
+        }
+   @@media (max-width: 575px) {
+        .field-cell {
+            border-right: none;
+        }
+
+            .field-cell:last-child {
+                border-bottom: none;
+            }
+
+            .field-cell:nth-last-child(-n+2) {
+                border-bottom: 1px solid var(--border);
+            }
+
+            .field-cell:last-child {
+                border-bottom: none;
+            }
+    }
+
+    /* Full-width cell spanning both columns */
+    .field-cell.full {
+        grid-column: 1 / -1;
+        border-right: none;
+    }
+
+        .field-cell.full:last-child {
+            border-bottom: none;
+        }
+
+    .field-label {
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .field-label i {
+            font-size: .8rem;
+        }
+
+    .field-value {
+        font-size: .95rem;
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 1.4;
+    }
+
+    .field-obs {
+        font-size: .9rem;
+        color: var(--ink-soft);
+        line-height: 1.7;
+        font-weight: 400;
+        font-style: italic;
+    }
+
+    /* ==============================
+           UNIT SIDEBAR CARD
+        ============================== */
+    .unit-thumb {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: var(--r-lg);
+        margin-bottom: 16px;
+        border: 1px solid var(--border);
+    }
+
+    .unit-no-img {
+        width: 100%;
+        height: 140px;
+        background: var(--surface);
+        border: 1.5px dashed var(--border);
+        border-radius: var(--r-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        gap: 6px;
+        color: var(--ink-muted);
+        font-size: .82rem;
+    }
+
+        .unit-no-img i {
+            font-size: 1.6rem;
+            opacity: .4;
+        }
+
+    .unit-id-tag {
+        font-family: var(--font-d);
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: -.03em;
+        color: var(--ink);
+        margin-bottom: 4px;
+    }
+
+    .unit-sub {
+        font-size: .82rem;
+        color: var(--ink-muted);
+        line-height: 1.55;
+    }
+
+    .unit-meta-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+        flex-wrap: wrap;
+    }
+
+    .unit-meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-pill);
+        font-size: .75rem;
+        font-weight: 600;
+        color: var(--ink-soft);
+        padding: 5px 12px;
+    }
+
+    /* ==============================
+           ACTION CARD
+        ============================== */
+    .action-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        position: sticky;
+        top: 20px;
+    }
+
+    .action-card-head {
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .action-card-head h3 {
+            font-family: var(--font-d);
+            font-size: .9rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin: 0;
+        }
+
+    .action-card-body {
+        padding: 20px 22px 22px;
+    }
+
+    .btn-approve {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        color: #ffffff;
+        font-family: var(--font-b);
+        font-weight: 700;
+        font-size: .9rem;
+        cursor: pointer;
+        transition: var(--tr);
+        box-shadow: 0 4px 14px rgba(21,128,61,.28);
+        margin-bottom: 10px;
+    }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(21,128,61,.35);
+        }
+
+    .btn-reject {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1.5px solid var(--no-bdr);
+        background: var(--no-bg);
+        color: var(--no-ink);
+        font-family: var(--font-b);
+        font-weight: 700;
+        font-size: .9rem;
+        cursor: pointer;
+        transition: var(--tr);
+    }
+
+        .btn-reject:hover {
+            background: var(--no-acc);
+            color: #ffffff;
+            border-color: var(--no-acc);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(239,68,68,.28);
+        }
+
+    .action-note {
+        margin-top: 16px;
+        padding: 12px 14px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: .78rem;
+        color: var(--ink-muted);
+        line-height: 1.6;
+        display: flex;
+        gap: 8px;
+    }
+
+        .action-note i {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+    .processed-badge {
+        padding: 16px;
+        border-radius: 14px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        font-size: .875rem;
+    }
+
+        .processed-badge.ok {
+            background: var(--ok-bg);
+            color: var(--ok-ink);
+            border: 1px solid var(--ok-bdr);
+        }
+
+        .processed-badge.no {
+            background: var(--no-bg);
+            color: var(--no-ink);
+            border: 1px solid var(--no-bdr);
+        }
+
+        .processed-badge i {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .processed-badge strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .processed-badge span {
+            font-size: .8rem;
+            opacity: .75;
+        }
+
+    /* ==============================
+           TIMELINE / ACTIVITY
+        ============================== */
+    .timeline {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: relative;
+    }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+    .tl-item {
+        display: flex;
+        gap: 16px;
+        position: relative;
+        padding-bottom: 20px;
+    }
+
+        .tl-item:last-child {
+            padding-bottom: 0;
+        }
+
+    .tl-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .8rem;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+        border: 2px solid var(--surface-2);
+    }
+
+        .tl-dot.blue {
+            background: #eff6ff;
+            color: var(--accent);
+            border-color: #dbeafe;
+        }
+
+        .tl-dot.amber {
+            background: var(--pending-bg);
+            color: var(--pending-acc);
+            border-color: var(--pending-bdr);
+        }
+
+        .tl-dot.green {
+            background: var(--ok-bg);
+            color: var(--ok-acc);
+            border-color: var(--ok-bdr);
+        }
+
+    .tl-body {
+        flex: 1;
+        padding-top: 6px;
+    }
+
+        .tl-body strong {
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--ink);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .tl-body span {
+            font-size: .775rem;
+            color: var(--ink-muted);
+        }
+</style>
+
+<!-- ================================================
+     STATUS BANNER — full-bleed, above everything
+================================================ -->
+<div class="status-banner @(isPending ? "pending" : isApproved ? "approved" : "rejected")">
+    <div class="sb-inner">
+        <div class="sb-left">
+            <span class="sb-dot"></span>
+            <div>
+                <div class="sb-title">Estado de la solicitud</div>
+                <div class="sb-label">
+                    @if (isPending)
+                    {
+                        <text>Esperando revisión</text>
+                    }
+                    @if (isApproved)
+                    {
+                        <text>Solicitud aprobada</text>
+                    }
+                    @if (isRejected)
+                    {
+                        <text>Solicitud rechazada</text>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="sb-pill">@Model.Estado?.ToUpper()</span>
+            <a href="javascript:history.back()" class="sb-back">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================
+     MAIN CONTENT
+================================================ -->
+<div class="detail-wrap">
+
+    <!-- Page heading -->
+    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="page-title">Solicitud #@ViewBag.NumeroSolicitud</h1>
+            <p class="page-sub">
+                @Model.TipoSolicitud &nbsp;·&nbsp;
+                Recibida el @(Model.Fecha?.ToString("dd MMM yyyy, HH:mm") ?? "—")
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- ============ LEFT — main info ============ -->
+        <div class="col-lg-8 d-flex flex-column gap-4">
+
+            <!-- Applicant card -->
+            <!-- Applicant card -->
+            <div class="det-card">
+                <div class="det-card-head">
+                    <div class="det-card-head-icon">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <h2>Información del solicitante</h2>
+                    <span>#@ViewBag.NumeroSolicitud</span>
+                </div>
+
+                <div class="det-card-body">
+                    <div class="field-grid">
+
+                        <!-- TIPO DE CLIENTE -->
+                        <div class="field-cell full">
+                            <div class="field-label">
+                                <i class="bi bi-person-vcard"></i>
+                                Tipo de cliente
+                            </div>
+
+                            <div class="field-value">
+                                @if (Model.TipoCliente == "Juridico")
+                                {
+                                    <span>Persona jurídica</span>
+                                }
+                                else if (Model.TipoCliente == "Extranjero")
+                                {
+                                    <span>Persona extranjera</span>
+                                }
+                                else if (Model.TipoCliente == "Dominicano")
+                                {
+                                    <span>Persona dominicana</span>
+                                }
+                                else
+                                {
+                                    <span class="muted">No especificado</span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- ================================================= -->
+                        <!-- PERSONA FÍSICA -->
+                        <!-- ================================================= -->
+                        @if (Model.TipoCliente == "Dominicano" || Model.TipoCliente == "Extranjero")
+                        {
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-person"></i>
+                                    Nombre
+                                </div>
+
+                                <div class="field-value">
+                                    @Model.NombreSolicitante
+                                </div>
+                            </div>
+
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-person"></i>
+                                    Apellido
+                                </div>
+
+                                <div class="field-value">
+                                    @Model.Apellido
+                                </div>
+                            </div>
+
+                            <!-- DOCUMENTO -->
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-card-text"></i>
+                                    @if (Model.TipoCliente == "Dominicano")
+                                    {
+                                        <text>Cédula</text>
+                                    }
+                                    else if (Model.TipoCliente == "Extranjero")
+                                    {
+                                        <text>Pasaporte</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Documento</text>
+                                    }
+                                </div>
+
+                                <div class="field-value">
+                                    @if (Model.TipoCliente == "Dominicano")
+                                    {
+                                        @if (!string.IsNullOrEmpty(Model.Cedula))
+                                        {
+                                            @Model.Cedula
+                                        }
+                                        else
+                                        {
+                                            <span class="muted">No registrada</span>
+                                        }
+                                    }
+                                    else if (Model.TipoCliente == "Extranjero")
+                                    {
+                                        @if (!string.IsNullOrEmpty(Model.Pasaporte))
+                                        {
+                                            @Model.Pasaporte
+                                        }
+                                        else
+                                        {
+                                            <span class="muted">No registrado</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @if (!string.IsNullOrEmpty(Model.RNC))
+                                        {
+                                            @Model.RNC
+                                        }
+                                        else
+                                        {
+                                            <span class="muted">No registrado</span>
+                                        }
+                                    }
+                                </div>
+                            </div>
+
+                            @if (Model.TipoCliente == "Extranjero")
+                            {
+                                <div class="field-cell">
+                                    <div class="field-label">
+                                        <i class="bi bi-globe"></i>
+                                        Nacionalidad
+                                    </div>
+
+                                    <div class="field-value">
+                                        @if (!string.IsNullOrEmpty(Model.Nacionalidad))
+                                        {
+                                            @Model.Nacionalidad
+                                        }
+                                        else
+                                        {
+                                            <span class="muted">No registrada</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        <!-- ================================================= -->
+                        <!-- PERSONA JURÍDICA -->
+                        <!-- ================================================= -->
+                        @if (Model.TipoCliente == "Juridico")
+{
+    <!-- Nombre de la empresa -->
+    <div class="field-cell">
+        <div class="field-label">
+            <i class="bi bi-building"></i>
+            Nombre de la empresa
+        </div>
+        <div class="field-value">
+            @(!string.IsNullOrEmpty(Model.NombreEmpresa) ? Model.NombreEmpresa : "No registrado")
+        </div>
+    </div>
+
+    <!-- RNC -->
+    <div class="field-cell">
+        <div class="field-label">
+            <i class="bi bi-card-text"></i>
+            RNC
+        </div>
+        <div class="field-value">
+            @(!string.IsNullOrEmpty(Model.RNC) ? Model.RNC : "No registrado")
+        </div>
+    </div>
+
+    <!-- Nombre del contacto / solicitante -->
+    <div class="field-cell">
+        <div class="field-label">
+            <i class="bi bi-person"></i>
+            Nombre
+        </div>
+        <div class="field-value">
+            @(!string.IsNullOrEmpty(Model.NombreSolicitante) ? Model.NombreSolicitante : "No registrado")
+        </div>
+    </div>
+
+    <!-- Apellido del contacto -->
+    <div class="field-cell">
+        <div class="field-label">
+            <i class="bi bi-person"></i>
+            Apellido
+        </div>
+        <div class="field-value">
+            @(!string.IsNullOrEmpty(Model.Apellido) ? Model.Apellido : "No registrado")
+        </div>
+    </div>
+
+    <!-- Persona alojada -->
+    <div class="field-cell full">
+        <div class="field-label">
+            <i class="bi bi-person-badge"></i>
+            Persona alojada
+        </div>
+        <div class="field-value">
+            @(!string.IsNullOrEmpty(Model.PersonaAlojada) ? Model.PersonaAlojada : "No registrado")
+        </div>
+    </div>
+}
+
+                        <!-- ================================================= -->
+                        <!-- CONTACTO -->
+                        <!-- ================================================= -->
+
+                        <div class="field-cell">
+                            <div class="field-label">
+                                <i class="bi bi-telephone"></i>
+                                Contacto
+                            </div>
+
+                            <div class="field-value">
+                                @if (!string.IsNullOrEmpty(Model.Contacto))
+                                {
+                                    @Model.Contacto
+                                }
+                                else
+                                {
+                                    <span class="muted">No registrado</span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- FECHA -->
+                        <div class="field-cell">
+                            <div class="field-label">
+                                <i class="bi bi-calendar3"></i>
+                                Fecha de solicitud
+                            </div>
+
+                            <div class="field-value">
+                                @(Model.Fecha?.ToString("dd/MM/yyyy") ?? "—")
+                            </div>
+                        </div>
+
+                        <!-- HORA -->
+                        <div class="field-cell">
+                            <div class="field-label">
+                                <i class="bi bi-clock"></i>
+                                Hora
+                            </div>
+
+                            <div class="field-value">
+                                @(Model.Fecha?.ToString("HH:mm") ?? "—")
+                            </div>
+                        </div>
+
+                        <!-- TIPO DE SOLICITUD -->
+                        <div class="field-cell full">
+                            <div class="field-label">
+                                <i class="bi bi-tag"></i>
+                                Tipo de solicitud
+                            </div>
+
+                            <div class="field-value">
+                                @Model.TipoSolicitud
+                            </div>
+                        </div>
+
+                        <!-- OBSERVACIONES -->
+                        <div class="field-cell full" style="border-bottom:none;">
+                            <div class="field-label">
+                                <i class="bi bi-chat-left-text"></i>
+                                Observaciones
+                            </div>
+
+                            <div class="field-obs mt-1">
+                                @(string.IsNullOrEmpty(Model.Observaciones)
+                                    ? "El solicitante no añadió observaciones."
+                                    : Model.Observaciones)
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Información laboral -->
+            @if (Model.ReferenciaLaboral != null)
+            {
+                <div class="det-card">
+
+                    <div class="det-card-head">
+                        <div class="det-card-head-icon">
+                            <i class="bi bi-briefcase-fill"></i>
+                        </div>
+                        <h2>Información laboral</h2>
+                    </div>
+
+                    <div class="det-card-body">
+
+                        <div class="field-grid">
+
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-person-workspace"></i> Tipo de trabajo
+                                </div>
+                                <div class="field-value">
+                                    @Model.ReferenciaLaboral.TipoTrabajo
+                                </div>
+                            </div>
+
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-building"></i> Empresa
+                                </div>
+                                <div class="field-value">
+                                    @Model.ReferenciaLaboral.Empresa
+                                </div>
+                            </div>
+
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-person-badge"></i> Cargo
+                                </div>
+                                <div class="field-value">
+                                    @Model.ReferenciaLaboral.Cargo
+                                </div>
+                            </div>
+
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-hourglass-split"></i> Tiempo laborando
+                                </div>
+                                <div class="field-value">
+                                    @Model.ReferenciaLaboral.TiempoLaborando
+                                </div>
+                            </div>
+
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-cash-stack"></i> Ingreso mensual
+                                </div>
+                                <div class="field-value">
+                                    RD$ @Model.ReferenciaLaboral.IngresoMensual?.ToString("N2")
+                                </div>
+                            </div>
+
+                            <div class="field-cell">
+                                <div class="field-label">
+                                    <i class="bi bi-telephone"></i> Teléfono empresa
+                                </div>
+                                <div class="field-value">
+                                    @Model.ReferenciaLaboral.TelefonoEmpresa
+                                </div>
+                            </div>
+
+                            <div class="field-cell full">
+                                <div class="field-label">
+                                    <i class="bi bi-geo-alt"></i> Dirección empresa
+                                </div>
+                                <div class="field-value">
+                                    @Model.ReferenciaLaboral.DireccionEmpresa
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+            <!-- Activity timeline -->
+            <div class="det-card">
+                <div class="det-card-head">
+                    <div class="det-card-head-icon"><i class="bi bi-activity"></i></div>
+                    <h2>Actividad</h2>
+                </div>
+                <div class="det-card-body">
+                    <ul class="timeline">
+                        <li class="tl-item">
+                            <div class="tl-dot blue"><i class="bi bi-file-earmark-plus"></i></div>
+                            <div class="tl-body">
+                                <strong>Solicitud creada</strong>
+                                <span>@(Model.Fecha?.ToString("dd/MM/yyyy HH:mm") ?? "Fecha no disponible")</span>
+                            </div>
+                        </li>
+                        <li class="tl-item">
+                            <div class="tl-dot amber"><i class="bi bi-hourglass-split"></i></div>
+                            <div class="tl-body">
+                                <strong>En revisión</strong>
+                                <span>La solicitud está pendiente de decisión por el administrador</span>
+                            </div>
+                        </li>
+                        @if (isApproved)
+                        {
+                            <li class="tl-item">
+                                <div class="tl-dot green"><i class="bi bi-check-lg"></i></div>
+                                <div class="tl-body">
+                                    <strong>Aprobada</strong>
+                                    <span>El acceso a la unidad fue autorizado</span>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ============ RIGHT — sidebar ============ -->
+        <div class="col-lg-4 d-flex flex-column gap-4">
+
+            <!-- Unit card -->
+            <div class="det-card" style="overflow:visible;">
+                <div class="det-card-head">
+                    <div class="det-card-head-icon"><i class="bi bi-door-open"></i></div>
+                    <h2>Unidad solicitada</h2>
+                </div>
+                <div class="det-card-body">
+
+                    @if (Model.IdUnidadNavigation?.ImagenUnidads != null && Model.IdUnidadNavigation.ImagenUnidads.Any())
+                    {
+                        var imgUrl = Model.IdUnidadNavigation.ImagenUnidads.FirstOrDefault()?.Url;
+                        <img src="@imgUrl" alt="Unidad @Model.IdUnidad" class="unit-thumb">
+                    }
+                    else
+                    {
+                        <div class="unit-no-img">
+                            <i class="bi bi-image"></i>
+                            <span>Sin imagen disponible</span>
+                        </div>
+                    }
+
+                    <div class="unit-id-tag">
+                        Unidad @Model.IdUnidadNavigation?.Numero
+                    </div>
+                    <div class="unit-sub">Unidad habitacional seleccionada por el solicitante para su ingreso al condominio.</div>
+
+                    <div class="unit-meta-row">
+                        <span class="unit-meta-chip">
+                            <i class="bi bi-aspect-ratio"></i>
+                            @Model.IdUnidadNavigation?.MetrosCuadrados m²
+                        </span>
+
+                        <span class="unit-meta-chip">
+                            <i class="bi bi-door-closed"></i>
+                            @Model.IdUnidadNavigation?.CantidadHabitaciones hab.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions card (sticky) -->
+            <div class="action-card">
+                <div class="action-card-head">
+                    <i class="bi bi-sliders2" style="color:var(--ink-muted);font-size:.9rem;"></i>
+                    <h3>Acciones</h3>
+                </div>
+                <div class="action-card-body">
+
+                    @if (isPending)
+                    {
+                        <form asp-action="Aprobar" method="post" class="m-0 ajax-action" data-endpoint="@Url.Action("Aprobar", "SolicitudesIngreso")">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.IdSolicitud" />
+                            <button type="submit" class="btn-approve">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Aprobar solicitud
+                            </button>
+                        </form>
+
+                        <form asp-action="Rechazar" method="post" class="m-0 ajax-action" data-endpoint="@Url.Action("Rechazar", "SolicitudesIngreso")">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.IdSolicitud" />
+                            <button type="submit" class="btn-reject">
+                                <i class="bi bi-x-circle-fill"></i>
+                                Rechazar solicitud
+                            </button>
+                        </form>
+
+                        <div class="action-note">
+                            <i class="bi bi-info-circle"></i>
+                            Esta acción es permanente y notificará al solicitante. Verifica los datos antes de continuar.
+                        </div>
+
+                        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                            <div id="resultToast" class="toast border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="toast-body text-white fw-semibold" id="toastBody"></div>
+                            </div>
+                        </div>
+
+                        <script>
+                            (function(){
+                                function showToast(message, background){
+                                    const toastElement = document.getElementById('resultToast');
+                                    const toastBody = document.getElementById('toastBody');
+                                    if(!toastElement || !toastBody) return;
+                                    toastBody.textContent = message;
+                                    toastElement.style.background = background;
+                                    const bsToast = new bootstrap.Toast(toastElement);
+                                    bsToast.show();
+                                }
+
+                                document.querySelectorAll('.ajax-action').forEach(form => {
+                                    form.addEventListener('submit', function (e) {
+                                        e.preventDefault();
+
+                                        const endpoint = form.getAttribute('data-endpoint') || form.action;
+                                        const formData = new FormData(form);
+                                        const token = formData.get('__RequestVerificationToken') || document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+                                        fetch(endpoint, {
+                                            method: 'POST',
+                                            headers: {
+                                                'X-Requested-With': 'XMLHttpRequest',
+                                                'RequestVerificationToken': token
+                                            },
+                                            body: new URLSearchParams(Array.from(formData))
+                                        })
+                                        .then(r => r.json())
+                                        .then(json => {
+                                                                    if (json && json.success) {
+
+                                                                        const estado = (json.estado || '').toLowerCase();
+
+                                                                        if (estado === 'rechazada') {
+
+                                                                            showToast(json.message || 'Solicitud rechazada', '#dc2626');
+
+                                                                            const banner = document.querySelector('.status-banner');
+                                                                            const sbLabel = document.querySelector('.sb-label');
+                                                                            const sbPill = document.querySelector('.sb-pill');
+
+                                                                            if (banner && sbLabel && sbPill) {
+
+                                                                                banner.classList.remove('pending', 'approved');
+                                                                                banner.classList.add('rejected');
+
+                                                                                sbLabel.textContent = 'Solicitud rechazada';
+                                                                                sbPill.textContent = 'RECHAZADA';
+                                                                            }
+
+                                                                            const actionBody = document.querySelector('.action-card-body');
+
+                                                                            if (actionBody) {
+                                                                                actionBody.innerHTML = `
+                                                                <div class="processed-badge no">
+                                                                    <i class="bi bi-x-octagon-fill"></i>
+                                                                    <div>
+                                                                        <strong>Solicitud rechazada</strong>
+                                                                        <span>El acceso fue denegado. No se requieren más acciones.</span>
+                                                                    </div>
+                                                                </div>`;
+                                                                            }
+
+                                                                        } else {
+
+                                                                            showToast(json.message || 'Solicitud aprobada', '#16a34a');
+
+                                                                            const banner = document.querySelector('.status-banner');
+                                                                            const sbLabel = document.querySelector('.sb-label');
+                                                                            const sbPill = document.querySelector('.sb-pill');
+
+                                                                            if (banner && sbLabel && sbPill) {
+
+                                                                                banner.classList.remove('pending', 'rejected');
+                                                                                banner.classList.add('approved');
+
+                                                                                sbLabel.textContent = 'Solicitud aprobada';
+                                                                                sbPill.textContent = 'PROCESADA';
+                                                                            }
+
+                                                                            const actionBody = document.querySelector('.action-card-body');
+
+                                                                            if (actionBody) {
+                                                                                actionBody.innerHTML = `
+                                                                <div class="processed-badge ok">
+                                                                    <i class="bi bi-patch-check-fill"></i>
+                                                                    <div>
+                                                                        <strong>Solicitud aprobada</strong>
+                                                                        <span>El acceso fue autorizado. No se requieren más acciones.</span>
+                                                                    </div>
+                                                                </div>`;
+                                                                            }
+                                                                        }
+                                                                    }
+                                            } else {
+                                                showToast(json?.message || 'No se pudo procesar', '#b45309');
+                                            }
+                                        })
+                                        .catch(() => showToast('Error de conexión', '#b45309'));
+                                    });
+                                });
+                            })();
+                        </script>
+                    }
+                    else if (isApproved)
+                    {
+                        <div class="processed-badge ok">
+                            <i class="bi bi-patch-check-fill"></i>
+                            <div>
+                                <strong>Solicitud aprobada</strong>
+                                <span>El acceso fue autorizado. No se requieren más acciones.</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="processed-badge no">
+                            <i class="bi bi-x-octagon-fill"></i>
+                            <div>
+                                <strong>Solicitud rechazada</strong>
+                                <span>El acceso fue denegado. No se requieren más acciones.</span>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

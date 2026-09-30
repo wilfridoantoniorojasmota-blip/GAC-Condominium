@@ -1,0 +1,742 @@
+﻿@using PROTOTIPO.Models.ViewModel
+@model PaginatedList<PagoDTO>
+
+@{
+    ViewData["Title"] = "Pagos";
+
+    var total = Model.Items.Sum(x => x.Monto ?? 0);
+    var pagados = Model.Items.Count(x => x.Estado == "Pagado");
+    var pendientes = Model.Items.Count(x => x.Estado == "Pendiente");
+    var atrasados = Model.Items.Count(x => x.Estado == "Atrasado");
+
+    var porMes = Model.Items
+        .Where(x => x.Fecha.HasValue)
+        .GroupBy(x => x.Fecha!.Value.Month)
+        .OrderBy(g => g.Key)
+        .Select(g => new
+        {
+            Mes = System.Globalization.CultureInfo.GetCultureInfo("es-DO").DateTimeFormat.GetAbbreviatedMonthName(g.Key),
+            Total = g.Sum(x => x.Monto ?? 0)
+        })
+        .ToList();
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .pagos-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15, 22, 35, .15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header h3 {
+        font-weight: 700;
+        letter-spacing: -.02em;
+        margin: 0;
+    }
+
+    .page-header p {
+        color: rgba(255,255,255,.65);
+        margin: 0;
+        font-size: .875rem;
+    }
+
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.2rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+    }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-gac-primary:hover {
+        background: var(--gac-primary-dark);
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(37,140,251,.35);
+    }
+
+    .btn-gac-outline {
+        border: 1.5px solid rgba(255,255,255,.3);
+        background: rgba(255,255,255,.08);
+        color: #fff;
+    }
+
+    .btn-gac-outline:hover {
+        background: rgba(255,255,255,.15);
+        color: #fff;
+        border-color: rgba(255,255,255,.5);
+    }
+
+    /* STAT CARDS */
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.4rem;
+        height: 100%;
+        transition: transform .2s ease, box-shadow .2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--gac-primary);
+        border-radius: 16px 16px 0 0;
+    }
+
+    .stat-card.stat-success::after { background: var(--gac-success); }
+    .stat-card.stat-warning::after { background: var(--gac-warning); }
+    .stat-card.stat-danger::after { background: var(--gac-danger); }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(15,22,35,.06);
+    }
+
+    .stat-card .sc-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-bottom: .85rem;
+    }
+
+    .sc-blue   { background: rgba(37,140,251,.1);  color: var(--gac-primary); }
+    .sc-green  { background: rgba(34,197,94,.1);   color: #16a34a; }
+    .sc-amber  { background: rgba(245,158,11,.1);  color: #d97706; }
+    .sc-red    { background: rgba(239,68,68,.1);   color: #dc2626; }
+
+    .stat-card .sc-label {
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .stat-card .sc-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+    }
+
+    /* CHART CARD */
+    .chart-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-card .chart-title {
+        font-weight: 700;
+        color: var(--gac-navy);
+        font-size: .95rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .chart-card .chart-title i {
+        color: var(--gac-primary);
+    }
+
+    /* FILTER CARD */
+    .filter-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-card .form-label {
+        font-weight: 600;
+        font-size: .82rem;
+        color: #64748b;
+        margin-bottom: .35rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .filter-card .form-select,
+    .filter-card .form-control {
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        font-size: .9rem;
+        padding: .5rem .85rem;
+    }
+
+    .filter-card .form-select:focus,
+    .filter-card .form-control:focus {
+        border-color: var(--gac-primary);
+        box-shadow: 0 0 0 3px rgba(37,140,251,.12);
+    }
+
+    .btn-filter {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all .2s ease;
+    }
+
+    .btn-filter:hover {
+        background: var(--gac-primary-dark);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    /* TABLE CARD */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+    }
+
+    .table-card table {
+        margin-bottom: 0;
+    }
+
+    .table-card thead {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+    }
+
+    .table-card thead th {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #000;
+        font-weight: 700;
+        padding: 1rem 1.1rem;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .table-card tbody td {
+        padding: .9rem 1.1rem;
+        color: #334155;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f4f9;
+        font-size: .9rem;
+    }
+
+    .table-card tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-card tbody tr {
+        transition: background .15s ease;
+    }
+
+    .table-card tbody tr:hover {
+        background: #fafcff;
+    }
+
+    .residente-cell {
+        font-weight: 700;
+        color: var(--gac-navy);
+    }
+
+    .unidad-cell {
+        font-size: .82rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .monto-cell {
+        font-weight: 700;
+        color: var(--gac-navy);
+    }
+
+    .tipo-badge {
+        font-size: .75rem;
+        font-weight: 700;
+        padding: .35rem .8rem;
+        border-radius: 50px;
+        background: rgba(15,22,35,.06);
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    .badge-estado {
+        font-weight: 600;
+        font-size: .75rem;
+        padding: .38rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+    .badge-pagado { background: rgba(34,197,94,.12); color: #15803d; }
+    .badge-pendiente { background: rgba(245,158,11,.12); color: #b45309; }
+    .badge-atrasado { background: rgba(239,68,68,.12); color: #b91c1c; }
+    .badge-otro { background: rgba(15,22,35,.08); color: var(--gac-navy); }
+
+    .btn-tbl {
+        border-radius: 8px;
+        font-size: .8rem;
+        font-weight: 600;
+        padding: .35rem .75rem;
+        transition: all .15s ease;
+        white-space: nowrap;
+    }
+
+    .btn-tbl-primary { border: 1.5px solid var(--gac-primary); color: var(--gac-primary); background: transparent; }
+    .btn-tbl-primary:hover { background: var(--gac-primary); color: #fff; }
+    .btn-tbl-primary.disabled { opacity: .4; pointer-events: none; }
+
+    .btn-tbl-secondary { border: 1.5px solid #cbd5e1; color: #64748b; background: transparent; }
+    .btn-tbl-secondary:hover { background: #64748b; color: #fff; border-color: #64748b; }
+
+    /* EMPTY STATE */
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: .75rem;
+        opacity: .5;
+    }
+</style>
+
+<div class="pagos-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3>Historial de Pagos</h3>
+                <p>Gestión y seguimiento de pagos del condominio</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a asp-controller="CuotaMantenimiento" asp-action="Index" class="btn btn-gac btn-gac-outline">
+                    <i class="fa-solid fa-receipt me-2"></i>Ver Cuotas
+                </a>
+                <a asp-action="Create" class="btn btn-gac btn-gac-primary" style="background:#22c55e; border:none;">
+                    <i class="fa-solid fa-plus me-2"></i>Agregar Pago
+                </a>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="sc-icon sc-blue"><i class="fa-solid fa-coins"></i></div>
+                    <div class="sc-label">Total Ingresos</div>
+                    <div class="sc-value" style="font-size:1.25rem;">RD$ @String.Format("{0:N0}", total)</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-card stat-success">
+                    <div class="sc-icon sc-green"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="sc-label">Pagados</div>
+                    <div class="sc-value">@pagados</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-card stat-warning">
+                    <div class="sc-icon sc-amber"><i class="fa-solid fa-clock"></i></div>
+                    <div class="sc-label">Pendientes</div>
+                    <div class="sc-value">@pendientes</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="stat-card stat-danger">
+                    <div class="sc-icon sc-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="sc-label">Atrasados</div>
+                    <div class="sc-value">@atrasados</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- GRÁFICO (solo si hay datos por mes) -->
+        @if (porMes.Any())
+        {
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fa-solid fa-chart-bar"></i>
+                    Ingresos por Mes
+                </div>
+                <canvas id="pagosMesChart" height="90"></canvas>
+            </div>
+        }
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-bar-chart-fill me-2"></i>
+                    Cuentas por cobrar
+                </h5>
+
+
+                <canvas id="graficoCobros"></canvas>
+
+            </div>
+
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filter-card">
+            <form method="get" class="row g-3 align-items-end">
+
+                <div class="col-md-4">
+                    <label class="form-label">Inquilino</label>
+
+                    <input type="text"
+                           id="inquilinoBuscar"
+                           class="form-control"
+                           list="listaInquilinos"
+                           placeholder="Buscar inquilino..."
+                           autocomplete="off">
+
+                    <input type="hidden"
+                           id="inquilinoId"
+                           name="inquilinoId"
+                           value="@ViewData["InquilinoId"]" />
+
+                    <datalist id="listaInquilinos">
+                        @foreach (var item in (IEnumerable<dynamic>)ViewData["Inquilinos"])
+                        {
+                            <option value="@item.Nombre" data-id="@item.IdUsuario"></option>
+                        }
+                    </datalist>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Mes</label>
+                    <select name="mes" class="form-select">
+                        <option value="">Todos los meses</option>
+                        @for (int i = 1; i <= 12; i++)
+                        {
+                            <option value="@i" selected="@(ViewData["Mes"] != null && (int?)ViewData["Mes"] == i)">
+                                @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Año</label>
+                    <input type="number" name="anio" value="@ViewData["Anio"]"
+                           class="form-control" placeholder="Ej: 2026" />
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-filter w-100">
+                        <i class="fa-solid fa-filter me-2"></i>Filtrar
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-card">
+            @if (!Model.Items.Any())
+            {
+                <div class="empty-state">
+                    <i class="fa-regular fa-credit-card d-block"></i>
+                    No hay pagos registrados con los filtros actuales.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Residente</th>
+                                <th>Unidad</th>
+                                <th>Tipo</th>
+                                <th>Monto</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td class="residente-cell">@item.Residente</td>
+                                    <td class="unidad-cell">@item.Unidad</td>
+                                    <td><span class="tipo-badge">@item.TipoPago</span></td>
+                                    <td class="monto-cell">RD$ @String.Format("{0:N2}", item.Monto)</td>
+                                    <td>@item.Fecha?.ToString("dd/MM/yyyy")</td>
+
+                                    <td>
+                                        @if (item.Estado == "Pagado")
+                                        {
+                                            <span class="badge-estado badge-pagado">Pagado</span>
+                                        }
+                                        else if (item.Estado == "Pendiente")
+                                        {
+                                            <span class="badge-estado badge-pendiente">Pendiente</span>
+                                        }
+                                        else if (item.Estado == "Atrasado")
+                                        {
+                                            <span class="badge-estado badge-atrasado">Atrasado</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-estado badge-otro">@item.Estado</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex gap-1 justify-content-end flex-wrap">
+                                            <a asp-action="Edit"
+                                               asp-route-id="@item.IdPago"
+                                               class="btn btn-tbl btn-tbl-primary @(item.Estado == "Pagado" ? "disabled" : "")">
+                                                <i class="fa-solid fa-pen fa-xs me-1"></i>Editar
+                                            </a>
+                                            <a asp-action="Details"
+                                               asp-route-id="@item.IdPago"
+                                               class="btn btn-tbl btn-tbl-secondary">
+                                                <i class="fa-regular fa-eye fa-xs me-1"></i>Ver
+                                            </a>
+                                            <a asp-action="Historial"
+                                               asp-route-id="@item.IdUsuario"
+                                               class="btn btn-tbl btn-tbl-secondary">
+                                                <i class="fa-solid fa-clock-rotate-left fa-xs me-1"></i>Historial
+                                            </a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <!-- PAGINACIÓN -->
+                <nav aria-label="Page navigation" class="d-flex justify-content-between align-items-center" style="padding: 1.25rem;">
+                    <div style="font-size: 0.875rem; color: #64748b;">
+                        Mostrando página <strong>@Model.CurrentPage</strong> de <strong>@Model.TotalPages</strong> 
+                        (Total: <strong>@Model.TotalCount</strong> pagos)
+                    </div>
+
+                    <ul class="pagination mb-0">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-route-page="1" 
+                                   asp-route-inquilinoId="@ViewData["InquilinoId"]"
+                                   asp-route-mes="@ViewData["Mes"]"
+                                   asp-route-anio="@ViewData["Anio"]">
+                                    <i class="fa-solid fa-chevron-left me-1"></i>Primera
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" asp-route-page="@Model.PreviousPage"
+                                   asp-route-inquilinoId="@ViewData["InquilinoId"]"
+                                   asp-route-mes="@ViewData["Mes"]"
+                                   asp-route-anio="@ViewData["Anio"]">
+                                    <i class="fa-solid fa-chevron-left me-1"></i>Anterior
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="fa-solid fa-chevron-left me-1"></i>Anterior</span>
+                            </li>
+                        }
+
+                        @if (Model.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-route-page="@Model.NextPage"
+                                   asp-route-inquilinoId="@ViewData["InquilinoId"]"
+                                   asp-route-mes="@ViewData["Mes"]"
+                                   asp-route-anio="@ViewData["Anio"]">
+                                    Siguiente<i class="fa-solid fa-chevron-right ms-1"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" asp-route-page="@Model.TotalPages"
+                                   asp-route-inquilinoId="@ViewData["InquilinoId"]"
+                                   asp-route-mes="@ViewData["Mes"]"
+                                   asp-route-anio="@ViewData["Anio"]">
+                                    Última<i class="fa-solid fa-chevron-right ms-1"></i>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">Siguiente<i class="fa-solid fa-chevron-right ms-1"></i></span>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    const cuentas = @Html.Raw(Json.Serialize(ViewBag.CuentasCobrar));
+
+
+    new Chart(
+    document.getElementById('graficoCobros'),
+    {
+    type:'bar',
+
+    data:{
+    labels: cuentas.map(x=>x.mes),
+
+    datasets:[
+    {
+    label:'Pendiente por cobrar RD$',
+
+    data: cuentas.map(x=>x.monto),
+
+    borderRadius:8
+    }
+    ]
+    },
+
+    options:{
+    responsive:true,
+
+    plugins:{
+    legend:{
+    display:true
+    }
+    }
+    }
+    }
+    );
+
+</script>
+<script>
+    document.getElementById("inquilinoBuscar")
+        .addEventListener("input", function () {
+
+            const valor = this.value.trim();
+            const opciones = document.querySelectorAll("#listaInquilinos option");
+
+            let id = "";
+
+            opciones.forEach(o => {
+                if (o.value === valor) {
+                    id = o.dataset.id;
+                }
+            });
+
+            // Si no coincide con ningún inquilino o el campo está vacío,
+            // el hidden queda vacío y el controlador traerá todos.
+            document.getElementById("inquilinoId").value = id;
+        });
+</script>
+
+@if (porMes.Any())
+{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        const labels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(porMes.Select(x => x.Mes)));
+        const datos  = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(porMes.Select(x => x.Total)));
+
+        new Chart(document.getElementById('pagosMesChart'), {
+        type: 'bar',
+        data: {
+        labels,
+        datasets: [{
+        label: 'Ingresos (RD$)',
+        data: datos,
+        backgroundColor: 'rgba(37,140,251,.15)',
+        borderColor: '#258cfb',
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false
+        }]
+        },
+        options: {
+        responsive: true,
+        plugins: {
+        legend: { display: false },
+        tooltip: {
+        callbacks: {
+        label: ctx => ' RD$ ' + ctx.parsed.y.toLocaleString('es-DO', { minimumFractionDigits: 2 })
+        }
+        }
+        },
+        scales: {
+        x: { grid: { display: false }, border: { display: false } },
+        y: {
+        border: { display: false },
+        grid: { color: '#f1f4f9' },
+        ticks: {
+        callback: v => 'RD$ ' + v.toLocaleString('es-DO')
+        }
+        }
+        }
+        }
+        });
+    </script>
+}

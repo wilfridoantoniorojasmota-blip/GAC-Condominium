@@ -1,0 +1,643 @@
+@model PROTOTIPO.Models.UnidadHabitacional
+
+@{
+    var contrato = Model.ContratoAlquilers?
+                    .FirstOrDefault(c => c.Estado == "activo");
+
+    var inquilino = contrato?.IdUsuarioNavigation;
+    
+
+    var imgUrl = Model.ImagenUnidads?.FirstOrDefault()?.Url;
+    if (string.IsNullOrEmpty(imgUrl))
+        imgUrl = Url.Content("~/img/placeholder-unidad.jpg");
+
+    string badgeClass = Model.Estado?.ToLower() switch
+    {
+        "disponible" => "od-badge--dis",
+        "ocupada" => "od-badge--ocu",
+        "proceso" => "od-badge--pro",
+        _ => "od-badge--def"
+    };
+
+    var caracteristicas = new (bool activo, string icono, string color, string texto)[]
+    {
+        (Model.SalaEstar, "fa-couch",          "azul",  "Sala de estar"),
+        (Model.Balcon,    "fa-building",       "cian",  "Balcón"),
+        (Model.Terraza,   "fa-umbrella-beach", "verde", "Terraza"),
+        (Model.Jacuzzi,   "fa-hot-tub-person", "ambar", "Jacuzzi"),
+        (Model.Picuzzi,   "fa-water-ladder",   "rojo",  "Picuzzi"),
+    };
+    var hayCaracteristicas = caracteristicas.Any(c => c.activo);
+
+
+}
+@{
+    var partesNumero = (Model.Numero ?? "").Split('-');
+
+    var edificio = partesNumero.Length > 0 ? partesNumero[0] : "-";
+    var piso = partesNumero.Length > 1 ? partesNumero[1] : "-";
+    var apartamento = partesNumero.Length > 2 ? partesNumero[2] : "-";
+}
+
+<div class="offcanvas offcanvas-end od-offcanvas" tabindex="-1" id="unidadOffcanvas">
+
+    <!-- ── HEADER ── -->
+    <div class="od-header">
+        <div class="od-title">@Model.Numero</div>
+        <button type="button" class="od-close" data-bs-dismiss="offcanvas" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <div class="offcanvas-body od-body">
+
+        <!-- ── IMAGEN ── -->
+        <div class="od-img-wrap">
+            <img src="@Url.Content(imgUrl)" alt="Unidad @Model.Numero" class="od-img" />
+            <div class="od-img-overlay"></div>
+
+            <div class="od-img-badge">
+                <i class="fa-solid fa-building"></i>
+                @Model.Numero
+            </div>
+
+            <div class="od-estado @badgeClass">
+                <span class="od-dot"></span>
+                @Model.Estado
+            </div>
+        </div>
+
+        <!-- ── INFO UNIDAD ── -->
+        <p class="od-section-label">Información de la unidad</p>
+
+        <div class="od-info-grid">
+
+            <div class="od-chip">
+                <span class="od-chip-lbl">Código</span>
+                <span class="od-chip-val">@Model.Numero</span>
+            </div>
+
+            <div class="od-chip">
+                <span class="od-chip-lbl">Edificio</span>
+                <span class="od-chip-val">@edificio</span>
+            </div>
+
+            <div class="od-chip">
+                <span class="od-chip-lbl">Piso</span>
+                <span class="od-chip-val">@piso</span>
+            </div>
+
+            <div class="od-chip">
+                <span class="od-chip-lbl">Apartamento</span>
+                <span class="od-chip-val">@apartamento</span>
+            </div>
+
+            <div class="od-chip">
+                <span class="od-chip-lbl">Tipo</span>
+                <span class="od-chip-val">@Model.Tipo</span>
+            </div>
+
+            <div class="od-chip">
+                <span class="od-chip-lbl">
+                    <i class="fa-solid fa-bed"></i> Habitaciones
+                </span>
+                <span class="od-chip-val">
+                    @(Model.CantidadHabitaciones.ToString() ?? "0")
+                </span>
+            </div>
+
+            <div class="od-chip">
+                <span class="od-chip-lbl">
+                    <i class="fa-solid fa-bath"></i> Baños
+                </span>
+                <span class="od-chip-val">
+                    @(Model.CantidadBanos.ToString() ?? "0")
+                </span>
+            </div>
+
+            <div class="od-chip">
+                <span class="od-chip-lbl">
+                    <i class="fa-solid fa-ruler-combined"></i> Metros²
+                </span>
+                <span class="od-chip-val">
+                    @(Model.MetrosCuadrados.ToString() ?? "0") m²
+                </span>
+            </div>
+
+            <div class="od-chip od-chip--full">
+                <span class="od-chip-lbl">Condominio</span>
+                <span class="od-chip-val">
+                    @(Model.IdCondominioNavigation?.Nombre ?? "—")
+                </span>
+            </div>
+
+        </div>
+        <!-- ⬆ FIN od-info-grid: antes las "Características" quedaban metidas
+             aquí adentro y por eso se veían aplastadas en una sola columna -->
+        @if (hayCaracteristicas)
+        {
+            <p class="od-section-label">Características</p>
+
+            <div class="od-features-grid">
+                @foreach (var c in caracteristicas.Where(x => x.activo))
+                {
+                    <div class="od-feature od-feature--@c.color">
+                        <div class="od-feature-ico">
+                            <i class="fa-solid @c.icono"></i>
+                        </div>
+                        <span class="od-feature-txt">@c.texto</span>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Descripcion))
+        {
+            <p class="od-section-label">Descripción</p>
+            <div class="od-chip od-chip--full od-chip--desc">
+                <span class="od-chip-val od-chip-val--desc">@Model.Descripcion</span>
+            </div>
+        }
+
+        <div class="od-divider"></div>
+
+        <!-- ── INQUILINO ── -->
+        <p class="od-section-label">Inquilino activo</p>
+
+        @if (inquilino != null)
+        {
+            <div class="od-inq-card">
+
+                <div class="od-inq-row">
+                    <div class="od-inq-ico">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="od-inq-text">
+                        <span class="od-inq-lbl">Nombre</span>
+                        <span class="od-inq-val">@inquilino.Nombre @inquilino.Apellido</span>
+                    </div>
+                </div>
+
+                <div class="od-inq-row">
+                    <div class="od-inq-ico">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <div class="od-inq-text">
+                        <span class="od-inq-lbl">Teléfono</span>
+                        <span class="od-inq-val">@inquilino.Telefono</span>
+                    </div>
+                </div>
+
+                <div class="od-inq-row">
+                    <div class="od-inq-ico">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div class="od-inq-text">
+                        <span class="od-inq-lbl">Email</span>
+                        <span class="od-inq-val">@inquilino.Email</span>
+                    </div>
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="od-no-inq">
+                <i class="fa-solid fa-user-slash"></i>
+                <span>Sin inquilino registrado</span>
+            </div>
+        }
+
+    </div>
+
+    <!-- ── FOOTER ACCIONES ── -->
+    <div class="od-footer">
+        <a href="/UnidadHabitacionals/Edit/@Model.IdUnidad" class="od-foot-btn od-foot-btn--edit">
+            <i class="fa-solid fa-pen"></i>
+            Editar
+        </a>
+        <a href="/UnidadHabitacionals/Delete/@Model.IdUnidad" class="od-foot-btn od-foot-btn--delete">
+            <i class="fa-solid fa-trash"></i>
+            Eliminar
+        </a>
+
+        <a asp-action="HistorialAlquileres"
+           asp-route-id="@Model.IdUnidad"
+           class="od-foot-btn od-foot-btn--history">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Historial de alquileres
+        </a>
+    </div>
+
+</div>
+
+<style>
+
+    .od-foot-btn--history {
+        background: #eef2ff;
+        color: #4338ca;
+        border: 1px solid #c7d2fe;
+    }
+
+        .od-foot-btn--history:hover {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+    /* ── OFFCANVAS BASE ── */
+    .od-offcanvas {
+        width: 420px !important;
+        font-family: 'Outfit', sans-serif;
+        border-left: 1px solid #e8edf6 !important;
+        box-shadow: -8px 0 40px rgba(15, 23, 42, .12) !important;
+    }
+
+    /* ── HEADER ── */
+    .od-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 24px 0;
+    }
+
+    .od-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 22px;
+        color: #0f172a;
+        font-weight: 400;
+    }
+
+    .od-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #f8faff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 15px;
+        color: #64748b;
+        transition: .2s ease;
+    }
+
+        .od-close:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+    /* ── BODY SCROLL ── */
+    .od-body {
+        padding: 0 24px 16px !important;
+        overflow-y: auto;
+    }
+
+    /* ── IMAGEN ── */
+    .od-img-wrap {
+        position: relative;
+        margin: 18px 0 0;
+        height: 200px;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .od-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .od-img-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 35%, rgba(15,23,42,.62) 100%);
+    }
+
+    .od-img-badge {
+        position: absolute;
+        bottom: 13px;
+        left: 13px;
+        background: rgba(255,255,255,.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,.3);
+        color: #fff;
+        padding: 6px 13px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .od-estado {
+        position: absolute;
+        bottom: 13px;
+        right: 13px;
+        padding: 6px 12px;
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .od-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+    }
+
+    .od-badge--dis {
+        background: rgba(34,197,94,.18);
+        border: 1px solid rgba(34,197,94,.3);
+        color: #86efac;
+    }
+
+    .od-badge--ocu {
+        background: rgba(239,68,68,.18);
+        border: 1px solid rgba(239,68,68,.3);
+        color: #fca5a5;
+    }
+
+    .od-badge--pro {
+        background: rgba(245,158,11,.18);
+        border: 1px solid rgba(245,158,11,.3);
+        color: #fcd34d;
+    }
+
+    .od-badge--def {
+        background: rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+    }
+
+    /* ── SECTION LABEL ── */
+    .od-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin: 22px 0 12px;
+    }
+
+    /* ── INFO GRID ── */
+    .od-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .od-chip {
+        background: #f8faff;
+        border: 1px solid #e8edf6;
+        border-radius: 14px;
+        padding: 13px 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .od-chip--full {
+        grid-column: 1 / -1;
+    }
+
+    .od-chip-lbl {
+        font-size: 10px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        font-weight: 500;
+    }
+
+    .od-chip-val {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .od-chip-val--desc {
+        font-size: 13px;
+        font-weight: 400;
+        color: #475569;
+        line-height: 1.55;
+    }
+
+    /* ── DIVIDER ── */
+    .od-divider {
+        height: 1px;
+        background: #f1f5f9;
+        margin: 6px 0 4px;
+    }
+
+    /* ── CARACTERÍSTICAS ── */
+    .od-features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .od-feature {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f8faff;
+        border: 1px solid #e8edf6;
+        border-radius: 14px;
+        padding: 10px 12px;
+    }
+
+    .od-feature-ico {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        background: #fff;
+        border: 1px solid #e8edf6;
+    }
+
+    .od-feature-txt {
+        font-size: 13px;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .od-feature--azul .od-feature-ico {
+        color: #2563eb;
+        border-color: #dbeafe;
+    }
+
+    .od-feature--cian .od-feature-ico {
+        color: #0891b2;
+        border-color: #cffafe;
+    }
+
+    .od-feature--verde .od-feature-ico {
+        color: #16a34a;
+        border-color: #dcfce7;
+    }
+
+    .od-feature--ambar .od-feature-ico {
+        color: #d97706;
+        border-color: #fef3c7;
+    }
+
+    .od-feature--rojo .od-feature-ico {
+        color: #dc2626;
+        border-color: #fee2e2;
+    }
+
+    /* ── INQUILINO CARD ── */
+    .od-inq-card {
+        background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+        border: 1px solid #dbeafe;
+        border-radius: 18px;
+        padding: 6px 16px;
+    }
+
+    .od-inq-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(219,234,254,.7);
+    }
+
+        .od-inq-row:last-child {
+            border-bottom: none;
+        }
+
+    .od-inq-ico {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid #dbeafe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #2563eb;
+        flex-shrink: 0;
+    }
+
+    .od-inq-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .od-inq-lbl {
+        font-size: 10px;
+        color: #7cb4e4;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        font-weight: 500;
+    }
+
+    .od-inq-val {
+        font-size: 13px;
+        font-weight: 600;
+        color: #0f172a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ── SIN INQUILINO ── */
+    .od-no-inq {
+        background: #f8faff;
+        border: 1.5px dashed #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 13px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .od-no-inq i {
+            font-size: 22px;
+            opacity: .5;
+        }
+
+    /* ── FOOTER ── */
+    .od-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 14px 24px 22px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .od-foot-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 13px;
+        border-radius: 13px;
+        font-family: 'Outfit', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform .2s ease, background .2s ease, color .2s ease;
+        border: 1px solid transparent;
+    }
+
+        .od-foot-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .od-foot-btn--edit {
+        background: #fffbeb;
+        color: #d97706;
+        border-color: #fde68a;
+    }
+
+        .od-foot-btn--edit:hover {
+            background: #d97706;
+            color: #fff;
+            border-color: #d97706;
+        }
+
+    .od-foot-btn--delete {
+        background: #fef2f2;
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+
+        .od-foot-btn--delete:hover {
+            background: #dc2626;
+            color: #fff;
+            border-color: #dc2626;
+        }
+
+    /* ── RESPONSIVE ── */
+    @@media (max-width: 480px) {
+        .od-offcanvas {
+            width: 100vw !important;
+        }
+
+        .od-features-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>

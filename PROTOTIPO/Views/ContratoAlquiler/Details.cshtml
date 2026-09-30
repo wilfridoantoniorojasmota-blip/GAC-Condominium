@@ -1,0 +1,427 @@
+﻿
+@model PROTOTIPO.Models.ContratoAlquiler
+
+@{
+    ViewData["Title"] = "Detalles del Contrato";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var nombreCompleto = Model.IdUsuarioNavigation != null
+        ? $"{Model.IdUsuarioNavigation.Nombre} {Model.IdUsuarioNavigation.Apellido}".Trim()
+        : "Sin inquilino";
+
+    var initials = string.Join("",
+        nombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2).Select(w => w[0].ToString().ToUpper()));
+
+    var esActivo = string.Equals(Model.Estado, "activo", StringComparison.OrdinalIgnoreCase);
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="mnt-page">
+    <div class="container-fluid py-4 px-3 px-md-4" style="max-width: 850px;">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3><i class="bi bi-file-earmark-text me-2"></i>Detalles del Contrato</h3>
+                <p>Información completa del contrato de arrendamiento registrado</p>
+            </div>
+
+            <a asp-action="Index" class="btn-gac btn-gac-secondary-header">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+            </a>
+        </div>
+
+        <!-- DETAILS CONTAINER -->
+        <div class="form-container">
+
+            <!-- Perfil del Inquilino y Estado -->
+            <div class="details-card-header">
+                <div class="tenant-profile">
+                    <div class="tenant-avatar-large">@initials</div>
+                    <div>
+                        <h4 class="tenant-name">@nombreCompleto</h4>
+                        <p class="tenant-subtext">Contrato de Alquiler #@Model.IdContrato</p>
+                    </div>
+                </div>
+                <div class="status-box">
+                    <span class="badge-estado @(esActivo ? "badge-resuelta" : "badge-otro")">
+                        <span class="dot"></span>
+                        @(esActivo ? "Activo" : "Finalizado")
+                    </span>
+                </div>
+            </div>
+
+            <!-- Grilla de Información -->
+            <div class="row g-4">
+
+                <!-- Columna Izquierda: Información Financiera y Ubicación -->
+                <div class="col-md-6">
+                    <h5 class="section-subtitle-gac"><i class="bi bi-cash-stack me-2"></i>Condiciones de Renta</h5>
+
+                    <div class="info-list-gac">
+
+                        <div class="info-item-gac">
+                            <span class="info-label-gac">Mensualidad</span>
+                            <span class="info-value-gac rent-amount">
+                                RD$ @String.Format("{0:N2}", Model.MontoRenta)
+                            </span>
+                        </div>
+
+                        <div class="info-item-gac">
+                            <span class="info-label-gac">Unidad Habitacional</span>
+                            <span class="info-value-gac">
+                                @if (Model.IdUnidadNavigation != null)
+                                {
+                                    <span class="unit-pill">
+                                        <i class="bi bi-door-open-fill me-1"></i>
+                                        Unidad @Model.IdUnidadNavigation.Numero
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted italic">—</span>
+                                }
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Plazos y Fechas -->
+                <div class="col-md-6">
+                    <h5 class="section-subtitle-gac"><i class="bi bi-calendar3 me-2"></i>Vigencia y Fechas</h5>
+
+                    <div class="info-list-gac">
+
+                        <div class="info-item-gac">
+                            <span class="info-label-gac">Fecha de inicio</span>
+                            <span class="info-value-gac">
+                                @if (Model.FechaInicio != null)
+                                {
+                                    <span class="date-cell">
+                                        <i class="bi bi-calendar me-1"></i>@Model.FechaInicio?.ToString("dd/MM/yyyy")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="date-none">—</span>
+                                }
+                            </span>
+                        </div>
+
+                        <div class="info-item-gac">
+                            <span class="info-label-gac">Fecha de finalización</span>
+                            <span class="info-value-gac">
+                                @if (Model.FechaFin != null)
+                                {
+                                    <span class="date-cell">
+                                        <i class="bi bi-calendar-event me-1"></i>@Model.FechaFin?.ToString("dd/MM/yyyy")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="date-none">—</span>
+                                }
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ACCIONES -->
+            <div class="form-actions mt-5">
+                <a asp-action="Index" class="btn-gac btn-gac-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver al listado
+                </a>
+
+                <a asp-action="Edit" asp-route-id="@Model.IdContrato" class="btn-gac btn-gac-primary">
+                    <i class="bi bi-pencil-square"></i>
+                    Editar contrato
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    /* ── BUTTONS ── */
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.4rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        cursor: pointer;
+    }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-gac-primary:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    .btn-gac-secondary-header {
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+    }
+
+        .btn-gac-secondary-header:hover {
+            background: rgba(255,255,255,.2);
+            color: #fff;
+        }
+
+    .btn-gac-secondary {
+        background: var(--gac-surface);
+        border: 1.5px solid var(--gac-border);
+        color: #64748b;
+    }
+
+        .btn-gac-secondary:hover {
+            background: #eef1f6;
+            color: var(--gac-navy);
+        }
+
+    /* ── CONTAINER ── */
+    .form-container {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(15,22,35,.03);
+    }
+
+    /* ── DETAILS HEADER CARD ── */
+    .details-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 2rem;
+        border-bottom: 1.5px solid var(--gac-border);
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .tenant-profile {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .tenant-avatar-large {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        background: rgba(37,140,251,.12);
+        color: var(--gac-primary);
+        font-size: 1.35rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .tenant-name {
+        font-weight: 700;
+        color: var(--gac-navy);
+        margin: 0;
+        font-family: 'Sora', sans-serif;
+    }
+
+    .tenant-subtext {
+        font-size: .8rem;
+        color: #94a3b8;
+        margin: 2px 0 0;
+        font-weight: 600;
+    }
+
+    /* ── INFO BLOCKS ── */
+    .section-subtitle-gac {
+        font-size: .88rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .info-list-gac {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .info-item-gac {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        border-bottom: 1px solid var(--gac-border);
+        padding-bottom: 0.85rem;
+    }
+
+        .info-item-gac:last-child {
+            border-bottom: none;
+        }
+
+    .info-label-gac {
+        font-size: .78rem;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: .02em;
+    }
+
+    .info-value-gac {
+        font-size: .95rem;
+        font-weight: 600;
+        color: var(--gac-navy);
+    }
+
+    .rent-amount {
+        font-family: 'Sora', sans-serif;
+        font-size: 1.45rem;
+        color: var(--gac-primary);
+        font-weight: 800;
+    }
+
+    .unit-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(15,22,35,.05);
+        border-radius: 50px;
+        padding: .3rem .75rem;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--gac-navy);
+        white-space: nowrap;
+    }
+
+    .date-cell {
+        font-size: .88rem;
+        color: #64748b;
+        white-space: nowrap;
+    }
+
+    .date-none {
+        font-size: .83rem;
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    /* ── BADGES ── */
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        font-size: .73rem;
+        padding: .35rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+        .badge-estado .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .badge-resuelta {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+        .badge-resuelta .dot {
+            background: var(--gac-success);
+        }
+
+    .badge-otro {
+        background: rgba(15,22,35,.07);
+        color: var(--gac-navy);
+    }
+
+        .badge-otro .dot {
+            background: #94a3b8;
+        }
+
+    /* ── ACTIONS ── */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--gac-border);
+        padding-top: 1.75rem;
+    }
+</style>

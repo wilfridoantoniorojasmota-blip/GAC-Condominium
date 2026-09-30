@@ -1,0 +1,460 @@
+﻿@model IEnumerable<PROTOTIPO.Models.ViewModel.AreaComunTenantVM>
+
+@{
+    ViewData["Title"] = "Áreas Comunes";
+}
+
+<style>
+    :root {
+        --gac-blue: #258cfb;
+        --gac-blue-dark: #1a6fcf;
+        --gac-blue-light: #4dabf7;
+        --gac-blue-lighter: #e8f4ff;
+        --gac-muted: #64748b;
+        --gac-border: #e2e8f0;
+        --gac-text: #1a202c;
+        --gac-radius: 14px;
+        --gac-radius-sm: 8px;
+        --gac-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(37,140,251,.07);
+        --gac-shadow-hover: 0 8px 28px rgba(37,140,251,.18);
+    }
+
+    .areas-wrapper {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--gac-text);
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 1.75rem;
+    }
+
+    .ph-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1a6fcf, #4dabf7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(37,140,251,.3);
+    }
+
+    .ph-title {
+        font-size: 1.45rem;
+        font-weight: 700;
+        margin: 0 0 2px;
+        letter-spacing: -.3px;
+    }
+
+    .ph-sub {
+        font-size: .82rem;
+        color: var(--gac-muted);
+        margin: 0;
+    }
+
+    /* ── AREA CARD ── */
+    .area-card {
+        background: #fff;
+        border-radius: var(--gac-radius);
+        border: 1px solid var(--gac-border);
+        box-shadow: var(--gac-shadow);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: box-shadow .25s, transform .25s;
+    }
+
+        .area-card:hover {
+            box-shadow: var(--gac-shadow-hover);
+            transform: translateY(-3px);
+        }
+
+    /* Imagen */
+    .area-img {
+        height: 185px;
+        object-fit: cover;
+        width: 100%;
+        display: block;
+    }
+
+    .area-img-placeholder {
+        height: 185px;
+        background: linear-gradient(135deg, #f0f4f8 0%, #e8f4ff 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: var(--gac-muted);
+    }
+
+        .area-img-placeholder i {
+            font-size: 2rem;
+            opacity: .25;
+        }
+
+        .area-img-placeholder span {
+            font-size: .75rem;
+            opacity: .5;
+        }
+
+    /* Overlay badge sobre imagen */
+    .img-wrap {
+        position: relative;
+    }
+
+    .area-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: rgba(15, 22, 35, .65);
+        backdrop-filter: blur(6px);
+        color: #fff;
+        font-size: .68rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,.15);
+        letter-spacing: .4px;
+        text-transform: uppercase;
+    }
+
+    /* Card body */
+    .area-body {
+        padding: 1.1rem 1.25rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .area-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--gac-text);
+        margin-bottom: 5px;
+        letter-spacing: -.1px;
+    }
+
+    .area-desc {
+        font-size: .82rem;
+        color: var(--gac-muted);
+        line-height: 1.6;
+        flex: 1;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Botón reservar */
+    .btn-reservar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        background: linear-gradient(135deg, #1a6fcf, #258cfb);
+        color: #fff;
+        border: none;
+        border-radius: var(--gac-radius-sm);
+        padding: .5rem 1.1rem;
+        font-size: .82rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: opacity .15s, transform .15s;
+        box-shadow: 0 3px 10px rgba(37,140,251,.3);
+        align-self: flex-end;
+    }
+
+        .btn-reservar:hover {
+            opacity: .9;
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3.5rem 1rem;
+        color: var(--gac-muted);
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            opacity: .2;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: .875rem;
+            margin: 0;
+        }
+
+    .reservas-panel {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #eef1f6;
+        padding: 1.4rem;
+        box-shadow: 0 8px 20px rgba(15,22,35,.05);
+    }
+
+
+    .reservas-header {
+        background: linear-gradient(110deg,#0f1623,#1a2436);
+        color: white;
+        padding: 1rem 1.2rem;
+        border-radius: 12px;
+    }
+
+
+        .reservas-header small {
+            color: rgba(255,255,255,.65);
+        }
+
+
+    .reserva-card {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 1rem;
+        border: 1px solid #eef1f6;
+        transition: .2s ease;
+    }
+
+
+        .reserva-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(15,22,35,.08);
+        }
+
+
+    .estado-reserva {
+        padding: .3rem .8rem;
+        border-radius: 50px;
+        font-size: .72rem;
+        font-weight: 700;
+    }
+
+
+        .estado-reserva.pendiente {
+            background: rgba(245,158,11,.12);
+            color: #b45309;
+        }
+
+
+        .estado-reserva.aprobada {
+            background: rgba(34,197,94,.12);
+            color: #15803d;
+        }
+</style>
+
+<div class="areas-wrapper">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h3 class="fw-bold mb-1">Áreas Comunes</h3>
+            <p class="text-muted mb-0">
+                Reserva espacios disponibles del residencial
+            </p>
+        </div>
+
+        <a asp-action="MisReservas" class="btn btn-primary">
+            <i class="fa-solid fa-calendar-check me-2"></i>
+            Mis Reservas
+        </a>
+
+    </div>
+
+
+    <!-- PANEL RESERVAS ABIERTAS -->
+    <!-- PANEL RESERVAS ABIERTAS -->
+    @if (ViewBag.ReservasAbiertas != null &&
+        ((IEnumerable<PROTOTIPO.Models.ReservaAreaComun>)ViewBag.ReservasAbiertas).Any())
+    {
+        <div class="reservas-panel mb-4">
+
+            <div class="reservas-header d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h5 class="mb-1 fw-bold">
+                        <i class="fa-solid fa-calendar-check me-2"></i>
+                        Mis próximas reservas
+                    </h5>
+
+                    <small>
+                        Espacios comunes reservados actualmente
+                    </small>
+                </div>
+
+                <span class="badge bg-primary">
+                    @(((IEnumerable<PROTOTIPO.Models.ReservaAreaComun>)ViewBag.ReservasAbiertas).Count())
+                    activas
+                </span>
+
+            </div>
+
+
+            <div class="row g-3 mt-2">
+
+                @foreach (var reserva in
+                    (IEnumerable<PROTOTIPO.Models.ReservaAreaComun>)ViewBag.ReservasAbiertas)
+                {
+
+                    <div class="col-md-6 col-lg-4">
+
+                        <div class="reserva-card">
+
+                            <div class="d-flex justify-content-between align-items-start">
+
+                                <h6 class="fw-bold mb-2">
+                                    <i class="fa-solid fa-fire me-2 text-warning"></i>
+                                    @reserva.IdAreaNavigation.Nombre
+                                </h6>
+
+
+                                @if (reserva.Estado == "Pendiente")
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Pendiente
+                                    </span>
+                                }
+                                else if (reserva.Estado == "Aprobada")
+                                {
+                                    <span class="badge bg-success">
+                                        Aprobada
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @reserva.Estado
+                                    </span>
+                                }
+
+                            </div>
+
+
+
+                            <div class="mt-3 text-muted small">
+
+                                <div class="mb-2">
+                                    <i class="fa-regular fa-calendar me-2"></i>
+
+                                    @(reserva.Fecha.HasValue
+                                        ? reserva.Fecha.Value.ToString("dd/MM/yyyy")
+                                        : "")
+                                </div>
+
+
+                                <div>
+                                    <i class="fa-regular fa-clock me-2"></i>
+
+                                    @reserva.HoraInicio -
+                                    @reserva.HoraFin
+
+                                </div>
+
+                            </div>
+
+
+
+                            <form asp-action="Cancelar"
+                                  method="post"
+                                  class="mt-3">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@reserva.IdReserva" />
+
+                                <button class="btn btn-outline-danger btn-sm w-100"
+                                        onclick="return confirm('¿Cancelar esta reserva?')">
+
+                                    <i class="fa-solid fa-xmark me-1"></i>
+
+                                    Cancelar reserva
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+    }
+
+    <!-- ══ GRID ══ -->
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fa-solid fa-tree"></i>
+            <p>No hay áreas comunes disponibles en este momento.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var area in Model)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="area-card">
+
+                        <div class="img-wrap">
+
+                            @if (!string.IsNullOrEmpty(area.ImagenUrl))
+                            {
+                                <img src="@area.ImagenUrl"
+                                     class="area-img"
+                                     alt="@area.Nombre" />
+                            }
+                            else
+                            {
+                                <div class="area-img-placeholder">
+                                    <i class="fa-regular fa-image"></i>
+                                    <span>Sin imagen</span>
+                                </div>
+                            }
+
+                            <span class="area-badge">
+                                <i class="fa-solid fa-circle-check fa-xs me-1"></i>Disponible
+                            </span>
+
+                        </div>
+
+                        <div class="area-body">
+
+                            <div class="area-name">@area.Nombre</div>
+                            <div class="area-desc">@area.Descripcion</div>
+
+                            <a asp-action="Create"
+                               asp-route-areaId="@area.IdArea"
+                               class="btn-reservar">
+                                <i class="fa-solid fa-calendar-plus fa-xs"></i>
+                                Reservar
+                            </a>
+
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>

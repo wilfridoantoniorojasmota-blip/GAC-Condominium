@@ -1,0 +1,481 @@
+﻿@model IEnumerable<PROTOTIPO.Models.ViewModel.PagoDTO>
+
+@{
+    ViewData["Title"] = "Historial de Pagos";
+
+    var total = Model.Sum(x => x.Monto ?? 0);
+    var pagados = Model.Count(x => x.Estado == "Pagado");
+    var pendientes = Model.Count(x => x.Estado == "Pendiente");
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+        --gac-muted: #64748b;
+    }
+
+    .historial-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header .ph-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(37,140,251,.2);
+            color: #60a8fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0 0 2px;
+        }
+
+        .page-header .ph-residente {
+            font-size: .875rem;
+            color: rgba(255,255,255,.6);
+            font-weight: 500;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+    .btn-back {
+        border: 1.5px solid rgba(255,255,255,.25);
+        background: rgba(255,255,255,.08);
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.2rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        white-space: nowrap;
+    }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,.16);
+            color: #fff;
+            border-color: rgba(255,255,255,.45);
+        }
+
+    /* STAT CARDS */
+    .stat-card {
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid var(--gac-border);
+        padding: 1.25rem;
+        height: 100%;
+        transition: transform .2s ease, box-shadow .2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 14px 14px 0 0;
+            background: var(--gac-primary);
+        }
+
+        .stat-card.stat-success::after {
+            background: var(--gac-success);
+        }
+
+        .stat-card.stat-warning::after {
+            background: var(--gac-warning);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(15,22,35,.06);
+        }
+
+        .stat-card .sc-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-bottom: .75rem;
+        }
+
+    .sc-blue {
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+    }
+
+    .sc-green {
+        background: rgba(34,197,94,.1);
+        color: #16a34a;
+    }
+
+    .sc-amber {
+        background: rgba(245,158,11,.1);
+        color: #d97706;
+    }
+
+    .stat-card .sc-label {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
+
+    .stat-card .sc-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+    }
+
+    /* FILTER CARD */
+    .filter-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .filter-card .form-label {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--gac-muted);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: .35rem;
+        }
+
+        .filter-card .form-select,
+        .filter-card .form-control {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: .9rem;
+            padding: .5rem .85rem;
+            min-height: 44px;
+        }
+
+            .filter-card .form-select:focus,
+            .filter-card .form-control:focus {
+                border-color: var(--gac-primary);
+                box-shadow: 0 0 0 3px rgba(37,140,251,.12);
+            }
+
+    .btn-filter {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        min-height: 44px;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .btn-filter:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    /* TABLE CARD */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+    }
+
+        .table-card table {
+            margin-bottom: 0;
+        }
+
+        .table-card thead {
+            background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        }
+
+            .table-card thead th {
+                font-size: .75rem;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: #000;
+                font-weight: 700;
+                padding: .95rem 1.1rem;
+                border: none;
+                white-space: nowrap;
+            }
+
+        .table-card tbody td {
+            padding: .9rem 1.1rem;
+            color: #334155;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f4f9;
+            font-size: .9rem;
+        }
+
+        .table-card tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-card tbody tr {
+            transition: background .15s ease;
+        }
+
+            .table-card tbody tr:hover {
+                background: #fafcff;
+            }
+
+    .monto-cell {
+        font-weight: 700;
+        color: var(--gac-navy);
+    }
+
+    .tipo-badge {
+        font-size: .75rem;
+        font-weight: 700;
+        padding: .35rem .8rem;
+        border-radius: 50px;
+        background: rgba(15,22,35,.06);
+        color: var(--gac-navy);
+    }
+
+    .badge-estado {
+        font-weight: 600;
+        font-size: .75rem;
+        padding: .38rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+    .badge-pagado {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+    .badge-pendiente {
+        background: rgba(245,158,11,.12);
+        color: #b45309;
+    }
+
+    .badge-otro {
+        background: rgba(15,22,35,.08);
+        color: var(--gac-navy);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: .75rem;
+            display: block;
+            opacity: .45;
+        }
+</style>
+
+<div class="historial-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ph-avatar">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                    <h3>Historial de Pagos</h3>
+                    <p class="ph-residente">
+                        <i class="fa-solid fa-user fa-xs"></i>
+                        @ViewBag.Residente
+                    </p>
+                </div>
+            </div>
+            <a asp-action="Index" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                Volver
+            </a>
+        </div>
+
+        <!-- STATS -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="sc-icon sc-blue"><i class="fa-solid fa-coins"></i></div>
+                    <div class="sc-label">Total Pagado</div>
+                    <div class="sc-value" style="font-size:1.2rem;">RD$ @String.Format("{0:N2}", total)</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="stat-card stat-success">
+                    <div class="sc-icon sc-green"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="sc-label">Pagados</div>
+                    <div class="sc-value">@pagados</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="stat-card stat-warning">
+                    <div class="sc-icon sc-amber"><i class="fa-solid fa-clock"></i></div>
+                    <div class="sc-label">Pendientes</div>
+                    <div class="sc-value">@pendientes</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filter-card">
+            <form method="get" class="row g-3 align-items-end">
+
+                <input type="hidden" name="id" value="@Context.Request.Query["id"]" />
+
+                <div class="col-md-3">
+                    <label class="form-label">Mes</label>
+                    <select name="mes" class="form-select">
+                        <option value="">Todos los meses</option>
+                        @for (int i = 1; i <= 12; i++)
+                        {
+                            <option value="@i" selected="@(ViewData["Mes"]?.ToString() == i.ToString())">
+                                @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Año</label>
+                    <input type="number" name="anio" value="@ViewData["Anio"]"
+                           class="form-control" placeholder="Ej: 2026" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="Pagado" selected="@(ViewData["Estado"]?.ToString() == "Pagado")">Pagado</option>
+                        <option value="Pendiente" selected="@(ViewData["Estado"]?.ToString() == "Pendiente")">Pendiente</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-filter w-100">
+                        <i class="fa-solid fa-filter"></i>
+                        Filtrar
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-card">
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+                    <i class="fa-regular fa-rectangle-list"></i>
+                    No hay pagos registrados con los filtros seleccionados.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Unidad</th>
+                                <th>Tipo</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <span style="display:flex; align-items:center; gap:.45rem; color:#94a3b8; font-size:.8rem;">
+                                            <i class="fa-regular fa-calendar"></i>
+                                            @item.Fecha?.ToString("dd/MM/yyyy")
+                                        </span>
+                                    </td>
+                                    <td style="font-weight:600; color:var(--gac-navy);">@item.Unidad</td>
+                                    <td><span class="tipo-badge">@item.TipoPago</span></td>
+                                    <td class="monto-cell">RD$ @String.Format("{0:N2}", item.Monto)</td>
+                                    <td>
+                                        @if (item.Estado == "Pagado")
+                                        {
+                                            <span class="badge-estado badge-pagado">Pagado</span>
+                                        }
+                                        else if (item.Estado == "Pendiente")
+                                        {
+                                            <span class="badge-estado badge-pendiente">Pendiente</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-estado badge-otro">@item.Estado</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

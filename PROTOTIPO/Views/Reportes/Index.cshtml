@@ -1,0 +1,453 @@
+﻿
+@{
+    ViewData["Title"] = "Dashboard de Reportes";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="mnt-page">
+    <div class="container-fluid py-4 px-3 px-md-4">
+
+        <!-- HEADER -->
+        <div class="page-header mb-4">
+            <div>
+                <h3><i class="bi bi-bar-chart-line-fill me-2"></i>Reportes</h3>
+                <p>Resumen general del estado administrativo y financiero del condominio</p>
+            </div>
+        </div>
+
+        <!-- ESTADISTICAS -->
+        <div class="row g-3 mb-4">
+
+            <!-- Residentes -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-info">
+                    <div class="sc-icon ic-blue">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="sc-label">Residentes</div>
+                    <div class="sc-value">@ViewBag.TotalResidentes</div>
+                </div>
+            </div>
+
+            <!-- Unidades -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-warning">
+                    <div class="sc-icon ic-amber">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div class="sc-label">Unidades</div>
+                    <div class="sc-value">@ViewBag.TotalUnidades</div>
+                </div>
+            </div>
+
+            <!-- Disponibles -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-success">
+                    <div class="sc-icon ic-green">
+                        <i class="bi bi-house-check-fill"></i>
+                    </div>
+                    <div class="sc-label">Disponibles</div>
+                    <div class="sc-value">@ViewBag.UnidadesDisponibles</div>
+                </div>
+            </div>
+
+            <!-- Ocupadas -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-danger">
+                    <div class="sc-icon ic-red">
+                        <i class="bi bi-house-lock-fill"></i>
+                    </div>
+                    <div class="sc-label">Ocupadas</div>
+                    <div class="sc-value">@ViewBag.UnidadesOcupadas</div>
+                </div>
+            </div>
+
+            <!-- Contratos -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-info">
+                    <div class="sc-icon ic-blue">
+                        <i class="bi bi-file-earmark-text-fill"></i>
+                    </div>
+                    <div class="sc-label">Contratos activos</div>
+                    <div class="sc-value">@ViewBag.ContratosActivos</div>
+                </div>
+            </div>
+
+            <!-- Solicitudes -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-warning">
+                    <div class="sc-icon ic-amber">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <div class="sc-label">Solicitudes pendientes</div>
+                    <div class="sc-value">@ViewBag.SolicitudesPendientes</div>
+                </div>
+            </div>
+
+            <!-- Incidencias -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-danger">
+                    <div class="sc-icon ic-red">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <div class="sc-label">Incidencias pendientes</div>
+                    <div class="sc-value">@ViewBag.IncidenciasPendientes</div>
+                </div>
+            </div>
+
+            <!-- Ingresos -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card sc-success">
+                    <div class="sc-icon ic-green">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div class="sc-label">Ingresos totales</div>
+                    <div class="sc-value-currency">RD$ @String.Format("{0:N2}", ViewBag.IngresosTotales)</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MÓDULOS DE REPORTES -->
+        <div class="table-card">
+
+            <div class="table-card-head">
+                <p class="tc-title">
+                    <i class="bi bi-grid-fill"></i>
+                    Módulos de reportes
+                </p>
+            </div>
+
+            <div class="row g-3 p-4">
+
+                <!-- Financiero -->
+                <div class="col-md-6 col-lg-4">
+                    <a asp-controller="Reportes" asp-action="Financiero" class="report-module-card">
+                        <div class="module-icon ic-green">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                        <div class="module-info">
+                            <h5 class="module-title">Reporte financiero</h5>
+                            <p class="module-desc">Balances generales, ingresos de caja y cobros de mantenimiento.</p>
+                        </div>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </a>
+                </div>
+
+                <!-- Contratos -->
+                <div class="col-md-6 col-lg-4">
+                    <a asp-controller="Reportes" asp-action="Contratos" class="report-module-card">
+                        <div class="module-icon ic-blue">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                        <div class="module-info">
+                            <h5 class="module-title">Reporte de contratos</h5>
+                            <p class="module-desc">Historial de alquileres, plazos vigentes y estado de inquilinos.</p>
+                        </div>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </a>
+                </div>
+
+                <!-- Residentes -->
+                <div class="col-md-6 col-lg-4">
+                    <a asp-controller="Reportes" asp-action="Residentes" class="report-module-card">
+                        <div class="module-icon ic-blue">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="module-info">
+                            <h5 class="module-title">Reporte residentes</h5>
+                            <p class="module-desc">Directorio de contacto de inquilinos y asignación de unidades.</p>
+                        </div>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </a>
+                </div>
+
+                <!-- Mantenimiento -->
+                <div class="col-md-6 col-lg-4">
+                    <a asp-controller="Reportes" asp-action="Mantenimiento" class="report-module-card">
+                        <div class="module-icon ic-red">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <div class="module-info">
+                            <h5 class="module-title">Reporte mantenimiento</h5>
+                            <p class="module-desc">Monitoreo de incidencias activas, tiempos y orden de reparación.</p>
+                        </div>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </a>
+                </div>
+
+                <!-- Reservas -->
+                <div class="col-md-6 col-lg-4">
+                    <a asp-controller="Reportes" asp-action="Reservas" class="report-module-card">
+                        <div class="module-icon ic-amber">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="module-info">
+                            <h5 class="module-title">Reporte reservas</h5>
+                            <p class="module-desc">Calendario y control de uso para las áreas comunes del complejo.</p>
+                        </div>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </a>
+                </div>
+
+                <!-- Solicitudes -->
+                <div class="col-md-6 col-lg-4">
+                    <a asp-controller="Reportes" asp-action="Solicitudes" class="report-module-card">
+                        <div class="module-icon ic-amber">
+                            <i class="bi bi-person-lines-fill"></i>
+                        </div>
+                        <div class="module-info">
+                            <h5 class="module-title">Reporte solicitudes</h5>
+                            <p class="module-desc">Historial de solicitudes de ingreso y sus respectivos estados.</p>
+                        </div>
+                        <i class="bi bi-chevron-right module-arrow"></i>
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    /* ── STAT CARDS ── */
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.4rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .stat-card.sc-info::after {
+            background: var(--gac-primary);
+        }
+
+        .stat-card.sc-warning::after {
+            background: var(--gac-warning);
+        }
+
+        .stat-card.sc-success::after {
+            background: var(--gac-success);
+        }
+
+        .stat-card.sc-danger::after {
+            background: var(--gac-danger);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15,22,35,.07);
+        }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        margin-bottom: .85rem;
+    }
+
+    .ic-blue {
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+    }
+
+    .ic-amber {
+        background: rgba(245,158,11,.1);
+        color: #d97706;
+    }
+
+    .ic-green {
+        background: rgba(34,197,94,.1);
+        color: #16a34a;
+    }
+
+    .ic-red {
+        background: rgba(239,68,68,.1);
+        color: var(--gac-danger);
+    }
+
+    .sc-label {
+        font-size: .77rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .sc-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+        font-family: 'Sora', sans-serif;
+    }
+
+    .sc-value-currency {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.4;
+        font-family: 'Sora', sans-serif;
+    }
+
+    /* ── REPORT MODULE CARD ── */
+    .report-module-card {
+        background: #fff;
+        border: 1.5px solid var(--gac-border);
+        border-radius: 16px;
+        padding: 1.4rem;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        transition: all .25s ease;
+        text-decoration: none;
+        color: inherit;
+        height: 100%;
+    }
+
+        .report-module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(15,22,35,.07);
+            border-color: rgba(37,140,251,.25);
+        }
+
+        .report-module-card .module-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .report-module-card .module-info {
+            flex: 1;
+        }
+
+        .report-module-card .module-title {
+            font-weight: 700;
+            color: var(--gac-navy);
+            font-size: .95rem;
+            margin: 0 0 5px;
+            font-family: 'Sora', sans-serif;
+            transition: color .2s;
+        }
+
+        .report-module-card:hover .module-title {
+            color: var(--gac-primary);
+        }
+
+        .report-module-card .module-desc {
+            font-size: .8rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.45;
+        }
+
+        .report-module-card .module-arrow {
+            align-self: center;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            transition: transform .2s ease, color .2s ease;
+        }
+
+        .report-module-card:hover .module-arrow {
+            color: var(--gac-primary);
+            transform: translateX(4px);
+        }
+
+    /* ── CONTAINER TABLE CARD ── */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+    }
+
+    .table-card-head {
+        padding: 1rem 1.4rem;
+        border-bottom: 1px solid var(--gac-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .tc-title {
+        font-weight: 700;
+        font-size: .95rem;
+        color: var(--gac-navy);
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: 0;
+        font-family: 'Sora', sans-serif;
+    }
+
+        .tc-title i {
+            color: var(--gac-primary);
+        }
+</style>

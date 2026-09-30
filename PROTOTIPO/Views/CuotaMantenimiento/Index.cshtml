@@ -1,0 +1,490 @@
+﻿@model IEnumerable<PROTOTIPO.Models.CuotaMantenimiento>
+
+@{
+    ViewData["Title"] = "Cuotas de Mantenimiento";
+
+    var total = Model.Count();
+    var pendientes = Model.Count(x => x.Estado == "Pendiente");
+    var pagadas = Model.Count(x => x.Estado != "Pendiente");
+    var totalMonto = Model.Sum(x => x.Monto ?? 0);
+}
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+        --gac-muted: #64748b;
+    }
+
+    .cuotas-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header .ph-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-header .ph-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(37,140,251,.2);
+            color: #60a8fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0 0 2px;
+            font-size: 1.4rem;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .6rem 1.25rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .btn-gac-primary:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    /* STAT CARDS */
+    .stat-card {
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid var(--gac-border);
+        padding: 1.25rem;
+        height: 100%;
+        transition: transform .2s ease, box-shadow .2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 14px 14px 0 0;
+            background: var(--gac-primary);
+        }
+
+        .stat-card.s-navy::after {
+            background: var(--gac-navy);
+        }
+
+        .stat-card.s-blue::after {
+            background: var(--gac-primary);
+        }
+
+        .stat-card.s-warning::after {
+            background: var(--gac-warning);
+        }
+
+        .stat-card.s-success::after {
+            background: var(--gac-success);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(15,22,35,.06);
+        }
+
+        .stat-card .sc-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-bottom: .75rem;
+        }
+
+    .sc-navy {
+        background: rgba(15,22,35,.07);
+        color: var(--gac-navy);
+    }
+
+    .sc-blue {
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+    }
+
+    .sc-amber {
+        background: rgba(245,158,11,.1);
+        color: #d97706;
+    }
+
+    .sc-green {
+        background: rgba(34,197,94,.1);
+        color: #16a34a;
+    }
+
+    .stat-card .sc-label {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
+
+    .stat-card .sc-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+    }
+
+    /* TABLE CARD */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,22,35,.04);
+    }
+
+        .table-card table {
+            margin-bottom: 0;
+        }
+
+        .table-card thead {
+            background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        }
+
+            .table-card thead th {
+                font-size: .73rem;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: rgba(255,255,255,.65);
+                font-weight: 700;
+                padding: .95rem 1.25rem;
+                border: none;
+                white-space: nowrap;
+            }
+
+        .table-card tbody td {
+            padding: .95rem 1.25rem;
+            color: #334155;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f4f9;
+            font-size: .9rem;
+        }
+
+        .table-card tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-card tbody tr {
+            transition: background .15s ease;
+        }
+
+            .table-card tbody tr:hover {
+                background: #fafcff;
+            }
+
+    .unidad-cell {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .unidad-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: rgba(37,140,251,.08);
+        color: var(--gac-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .85rem;
+        flex-shrink: 0;
+    }
+
+    .unidad-num {
+        font-weight: 700;
+        color: var(--gac-navy);
+    }
+
+    .periodo-cell {
+        font-size: .85rem;
+        color: var(--gac-muted);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .monto-cell {
+        font-weight: 700;
+        color: var(--gac-navy);
+    }
+
+    /* BADGES */
+    .badge-estado {
+        font-weight: 600;
+        font-size: .75rem;
+        padding: .38rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+    }
+
+    .badge-pendiente {
+        background: rgba(245,158,11,.12);
+        color: #b45309;
+    }
+
+    .badge-pagada {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+    /* ACTION BUTTONS */
+    .btn-tbl {
+        border-radius: 8px;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: .32rem .75rem;
+        transition: all .15s ease;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+    }
+
+    .btn-tbl-primary {
+        border: 1.5px solid var(--gac-primary);
+        color: var(--gac-primary);
+        background: transparent;
+    }
+
+        .btn-tbl-primary:hover {
+            background: var(--gac-primary);
+            color: #fff;
+        }
+
+    .btn-tbl-danger {
+        border: 1.5px solid var(--gac-danger);
+        color: var(--gac-danger);
+        background: transparent;
+    }
+
+        .btn-tbl-danger:hover {
+            background: var(--gac-danger);
+            color: #fff;
+        }
+
+    /* EMPTY STATE */
+    .empty-state {
+        padding: 3.5rem;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: .75rem;
+            display: block;
+            opacity: .4;
+        }
+</style>
+
+<div class="cuotas-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div class="ph-left">
+                <div class="ph-icon">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <div>
+                    <h3>Cuotas de Mantenimiento</h3>
+                    <p>Gestión de cobros y cuotas por unidad</p>
+                </div>
+            </div>
+            <a asp-action="Create" class="btn-gac-primary">
+                <i class="fa-solid fa-plus"></i>
+                Nueva Cuota
+            </a>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-6 col-md-3">
+                <div class="stat-card s-navy">
+                    <div class="sc-icon sc-navy"><i class="fa-solid fa-layer-group"></i></div>
+                    <div class="sc-label">Total Cuotas</div>
+                    <div class="sc-value">@total</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="stat-card s-blue">
+                    <div class="sc-icon sc-blue"><i class="fa-solid fa-coins"></i></div>
+                    <div class="sc-label">Monto Total</div>
+                    <div class="sc-value" style="font-size:1.2rem;">RD$ @String.Format("{0:N0}", totalMonto)</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="stat-card s-warning">
+                    <div class="sc-icon sc-amber"><i class="fa-solid fa-clock"></i></div>
+                    <div class="sc-label">Pendientes</div>
+                    <div class="sc-value">@pendientes</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="stat-card s-success">
+                    <div class="sc-icon sc-green"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="sc-label">Pagadas</div>
+                    <div class="sc-value">@pagadas</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-card">
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+                    <i class="fa-solid fa-receipt"></i>
+                    No hay cuotas de mantenimiento registradas.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Unidad</th>
+                                <th>Periodo</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <div class="unidad-cell">
+                                            <div class="unidad-icon">
+                                                <i class="fa-solid fa-building fa-xs"></i>
+                                            </div>
+                                            <span class="unidad-num">
+                                                @(item.IdUnidadNavigation?.Numero ?? "N/A")
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="periodo-cell">
+                                            <i class="fa-regular fa-calendar"></i>
+                                            @item.Periodo
+                                        </div>
+                                    </td>
+
+                                    <td class="monto-cell">
+                                        RD$ @String.Format("{0:N2}", item.Monto)
+                                    </td>
+
+                                    <td>
+                                        @if (item.Estado == "Pendiente")
+                                        {
+                                            <span class="badge-estado badge-pendiente">Pendiente</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-estado badge-pagada">Pagado</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a asp-action="Edit" asp-route-id="@item.IdCuota"
+                                               class="btn btn-tbl btn-tbl-primary">
+                                                <i class="fa-solid fa-pen fa-xs"></i>Editar
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.IdCuota"
+                                               class="btn btn-tbl btn-tbl-danger">
+                                                <i class="fa-solid fa-trash fa-xs"></i>Eliminar
+                                            </a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

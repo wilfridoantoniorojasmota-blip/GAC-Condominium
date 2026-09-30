@@ -1,0 +1,95 @@
+﻿@model PROTOTIPO.Models.Aviso
+
+@{
+    ViewData["Title"] = "Detalle de Aviso";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-dark text-white">
+
+                    <h3 class="mb-0">
+                        Detalle del Aviso
+                    </h3>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4">
+
+                    <!-- TITULO -->
+                    <div class="mb-4">
+                        <h4 class="fw-bold">
+                            @Model.Titulo
+                        </h4>
+                    </div>
+
+                    <!-- CONTENIDO -->
+                    <div class="mb-4">
+                        <label class="text-muted">Contenido</label>
+                        <p class="fs-5">
+                            @Model.Contenido
+                        </p>
+                    </div>
+
+                    <div class="row">
+
+                        <!-- FECHA -->
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted">Fecha de Publicación</label>
+                            <div class="fw-semibold">
+                                @Model.FechaPublicacion?.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+
+                        <!-- CONDOMINIO -->
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted">Condominio</label>
+                            <div class="fw-semibold">
+                                @Model.IdCondominioNavigation?.IdCondominio
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="card-footer bg-light d-flex justify-content-between">
+
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+
+                    <div class="d-flex gap-2">
+
+                        <a asp-action="Edit"
+                               asp-route-id="@Model.IdAviso"
+                               class="btn btn-warning">
+                            Editar
+                        </a>
+
+                        <a asp-action="Delete"
+                               asp-route-id="@Model.IdAviso"
+                               class="btn btn-danger">
+                            Eliminar
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

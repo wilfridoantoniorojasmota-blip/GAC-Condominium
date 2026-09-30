@@ -1,0 +1,786 @@
+﻿@model PROTOTIPO.Models.IncidenciaMantenimiento
+
+@{
+    ViewData["Title"] = "Editar Incidencia";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-warning: #f59e0b;
+        --gac-success: #22c55e;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+        --ink-muted: #7a8799;
+        --no-bg: #fff1f0;
+        --no-ink: #b91c1c;
+        --no-bdr: #fecaca;
+        --amber-bg: #fffbeb;
+        --amber-acc: #f59e0b;
+        --ok-bg: #f0fdf6;
+        --ok-ink: #15803d;
+        --r-lg: 12px;
+        --r-2xl: 24px;
+        --tr: .2s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+        --shadow-lg: 0 20px 48px rgba(12,18,32,.13), 0 6px 16px rgba(12,18,32,.07);
+    }
+
+    body {
+        font-family: var(--font-b);
+        background: var(--gac-surface);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Shell ── */
+    .edit-shell {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 44px 20px 80px;
+    }
+
+    .edit-panel {
+        width: 100%;
+        max-width: 660px;
+    }
+
+    /* ── Back ── */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: .82rem;
+        font-weight: 600;
+        color: var(--ink-muted);
+        text-decoration: none;
+        margin-bottom: 26px;
+        transition: color var(--tr);
+    }
+
+        .back-link:hover {
+            color: var(--gac-navy);
+        }
+
+    /* ── Card ── */
+    .edit-card {
+        background: #fff;
+        border: 1px solid var(--gac-border);
+        border-radius: var(--r-2xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .edit-head {
+        position: relative;
+        padding: 30px 36px 26px;
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        overflow: hidden;
+    }
+
+        .edit-head::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,.045) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        .edit-head::after {
+            content: '';
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245,158,11,.18) 0%, transparent 70%);
+            right: -40px;
+            top: -60px;
+            pointer-events: none;
+        }
+
+    .edit-head-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .edit-head-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        background: rgba(245,158,11,.2);
+        border: 1px solid rgba(245,158,11,.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #fbbf24;
+        flex-shrink: 0;
+    }
+
+    .edit-head-title {
+        font-family: var(--font-d);
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -.03em;
+        margin: 0;
+    }
+
+    .edit-head-sub {
+        font-size: .78rem;
+        color: rgba(255,255,255,.5);
+        margin: 3px 0 0;
+    }
+
+    /* ID badge */
+    .id-badge {
+        margin-left: auto;
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: .72rem;
+        font-weight: 700;
+        color: rgba(255,255,255,.65);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* ── Body ── */
+    .edit-body {
+        padding: 32px 36px 36px;
+    }
+
+    /* ── Validation summary ── */
+    .val-summary {
+        display: none;
+        align-items: flex-start;
+        gap: 10px;
+        background: var(--no-bg);
+        border: 1px solid var(--no-bdr);
+        border-radius: var(--r-lg);
+        padding: 14px 18px;
+        margin-bottom: 28px;
+        font-size: .855rem;
+        color: var(--no-ink);
+    }
+
+        .val-summary:not(:empty) {
+            display: flex;
+        }
+
+    /* ── Section heading ── */
+    .sec-heading {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--gac-border);
+    }
+
+        .sec-heading i {
+            color: var(--gac-primary);
+            font-size: .82rem;
+        }
+
+    /* ── Field label ── */
+    .f-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        margin-bottom: 7px;
+    }
+
+        .f-label i {
+            font-size: .8rem;
+            color: var(--gac-primary);
+        }
+
+    .f-optional {
+        font-size: .62rem;
+        font-weight: 600;
+        color: #0fd4b0;
+        letter-spacing: .05em;
+        margin-left: 4px;
+    }
+
+    /* ── Inputs & selects ── */
+    .f-control {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1.5px solid var(--gac-border);
+        border-radius: var(--r-lg);
+        background: var(--gac-surface);
+        font-family: var(--font-b);
+        font-size: .9rem;
+        color: var(--gac-navy);
+        transition: border-color var(--tr), box-shadow var(--tr), background var(--tr);
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+
+        .f-control:focus {
+            border-color: var(--gac-primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(37,140,251,.1);
+        }
+
+        .f-control::placeholder {
+            color: #cbd5e1;
+        }
+
+    textarea.f-control {
+        resize: vertical;
+        min-height: 110px;
+        line-height: 1.65;
+    }
+
+    .select-wrap {
+        position: relative;
+    }
+
+        .select-wrap::after {
+            content: '\F282';
+            font-family: 'bootstrap-icons';
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: .9rem;
+            color: var(--ink-muted);
+            pointer-events: none;
+        }
+
+        .select-wrap .f-control {
+            padding-right: 36px;
+            cursor: pointer;
+        }
+
+    input[type="date"].f-control::-webkit-calendar-picker-indicator {
+        opacity: .4;
+        cursor: pointer;
+    }
+
+    /* Validation messages */
+    .f-error {
+        font-size: .77rem;
+        color: var(--no-ink);
+        font-weight: 600;
+        margin-top: 6px;
+        display: none;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .f-error:not(:empty) {
+            display: flex;
+        }
+
+            .f-error:not(:empty)::before {
+                content: '\F332';
+                font-family: 'bootstrap-icons';
+                font-size: .8rem;
+                flex-shrink: 0;
+            }
+
+    /* ── Status selector (radio tiles) ── */
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    @@media (max-width: 520px) {
+        .status-grid {
+            grid-template-columns: repeat(2,1fr);
+        }
+    }
+
+    .status-opt {
+        position: relative;
+    }
+
+        .status-opt input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .status-tile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 13px 8px;
+        border-radius: var(--r-lg);
+        border: 1.5px solid var(--gac-border);
+        background: var(--gac-surface);
+        cursor: pointer;
+        transition: var(--tr);
+        text-align: center;
+    }
+
+        .status-tile:hover {
+            border-color: #c8d0dc;
+            background: #fff;
+        }
+
+    .status-tile-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .95rem;
+    }
+
+    .status-tile-name {
+        font-size: .72rem;
+        font-weight: 700;
+        color: #64748b;
+        letter-spacing: .02em;
+    }
+
+    /* checked states */
+    .status-opt input:checked + .status-tile.pendiente {
+        border-color: var(--amber-acc);
+        background: var(--amber-bg);
+        box-shadow: 0 0 0 3px rgba(245,158,11,.1);
+    }
+
+        .status-opt input:checked + .status-tile.pendiente .status-tile-name {
+            color: #92400e;
+        }
+
+    .status-opt input:checked + .status-tile.proceso {
+        border-color: var(--gac-primary);
+        background: #eff6ff;
+        box-shadow: 0 0 0 3px rgba(37,140,251,.1);
+    }
+
+        .status-opt input:checked + .status-tile.proceso .status-tile-name {
+            color: var(--gac-primary);
+        }
+
+    .status-opt input:checked + .status-tile.resuelta {
+        border-color: var(--gac-success);
+        background: var(--ok-bg);
+        box-shadow: 0 0 0 3px rgba(34,197,94,.1);
+    }
+
+        .status-opt input:checked + .status-tile.resuelta .status-tile-name {
+            color: var(--ok-ink);
+        }
+
+    .status-opt input:checked + .status-tile.cerrada {
+        border-color: #94a3b8;
+        background: #f8fafc;
+        box-shadow: 0 0 0 3px rgba(148,163,184,.1);
+    }
+
+        .status-opt input:checked + .status-tile.cerrada .status-tile-name {
+            color: #475569;
+        }
+
+    .si-pendiente {
+        background: var(--amber-bg);
+        color: var(--amber-acc);
+    }
+
+    .si-proceso {
+        background: #eff6ff;
+        color: var(--gac-primary);
+    }
+
+    .si-resuelta {
+        background: var(--ok-bg);
+        color: var(--gac-success);
+    }
+
+    .si-cerrada {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    #estadoHidden {
+        display: none;
+    }
+
+    /* ── Divider ── */
+    .inc-divider {
+        border: none;
+        border-top: 1px solid var(--gac-border);
+        margin: 28px 0;
+    }
+
+    /* ── Actions ── */
+    .action-row {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-cancel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 13px 22px;
+        border-radius: var(--r-lg);
+        border: 1px solid var(--gac-border);
+        background: var(--gac-surface);
+        color: #64748b;
+        font-family: var(--font-b);
+        font-weight: 600;
+        font-size: .9rem;
+        text-decoration: none;
+        transition: var(--tr);
+        white-space: nowrap;
+    }
+
+        .btn-cancel:hover {
+            background: #fff;
+            border-color: #c8d0dc;
+            color: var(--gac-navy);
+        }
+
+    .btn-submit {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 13px 24px;
+        border-radius: var(--r-lg);
+        border: none;
+        background: linear-gradient(135deg, var(--gac-warning) 0%, #d97706 100%);
+        color: #fff;
+        font-family: var(--font-b);
+        font-weight: 700;
+        font-size: .95rem;
+        cursor: pointer;
+        transition: var(--tr);
+        box-shadow: 0 4px 16px rgba(245,158,11,.35);
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245,158,11,.45);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit.loading {
+            opacity: .75;
+            pointer-events: none;
+        }
+
+        .btn-submit .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        .btn-submit.loading .spinner {
+            display: block;
+        }
+
+        .btn-submit.loading .btn-icon {
+            display: none;
+        }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .edit-head {
+            padding: 22px 20px 18px;
+        }
+
+        .edit-body {
+            padding: 24px 20px 28px;
+        }
+
+        .action-row {
+            flex-direction: column-reverse;
+        }
+
+        .id-badge {
+            display: none;
+        }
+    }
+</style>
+
+<div class="edit-shell">
+    <div class="edit-panel">
+
+        <!-- Back -->
+        <a asp-action="Index" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            Volver a incidencias
+        </a>
+
+        <div class="edit-card">
+
+            <!-- Header -->
+            <div class="edit-head">
+                <div class="edit-head-inner">
+                    <div class="edit-head-icon">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+                    <div>
+                        <h1 class="edit-head-title">Editar Incidencia</h1>
+                        <p class="edit-head-sub">Modifica los datos de la incidencia de mantenimiento</p>
+                    </div>
+                    <span class="id-badge"># @Model.IdIncidencia</span>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="edit-body">
+
+                <form asp-action="Edit" id="editForm" novalidate>
+
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="IdIncidencia" />
+
+                    <!-- Validation summary -->
+                    <div asp-validation-summary="ModelOnly" class="val-summary">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div></div>
+                    </div>
+
+                    <!-- ══ SECCIÓN 1: Descripción ══ -->
+                    <div class="sec-heading">
+                        <i class="bi bi-file-text"></i>
+                        Detalle del problema
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="f-label">
+                            <i class="bi bi-chat-left-text"></i>
+                            Descripción
+                        </div>
+                        <textarea asp-for="Descripcion"
+                                  class="f-control"
+                                  rows="4"
+                                  placeholder="Describe el problema o incidencia…"></textarea>
+                        <span asp-validation-for="Descripcion" class="f-error"></span>
+                    </div>
+
+                    <!-- ══ SECCIÓN 2: Estado ══ -->
+                    <div class="sec-heading">
+                        <i class="bi bi-activity"></i>
+                        Estado de la incidencia
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="status-grid">
+
+                            <label class="status-opt">
+                                <input type="radio" name="_estadoRadio" value="Pendiente"
+                                @(Model.Estado == "Pendiente" ? "checked" : "")
+                                       onchange="syncEstado(this.value)">
+                                <div class="status-tile pendiente">
+                                    <div class="status-tile-icon si-pendiente">
+                                        <i class="bi bi-hourglass-split"></i>
+                                    </div>
+                                    <span class="status-tile-name">Pendiente</span>
+                                </div>
+                            </label>
+
+                            <label class="status-opt">
+                                <input type="radio" name="_estadoRadio" value="En Proceso"
+                                @(Model.Estado == "En Proceso" ? "checked" : "")
+                                       onchange="syncEstado(this.value)">
+                                <div class="status-tile proceso">
+                                    <div class="status-tile-icon si-proceso">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </div>
+                                    <span class="status-tile-name">En Proceso</span>
+                                </div>
+                            </label>
+
+                            <label class="status-opt">
+                                <input type="radio" name="_estadoRadio" value="Resuelta"
+                                @(Model.Estado == "Resuelta" ? "checked" : "")
+                                       onchange="syncEstado(this.value)">
+                                <div class="status-tile resuelta">
+                                    <div class="status-tile-icon si-resuelta">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </div>
+                                    <span class="status-tile-name">Resuelta</span>
+                                </div>
+                            </label>
+
+                            <label class="status-opt">
+                                <input type="radio" name="_estadoRadio" value="Cerrada"
+                                @(Model.Estado == "Cerrada" ? "checked" : "")
+                                       onchange="syncEstado(this.value)">
+                                <div class="status-tile cerrada">
+                                    <div class="status-tile-icon si-cerrada">
+                                        <i class="bi bi-lock-fill"></i>
+                                    </div>
+                                    <span class="status-tile-name">Cerrada</span>
+                                </div>
+                            </label>
+
+                        </div>
+
+                        <select asp-for="Estado" id="estadoHidden" aria-hidden="true">
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="En Proceso">En Proceso</option>
+                            <option value="Resuelta">Resuelta</option>
+                            <option value="Cerrada">Cerrada</option>
+                        </select>
+                        <span asp-validation-for="Estado" class="f-error mt-2"></span>
+                    </div>
+
+                    <!-- ══ SECCIÓN 3: Fechas ══ -->
+                    <div class="sec-heading">
+                        <i class="bi bi-calendar3"></i>
+                        Fechas
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="f-label">
+                                <i class="bi bi-calendar-plus"></i>
+                                Fecha de solicitud
+                            </div>
+                            <input asp-for="FechaSolicitud" type="date" class="f-control" />
+                            <span asp-validation-for="FechaSolicitud" class="f-error"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="f-label">
+                                <i class="bi bi-calendar-check"></i>
+                                Fecha de cierre
+                                <span class="f-optional">Opcional</span>
+                            </div>
+                            <input asp-for="FechaCierre" type="date" class="f-control" />
+                            <span asp-validation-for="FechaCierre" class="f-error"></span>
+                        </div>
+                    </div>
+
+                    <!-- ══ SECCIÓN 4: Asignación ══ -->
+                    <div class="sec-heading">
+                        <i class="bi bi-link-45deg"></i>
+                        Asignación
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="f-label">
+                                <i class="bi bi-door-open"></i>
+                                Unidad habitacional
+                            </div>
+                            <div class="select-wrap">
+                                <select asp-for="IdUnidad" class="f-control" asp-items="ViewBag.IdUnidad">
+                                    <option value="">Selecciona una unidad…</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="IdUnidad" class="f-error"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="f-label">
+                                <i class="bi bi-person"></i>
+                                Usuario responsable
+                            </div>
+                            <div class="select-wrap">
+                                <select asp-for="IdUsuario" class="f-control" asp-items="ViewBag.IdUsuario">
+                                    <option value="">Selecciona un usuario…</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="IdUsuario" class="f-error"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="f-label">
+                                <i class="bi bi-tools"></i>
+                                Técnico asignado
+                            </div>
+
+                            <input asp-for="TecnicoAsignado"
+                                   class="f-control"
+                                   placeholder="Nombre del técnico asignado..." />
+
+                        </div>
+                    </div>
+
+                    <hr class="inc-divider">
+
+                    <!-- Actions -->
+                    <div class="action-row">
+                        <a asp-action="Index" class="btn-cancel">
+                            <i class="bi bi-x"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <span class="spinner"></span>
+                            <i class="bi bi-floppy-fill btn-icon"></i>
+                            Guardar cambios
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function syncEstado(val) {
+            document.getElementById('estadoHidden').value = val;
+        }
+
+        // Init: sincroniza el select oculto con el radio ya chequeado al cargar
+        (function () {
+            const checked = document.querySelector('input[name="_estadoRadio"]:checked');
+            if (checked) syncEstado(checked.value);
+        })();
+
+        document.getElementById('editForm').addEventListener('submit', function () {
+            document.getElementById('submitBtn').classList.add('loading');
+        });
+    </script>
+}

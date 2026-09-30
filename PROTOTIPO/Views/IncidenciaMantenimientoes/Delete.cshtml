@@ -1,0 +1,164 @@
+﻿@model PROTOTIPO.Models.IncidenciaMantenimiento
+
+@{
+    ViewData["Title"] = "Eliminar Incidencia";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-danger text-white">
+
+                    <h3 class="mb-0">
+                        Eliminar Incidencia
+                    </h3>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4">
+
+                    <!-- ALERTA -->
+                    <div class="alert alert-danger d-flex align-items-center mb-4">
+
+                        <div>
+                            <strong>Advertencia:</strong>
+                            Esta acción eliminará permanentemente la incidencia.
+                        </div>
+
+                    </div>
+
+                    <!-- DESCRIPCIÓN -->
+                    <div class="mb-4">
+
+                        <h5 class="fw-bold text-danger">
+                            Descripción
+                        </h5>
+
+                        <div class="border rounded p-3 bg-light">
+
+                            @Model.Descripcion
+
+                        </div>
+
+                    </div>
+
+                    <!-- DATOS -->
+                    <div class="row">
+
+                        <div class="col-md-6 mb-4">
+
+                            <h6 class="text-muted">
+                                Estado
+                            </h6>
+
+                            <p>
+
+                                @if (Model.Estado == "Pendiente")
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Pendiente
+                                    </span>
+                                }
+                                else if (Model.Estado == "En Proceso")
+                                {
+                                    <span class="badge bg-primary">
+                                        En Proceso
+                                    </span>
+                                }
+                                else if (Model.Estado == "Resuelta")
+                                {
+                                    <span class="badge bg-success">
+                                        Resuelta
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @Model.Estado
+                                    </span>
+                                }
+
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+
+                            <h6 class="text-muted">
+                                Fecha Solicitud
+                            </h6>
+
+                            <p class="fw-semibold">
+                                @(Model.FechaSolicitud.HasValue ? Model.FechaSolicitud.Value.ToString("dd/MM/yyyy") : "")
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-4">
+
+                            <h6 class="text-muted">
+                                Unidad Habitacional
+                            </h6>
+
+                            <p class="fw-semibold">
+                                @Model.IdUnidadNavigation.Numero
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+
+                            <h6 class="text-muted">
+                                Usuario
+                            </h6>
+
+                            <p class="fw-semibold">
+                                @Model.IdUsuarioNavigation.Nombre
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- FORM -->
+                    <form asp-action="Delete">
+
+                        <input type="hidden"
+                               asp-for="IdIncidencia" />
+
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Index"
+                                   class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-danger">
+                                Eliminar Incidencia
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

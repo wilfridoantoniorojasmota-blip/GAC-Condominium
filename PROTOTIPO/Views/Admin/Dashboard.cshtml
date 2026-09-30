@@ -1,0 +1,727 @@
+﻿@model PROTOTIPO.Models.ViewModel.DashboardVM
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var total = Model.EstadoUnidades.Ocupadas +
+                Model.EstadoUnidades.Disponibles +
+                Model.EstadoUnidades.EnProceso;
+
+    var ocupadasPct  = total == 0 ? 0 : (Model.EstadoUnidades.Ocupadas    * 100) / total;
+    var disponiblesPct = total == 0 ? 0 : (Model.EstadoUnidades.Disponibles * 100) / total;
+    var procesoPct   = total == 0 ? 0 : (Model.EstadoUnidades.EnProceso   * 100) / total;
+}
+
+<style>
+    :root {
+        --gac-blue:       #258cfb;
+        --gac-blue-dark:  #1a6fcf;
+        --gac-blue-light: #4dabf7;
+        --gac-blue-xlt:   #e8f4ff;
+        --gac-green:      #10b981;
+        --gac-yellow:     #f59e0b;
+        --gac-red:        #ef4444;
+        --gac-purple:     #8b5cf6;
+        --gac-muted:      #64748b;
+        --gac-border:     #e2e8f0;
+        --gac-text:       #0f172a;
+        --gac-surface:    #f7f9fc;
+        --gac-card:       #ffffff;
+        --gac-radius:     14px;
+        --gac-radius-sm:  8px;
+        --gac-shadow:     0 1px 3px rgba(0,0,0,.05), 0 4px 16px rgba(37,140,251,.07);
+        --gac-shadow-md:  0 4px 20px rgba(37,140,251,.13);
+    }
+
+    .adm-dash {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--gac-text);
+    }
+
+    /* ─── WELCOME BANNER ─── */
+    .welcome-banner {
+        background: linear-gradient(135deg, #0d1f3c 0%, #1a3a6b 40%, #1a6fcf 75%, #258cfb 100%);
+        border-radius: var(--gac-radius);
+        padding: 1.6rem 2rem;
+        margin-bottom: 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-banner::before {
+        content: '';
+        position: absolute;
+        top: -50px; right: -50px;
+        width: 220px; height: 220px;
+        background: rgba(255,255,255,.06);
+        border-radius: 50%;
+    }
+
+    .welcome-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -70px; right: 140px;
+        width: 160px; height: 160px;
+        background: rgba(255,255,255,.04);
+        border-radius: 50%;
+    }
+
+    .wb-left h4 {
+        color: #fff;
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin: 0 0 4px;
+        letter-spacing: -.3px;
+    }
+
+    .wb-left p {
+        color: rgba(255,255,255,.7);
+        font-size: .82rem;
+        margin: 0;
+    }
+
+    .wb-stats {
+        display: flex;
+        gap: 1.25rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .wb-stat {
+        text-align: center;
+        background: rgba(255,255,255,.1);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: var(--gac-radius-sm);
+        padding: .6rem 1.1rem;
+    }
+
+    .wb-stat .wbs-val {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1;
+    }
+
+    .wb-stat .wbs-lbl {
+        font-size: .65rem;
+        color: rgba(255,255,255,.65);
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-top: 3px;
+    }
+
+    /* ─── SECTION LABEL ─── */
+    .sec-label {
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--gac-muted);
+        margin-bottom: .75rem;
+    }
+
+    /* ─── KPI CARDS ─── */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 1.75rem;
+    }
+
+    .kpi-card {
+        background: var(--gac-card);
+        border-radius: var(--gac-radius);
+        border: 1px solid var(--gac-border);
+        box-shadow: var(--gac-shadow);
+        padding: 1.2rem 1.3rem;
+        position: relative;
+        overflow: hidden;
+        transition: box-shadow .2s, transform .2s;
+    }
+
+    .kpi-card:hover {
+        box-shadow: var(--gac-shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .kpi-card .kpi-accent {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 3px;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .kpi-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .kpi-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: var(--gac-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+    }
+
+    .ki-blue   { background: rgba(37,140,251,.1);  color: #258cfb; }
+    .ki-green  { background: rgba(16,185,129,.1);  color: #10b981; }
+    .ki-yellow { background: rgba(245,158,11,.1);  color: #f59e0b; }
+    .ki-purple { background: rgba(139,92,246,.1);  color: #8b5cf6; }
+
+    .kpi-trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: .68rem;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 20px;
+    }
+
+    .trend-up   { background: rgba(16,185,129,.1);  color: #059669; }
+    .trend-down { background: rgba(239,68,68,.1);   color: #dc2626; }
+    .trend-flat { background: rgba(100,116,139,.1); color: #64748b; }
+
+    .kpi-lbl {
+        font-size: .7rem;
+        color: var(--gac-muted);
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .kpi-val {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--gac-text);
+        letter-spacing: -.5px;
+        line-height: 1;
+    }
+
+    /* ─── PANEL CARD ─── */
+    .panel {
+        background: var(--gac-card);
+        border-radius: var(--gac-radius);
+        border: 1px solid var(--gac-border);
+        box-shadow: var(--gac-shadow);
+        overflow: hidden;
+    }
+
+    .panel-hdr {
+        padding: .9rem 1.4rem;
+        border-bottom: 1px solid var(--gac-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fafcff;
+    }
+
+    .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: .875rem;
+    }
+
+    .panel-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--gac-blue);
+    }
+
+    .panel-body {
+        padding: 1.1rem 1.4rem;
+    }
+
+    /* ─── ACTIVITY ─── */
+    .act-item {
+        display: flex;
+        gap: 12px;
+        padding: .7rem 0;
+        border-bottom: 1px solid var(--gac-border);
+    }
+
+    .act-item:last-child { border-bottom: none; }
+
+    .act-timeline {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+        padding-top: 4px;
+    }
+
+    .act-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: var(--gac-blue);
+        border: 2px solid var(--gac-blue-xlt);
+        flex-shrink: 0;
+    }
+
+    .act-line {
+        width: 1px;
+        flex: 1;
+        background: var(--gac-border);
+        margin-top: 4px;
+    }
+
+    .act-item:last-child .act-line { display: none; }
+
+    .act-text {
+        font-size: .82rem;
+        font-weight: 500;
+        color: var(--gac-text);
+        margin-bottom: 2px;
+    }
+
+    .act-time {
+        font-size: .72rem;
+        color: var(--gac-muted);
+    }
+
+    /* ─── DONUT LEGEND ─── */
+    .donut-legend {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 1.1rem;
+    }
+
+    .dl-item {
+        text-align: center;
+    }
+
+    .dl-val {
+        font-size: 1.15rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 3px;
+    }
+
+    .dl-lbl {
+        font-size: .68rem;
+        color: var(--gac-muted);
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .dl-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+
+    /* ─── BAR CHART PANEL ─── */
+    .bar-wrap {
+        position: relative;
+        height: 180px;
+    }
+
+    /* ─── TABLE ─── */
+    .dash-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .82rem;
+    }
+
+    .dash-table thead th {
+        padding: .55rem .9rem;
+        font-size: .68rem;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        color: var(--gac-muted);
+        font-weight: 600;
+        background: #fafcff;
+        border-bottom: 1px solid var(--gac-border);
+        white-space: nowrap;
+    }
+
+    .dash-table tbody tr {
+        border-bottom: 1px solid var(--gac-border);
+        transition: background .12s;
+    }
+
+    .dash-table tbody tr:last-child { border-bottom: none; }
+    .dash-table tbody tr:hover { background: var(--gac-surface); }
+
+    .dash-table tbody td {
+        padding: .65rem .9rem;
+        color: var(--gac-text);
+        vertical-align: middle;
+    }
+
+    .badge-tipo {
+        display: inline-block;
+        background: var(--gac-blue-xlt);
+        color: var(--gac-blue-dark);
+        border: 1px solid rgba(37,140,251,.2);
+        border-radius: 20px;
+        font-size: .68rem;
+        font-weight: 600;
+        padding: 2px 9px;
+    }
+
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border-radius: 20px;
+        font-size: .68rem;
+        font-weight: 600;
+        padding: 3px 9px;
+    }
+
+    .be-pagado    { background: rgba(16,185,129,.1);  color: #059669; border: 1px solid rgba(16,185,129,.2); }
+    .be-pendiente { background: rgba(245,158,11,.1);  color: #b45309; border: 1px solid rgba(245,158,11,.2); }
+    .be-vencido   { background: rgba(239,68,68,.1);   color: #dc2626; border: 1px solid rgba(239,68,68,.2);  }
+
+    .empty-cell {
+        text-align: center;
+        padding: 2rem;
+        color: var(--gac-muted);
+        font-size: .82rem;
+    }
+
+    /* ─── RESPONSIVE GRIDS ─── */
+    @@media (max-width: 991px) {
+        .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        .wb-stats { display: none; }
+    }
+
+    @@media (max-width: 575px) {
+        .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+</style>
+
+<div class="adm-dash">
+
+    <!-- ══ WELCOME BANNER ══ -->
+    <div class="welcome-banner mb-4">
+        <div class="wb-left" style="position:relative;z-index:1;">
+            <h4>Panel de Administración 🏢</h4>
+            <p>@DateTime.Now.ToString("dddd, dd 'de' MMMM 'de' yyyy") &nbsp;·&nbsp; Residencial Los Almendros</p>
+        </div>
+        <div class="wb-stats">
+            <div class="wb-stat">
+                <div class="wbs-val">@Model.TotalUnidades</div>
+                <div class="wbs-lbl">Unidades</div>
+            </div>
+            <div class="wb-stat">
+                <div class="wbs-val">@Model.ResidentesActivos</div>
+                <div class="wbs-lbl">Residentes</div>
+            </div>
+            <div class="wb-stat">
+                <div class="wbs-val">RD$@Model.IngresosMes.ToString("N0")</div>
+                <div class="wbs-lbl">Ingresos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ KPIs ══ -->
+    <p class="sec-label">Resumen general</p>
+    <div class="kpi-grid mb-4">
+
+        <div class="kpi-card">
+            <div class="kpi-accent" style="background:var(--gac-blue);"></div>
+            <div class="kpi-top">
+                <div class="kpi-icon ki-blue"><i class="fa-solid fa-building"></i></div>
+                <span class="kpi-trend trend-flat">― Sin cambios</span>
+            </div>
+            <div class="kpi-lbl">Total Unidades</div>
+            <div class="kpi-val">@Model.TotalUnidades</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-accent" style="background:var(--gac-green);"></div>
+            <div class="kpi-top">
+                <div class="kpi-icon ki-green"><i class="fa-solid fa-users"></i></div>
+                <span class="kpi-trend trend-up">↑ Activos</span>
+            </div>
+            <div class="kpi-lbl">Residentes Activos</div>
+            <div class="kpi-val">@Model.ResidentesActivos</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-accent" style="background:var(--gac-yellow);"></div>
+            <div class="kpi-top">
+                <div class="kpi-icon ki-yellow"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                <span class="kpi-trend trend-down">↓ Pendientes</span>
+            </div>
+            <div class="kpi-lbl">Cuotas Pendientes</div>
+            <div class="kpi-val">@Model.CuotasPendientes</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-accent" style="background:var(--gac-purple);"></div>
+            <div class="kpi-top">
+                <div class="kpi-icon ki-purple"><i class="fa-solid fa-sack-dollar"></i></div>
+                <span class="kpi-trend trend-up">↑ Este mes</span>
+            </div>
+            <div class="kpi-lbl">Ingresos del Mes</div>
+            <div class="kpi-val">RD$@Model.IngresosMes.ToString("N0")</div>
+        </div>
+
+    </div>
+
+    <!-- ══ FILA GRÁFICOS ══ -->
+    <p class="sec-label">Análisis y actividad</p>
+    <div class="row g-3 mb-4">
+
+        <!-- Actividad reciente -->
+        <div class="col-lg-4">
+            <div class="panel h-100">
+                <div class="panel-hdr">
+                    <div class="panel-title">
+                        <div class="panel-dot"></div>
+                        Actividad reciente
+                    </div>
+                </div>
+                <div class="panel-body">
+                    @if (Model.ActividadesRecientes?.Any() == true)
+                    {
+                        foreach (var act in Model.ActividadesRecientes)
+                        {
+                            <div class="act-item">
+                                <div class="act-timeline">
+                                    <div class="act-dot"></div>
+                                    <div class="act-line"></div>
+                                </div>
+                                <div>
+                                    <div class="act-text">@act.Descripcion</div>
+                                    <div class="act-time">@act.Fecha.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div style="text-align:center;padding:2rem 0;color:var(--gac-muted);">
+                            <i class="fa-regular fa-clock" style="font-size:1.8rem;opacity:.2;display:block;margin-bottom:8px;"></i>
+                            Sin actividad reciente
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Donut ocupación -->
+        <div class="col-lg-4">
+            <div class="panel h-100">
+                <div class="panel-hdr">
+                    <div class="panel-title">
+                        <div class="panel-dot" style="background:#8b5cf6;"></div>
+                        Ocupación de unidades
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div style="display:flex;justify-content:center;padding:.3rem 0;">
+                        <div style="width:170px;height:170px;position:relative;">
+                            <canvas id="unidadesChart"></canvas>
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                                <span style="font-size:1.5rem;font-weight:800;color:var(--gac-text);">@total</span>
+                                <span style="font-size:.65rem;color:var(--gac-muted);text-transform:uppercase;letter-spacing:.5px;">Total</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="donut-legend">
+                        <div class="dl-item">
+                            <div class="dl-val" style="color:#258cfb;">@ocupadasPct%</div>
+                            <div class="dl-lbl"><span class="dl-dot" style="background:#258cfb;"></span>Ocupadas</div>
+                        </div>
+                        <div class="dl-item">
+                            <div class="dl-val" style="color:#10b981;">@disponiblesPct%</div>
+                            <div class="dl-lbl"><span class="dl-dot" style="background:#10b981;"></span>Disponibles</div>
+                        </div>
+                        <div class="dl-item">
+                            <div class="dl-val" style="color:#f59e0b;">@procesoPct%</div>
+                            <div class="dl-lbl"><span class="dl-dot" style="background:#f59e0b;"></span>Proceso</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barras ingresos mensuales simulados -->
+        <div class="col-lg-4">
+            <div class="panel h-100">
+                <div class="panel-hdr">
+                    <div class="panel-title">
+                        <div class="panel-dot" style="background:#10b981;"></div>
+                        Ingresos últimos 6 meses
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="bar-wrap">
+                        <canvas id="ingresosChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══ PAGOS RECIENTES ══ -->
+    <p class="sec-label">Pagos recientes</p>
+    <div class="panel mb-2">
+        <div class="panel-hdr">
+            <div class="panel-title">
+                <div class="panel-dot" style="background:#f59e0b;"></div>
+                Últimos pagos registrados
+            </div>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Residente</th>
+                        <th>Unidad</th>
+                        <th>Tipo</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.PagosRecientes == null || !Model.PagosRecientes.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="empty-cell">
+                                <i class="fa-regular fa-credit-card" style="opacity:.2;font-size:1.5rem;display:block;margin-bottom:6px;"></i>
+                                No hay pagos recientes
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var p in Model.PagosRecientes)
+                        {
+                            var estadoClass = p.Estado?.ToLower() == "pagado"    ? "be-pagado"
+                                            : p.Estado?.ToLower() == "pendiente" ? "be-pendiente"
+                                            : "be-vencido";
+
+                            <tr>
+                                <td>
+                                    <div style="display:flex;align-items:center;gap:9px;">
+                                        <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#258cfb,#4dabf7);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0;">
+                                            @(p.Residente?.Length > 0 ? p.Residente[0].ToString().ToUpper() : "?")
+                                        </div>
+                                        <span style="font-weight:500;">@p.Residente @p.Apellido</span>
+                                         
+                                    </div>
+                                </td>
+                                <td style="color:var(--gac-muted);">@p.Unidad</td>
+                                <td><span class="badge-tipo">@p.TipoPago</span></td>
+                                <td style="font-weight:700;">RD$@(p.Monto?.ToString("N0") ?? "0")</td>
+                                <td style="color:var(--gac-muted);">@p.Fecha?.ToString("dd/MM/yyyy")</td>
+                                <td><span class="badge-estado @estadoClass">@p.Estado</span></td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // ── Donut ocupación
+    new Chart(document.getElementById('unidadesChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Ocupadas', 'Disponibles', 'En proceso'],
+            datasets: [{
+                data: [
+                    @Model.EstadoUnidades.Ocupadas,
+                    @Model.EstadoUnidades.Disponibles,
+                    @Model.EstadoUnidades.EnProceso
+                ],
+                backgroundColor: ['#258cfb', '#10b981', '#f59e0b'],
+                borderWidth: 0,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            cutout: '78%',
+            plugins: { legend: { display: false }, tooltip: { callbacks: {
+                label: ctx => ` ${ctx.label}: ${ctx.parsed}`
+            }}},
+            animation: { animateRotate: true, duration: 900 }
+        }
+    });
+
+    // ── Barras ingresos (últimos 6 meses con datos reales)
+    const today = new Date();
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const months = [];
+
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        months.push(monthNames[date.getMonth()]);
+    }
+
+    // Usar los ingresos reales del servidor
+    const values = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IngresosUltimos6Meses));
+
+    new Chart(document.getElementById('ingresosChart'), {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Ingresos',
+                data: values,
+                backgroundColor: (ctx) => {
+                    const last = ctx.dataIndex === values.length - 1;
+                    return last ? '#258cfb' : 'rgba(37,140,251,.18)';
+                },
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` RD$${ctx.parsed.y.toLocaleString()}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11 }, color: '#94a3b8' }
+                },
+                y: {
+                    grid: { color: '#f1f5f9', lineWidth: 1 },
+                    ticks: {
+                        font: { size: 10 }, color: '#94a3b8',
+                        callback: v => 'RD$' + (v/1000).toFixed(0) + 'k'
+                    },
+                    border: { display: false }
+                }
+            },
+            animation: { duration: 800 }
+        }
+    });
+</script>
+}

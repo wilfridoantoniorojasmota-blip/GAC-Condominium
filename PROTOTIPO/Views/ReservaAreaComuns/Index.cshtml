@@ -1,0 +1,161 @@
+﻿@model IEnumerable<PROTOTIPO.Models.ReservaAreaComun>
+
+@{
+    ViewData["Title"] = "Reservas de Áreas Comunes";
+}
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="row mb-4 align-items-center">
+
+        <div class="col-md-6">
+
+            <h2 class="fw-bold mb-1">
+                Reservas de Áreas Comunes
+            </h2>
+
+            <p class="text-muted mb-0">
+                Gestión y control de reservas
+            </p>
+
+        </div>
+
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+
+            <a asp-controller="ReservaAreaComuns"
+                   asp-action="Create"
+                   class="btn btn-primary">
+                + Nueva Reserva
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- TABLA -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Área Común</th>
+                            <th>Fecha</th>
+                            <th>Hora Inicio</th>
+                            <th>Hora Fin</th>
+                            <th>Estado</th>
+                            <th>Usuario</th>
+                            <th class="text-center">Acciones</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- AREA -->
+                                <td class="fw-semibold">
+                                    @item.IdAreaNavigation.Nombre
+                                </td>
+
+                                <!-- FECHA -->
+                                <td>
+                                    @item.Fecha
+                                </td>
+
+                                <!-- HORA INICIO -->
+                                <td>
+                                    @item.HoraInicio
+                                </td>
+
+                                <!-- HORA FIN -->
+                                <td>
+                                    @item.HoraFin
+                                </td>
+
+                                <!-- ESTADO -->
+                                <td>
+
+                                    @if (item.Estado == "Pendiente")
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Pendiente
+                                        </span>
+                                    }
+                                    else if (item.Estado == "Aprobada")
+                                    {
+                                        <span class="badge bg-success">
+                                            Aprobada
+                                        </span>
+                                    }
+                                    else if (item.Estado == "Rechazada")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Rechazada
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            @item.Estado
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <!-- USUARIO -->
+                                <td>
+                                    @item.IdUsuarioNavigation.Nombre
+                                </td>
+
+                                <!-- BOTONES -->
+                                <td class="text-center">
+
+                                    <a asp-controller="ReservaAreaComuns"
+                                           asp-action="Details"
+                                           asp-route-id="@item.IdReserva"
+                                           class="btn btn-sm btn-outline-primary">
+                                        Ver
+                                    </a>
+
+                                    <a asp-controller="ReservaAreaComuns"
+                                           asp-action="Edit"
+                                           asp-route-id="@item.IdReserva"
+                                           class="btn btn-sm btn-warning">
+                                        Editar
+                                    </a>
+
+                                    <a asp-controller="ReservaAreaComuns"
+                                           asp-action="Delete"
+                                           asp-route-id="@item.IdReserva"
+                                           class="btn btn-sm btn-danger">
+                                        Eliminar
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

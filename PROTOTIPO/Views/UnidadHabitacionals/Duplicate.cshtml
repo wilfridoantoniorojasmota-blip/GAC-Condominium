@@ -1,0 +1,1256 @@
+﻿@model PROTOTIPO.Models.ViewModel.UnidadDuplicarVM
+
+@{
+    ViewData["Title"] = "Duplicar Unidad Habitacional";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    /* ==============================
+           TOKENS
+        ============================== */
+    :root {
+        --ink: #0c1220;
+        --ink-soft: #3d4a5c;
+        --ink-muted: #7a8799;
+        --surface: #f5f7fa;
+        --surface-2: #ffffff;
+        --border: #e4e9f0;
+        --accent: #1a56e8;
+        --accent-2: #0fd4b0;
+        --accent-soft: #eff6ff;
+        --no-bg: #fff1f0;
+        --no-ink: #b91c1c;
+        --no-bdr: #fecaca;
+        --r-lg: 14px;
+        --r-xl: 20px;
+        --r-2xl: 28px;
+        --r-pill: 999px;
+        --shadow-sm: 0 1px 3px rgba(12,18,32,.06), 0 1px 2px rgba(12,18,32,.04);
+        --shadow-md: 0 4px 16px rgba(12,18,32,.08), 0 2px 6px rgba(12,18,32,.05);
+        --shadow-lg: 0 20px 48px rgba(12,18,32,.13), 0 6px 16px rgba(12,18,32,.07);
+        --tr: .2s cubic-bezier(.4,0,.2,1);
+        --font-d: 'Sora', system-ui, sans-serif;
+        --font-b: 'Inter', system-ui, sans-serif;
+    }
+
+    body {
+        font-family: var(--font-b);
+        background: var(--surface);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==============================
+           PAGE SHELL
+        ============================== */
+    .dup-shell {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 48px 20px 80px;
+    }
+
+    .dup-panel {
+        width: 100%;
+        max-width: 520px;
+    }
+
+    /* ── Back link ── */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: .82rem;
+        font-weight: 600;
+        color: var(--ink-muted);
+        text-decoration: none;
+        margin-bottom: 28px;
+        transition: color var(--tr);
+    }
+
+        .back-link:hover {
+            color: var(--ink);
+        }
+
+    /* ── Card ── */
+    .dup-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-2xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+
+    /* ── Card header ── */
+    .dup-card-head {
+        position: relative;
+        padding: 32px 36px 28px;
+        background: var(--ink);
+        overflow: hidden;
+    }
+        /* Dot grid texture */
+        .dup-card-head::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        /* Teal glow */
+        .dup-card-head::after {
+            content: '';
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(15,212,176,.2) 0%, transparent 70%);
+            right: -60px;
+            top: -60px;
+            pointer-events: none;
+        }
+
+    .dup-head-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .dup-head-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: #ffffff;
+        flex-shrink: 0;
+        backdrop-filter: blur(8px);
+    }
+
+    .dup-head-title {
+        font-family: var(--font-d);
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -.03em;
+        margin: 0;
+    }
+
+    .dup-head-sub {
+        font-size: .8rem;
+        color: rgba(255,255,255,.55);
+        margin: 3px 0 0;
+    }
+
+    /* ── Card body ── */
+    .dup-card-body {
+        padding: 32px 36px 36px;
+    }
+
+    /* ── Section label ── */
+    .field-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        margin-bottom: 10px;
+    }
+
+        .field-label i {
+            font-size: .82rem;
+            color: var(--accent);
+        }
+
+    /* ==============================
+           SPLIT UNIT NUMBER INPUT
+        ============================== */
+    .unit-builder {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-xl);
+        padding: 20px;
+        transition: border-color var(--tr), box-shadow var(--tr);
+    }
+
+        .unit-builder:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(26,86,232,.1);
+            background: var(--surface-2);
+        }
+
+    .unit-builder-row {
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    /* Segment: Letter */
+    .seg-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .seg-label {
+        font-size: .65rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+    }
+
+    /* Custom letter picker — replaces native select */
+    .letter-picker {
+        position: relative;
+        width: 80px;
+        flex-shrink: 0;
+    }
+
+    .letter-trigger {
+        width: 100%;
+        height: 64px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-lg);
+        background: var(--surface-2);
+        font-family: var(--font-d);
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: var(--accent);
+        text-align: center;
+        cursor: pointer;
+        transition: var(--tr);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        user-select: none;
+        position: relative;
+    }
+
+        .letter-trigger:hover,
+        .letter-trigger.open {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(26,86,232,.1);
+        }
+        /* tiny chevron */
+        .letter-trigger::after {
+            content: '';
+            position: absolute;
+            bottom: 7px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid var(--ink-muted);
+            transition: transform var(--tr);
+        }
+
+        .letter-trigger.open::after {
+            transform: translateX(-50%) rotate(180deg);
+        }
+
+    /* Dropdown panel */
+    .letter-dropdown {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 220px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-xl);
+        box-shadow: var(--shadow-lg);
+        padding: 10px;
+        display: none;
+        z-index: 100;
+    }
+
+        .letter-dropdown.open {
+            display: block;
+        }
+
+    .letter-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 4px;
+    }
+
+    .letter-opt {
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        font-family: var(--font-d);
+        font-size: .82rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        cursor: pointer;
+        transition: var(--tr);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .letter-opt:hover {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .letter-opt.selected {
+            background: var(--accent);
+            color: #ffffff;
+            border-radius: 8px;
+        }
+
+    /* Separator */
+    .seg-sep {
+        display: flex;
+        align-items: flex-end;
+        padding-bottom: 18px;
+        color: var(--ink-muted);
+        font-family: var(--font-d);
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 1;
+        user-select: none;
+        flex-shrink: 0;
+    }
+
+    /* Segment: Number */
+    .seg-number {
+        flex: 1;
+        height: 64px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r-lg);
+        background: var(--surface-2);
+        font-family: var(--font-d);
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--ink);
+        text-align: center;
+        outline: none;
+        transition: var(--tr);
+    }
+
+        .seg-number:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(26,86,232,.12);
+        }
+
+        .seg-number::placeholder {
+            color: var(--border);
+            font-size: 1.2rem;
+        }
+
+    /* Preview chip */
+    .unit-preview {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        gap: 10px;
+    }
+
+    .preview-label {
+        font-size: .75rem;
+        color: var(--ink-muted);
+        font-weight: 500;
+    }
+
+    .preview-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--accent-soft);
+        border: 1px solid #bfdbfe;
+        border-radius: var(--r-pill);
+        padding: 5px 16px;
+        font-family: var(--font-d);
+        font-size: .92rem;
+        font-weight: 800;
+        color: var(--accent);
+        letter-spacing: .02em;
+        transition: var(--tr);
+        min-width: 80px;
+        justify-content: center;
+    }
+
+        .preview-chip.empty {
+            color: var(--ink-muted);
+            background: var(--surface);
+            border-color: var(--border);
+            font-weight: 500;
+            font-size: .8rem;
+            font-family: var(--font-b);
+        }
+
+    /* Hidden real input */
+    #Numero {
+        display: none;
+    }
+
+    /* Validation */
+    .val-error {
+        font-size: .78rem;
+        color: var(--no-ink);
+        font-weight: 600;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .val-error.hidden {
+            display: none;
+        }
+
+    /* ==============================
+           IMAGE UPLOAD ZONE
+        ============================== */
+    .upload-zone {
+        border: 1.5px dashed var(--border);
+        border-radius: var(--r-xl);
+        padding: 28px 20px;
+        text-align: center;
+        background: var(--surface);
+        cursor: pointer;
+        transition: var(--tr);
+        position: relative;
+    }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .upload-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+    .upload-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: var(--ink-muted);
+        margin: 0 auto 12px;
+    }
+
+    .upload-zone:hover .upload-icon-wrap,
+    .upload-zone.dragover .upload-icon-wrap {
+        background: #fff;
+        border-color: #bfdbfe;
+        color: var(--accent);
+    }
+
+    .upload-title {
+        font-size: .875rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 4px;
+    }
+
+    .upload-sub {
+        font-size: .77rem;
+        color: var(--ink-muted);
+        line-height: 1.5;
+    }
+
+    /* Preview thumbnail after selection */
+    .img-preview-wrap {
+        display: none;
+        align-items: center;
+        gap: 14px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 12px 16px;
+        margin-top: 10px;
+    }
+
+        .img-preview-wrap.show {
+            display: flex;
+        }
+
+        .img-preview-wrap img {
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+    .img-preview-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .img-preview-name {
+        font-size: .83rem;
+        font-weight: 600;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .img-preview-size {
+        font-size: .75rem;
+        color: var(--ink-muted);
+        margin-top: 1px;
+    }
+
+    .img-remove {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--surface-2);
+        color: var(--ink-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--tr);
+        font-size: .8rem;
+        flex-shrink: 0;
+    }
+
+        .img-remove:hover {
+            background: var(--no-bg);
+            color: var(--no-ink);
+            border-color: var(--no-bdr);
+        }
+
+    /* ==============================
+           DIVIDER
+        ============================== */
+    .dup-divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 28px 0;
+    }
+
+    /* ==============================
+           ACTION BUTTONS
+        ============================== */
+    .action-row {
+        display: flex;
+        gap: 10px;
+        flex-direction: row-reverse;
+    }
+
+    .btn-submit {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 14px 24px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, var(--accent) 0%, #1647cc 100%);
+        color: #ffffff;
+        font-family: var(--font-b);
+        font-weight: 700;
+        font-size: .95rem;
+        cursor: pointer;
+        transition: var(--tr);
+        box-shadow: 0 4px 16px rgba(26,86,232,.3);
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(26,86,232,.38);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+    .btn-cancel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 20px;
+        border-radius: 14px;
+        border: 1.5px solid var(--border);
+        background: var(--surface);
+        color: var(--ink-soft);
+        font-family: var(--font-b);
+        font-weight: 600;
+        font-size: .9rem;
+        text-decoration: none;
+        transition: var(--tr);
+    }
+
+        .btn-cancel:hover {
+            background: var(--surface-2);
+            border-color: #c8d0dc;
+            color: var(--ink);
+        }
+
+    /* ==============================
+           VALIDATION SUMMARY
+        ============================== */
+    .val-summary {
+        background: var(--no-bg);
+        border: 1px solid var(--no-bdr);
+        border-radius: var(--r-lg);
+        padding: 14px 18px;
+        margin-bottom: 24px;
+        font-size: .855rem;
+        color: var(--no-ink);
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+        .val-summary i {
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .val-summary:empty {
+            display: none;
+        }
+
+    @@media (max-width: 480px) {
+        .dup-card-body {
+            padding: 24px 20px 28px;
+        }
+
+        .dup-card-head {
+            padding: 24px 20px;
+        }
+
+        .action-row {
+            flex-direction: column-reverse;
+        }
+    }
+</style>
+
+<div class="dup-shell">
+    <div class="dup-panel">
+
+        <!-- Back -->
+        <a asp-action="Index" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            Volver a unidades
+        </a>
+
+        <div class="dup-card">
+
+            <!-- Header -->
+            <div class="dup-card-head">
+                <div class="dup-head-inner">
+                    <div class="dup-head-icon">
+                        <i class="bi bi-copy"></i>
+                    </div>
+                    <div>
+                        <h1 class="dup-head-title">Duplicar Unidad</h1>
+                        <p class="dup-head-sub">Crea una copia exacta basada en una unidad existente</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="dup-card-body">
+
+                <form asp-action="Duplicate" method="post" enctype="multipart/form-data" novalidate id="dupForm">
+
+                    @Html.AntiForgeryToken()
+
+                    <!-- Validation summary -->
+                    <div asp-validation-summary="ModelOnly" class="val-summary">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div></div>
+                    </div>
+
+                    <input type="hidden" asp-for="IdOriginal" />
+
+                    <!-- Real hidden input that the model binds to -->
+                    <input type="text" asp-for="Numero" id="Numero" />
+
+                    <!-- ── NÚMERO DE UNIDAD ── -->
+                    <!-- ── NÚMERO DE UNIDAD ── -->
+                    <div class="mb-4">
+                        <div class="field-label">
+                            <i class="bi bi-hash"></i>
+                            Número de la nueva unidad
+                        </div>
+
+                        <div class="unit-builder">
+                            <div class="unit-builder-row">
+
+                                <!-- EDIFICIO -->
+                                <div class="seg-wrap">
+                                    <span class="seg-label">Edificio</span>
+
+                                    <div class="letter-picker">
+                                        <div class="letter-trigger" id="letterTrigger" tabindex="0">
+                                            <span id="letterDisplay">A</span>
+                                        </div>
+
+                                        <div class="letter-dropdown" id="letterDropdown">
+                                            <div class="letter-grid" id="letterGrid">
+                                                @foreach (var c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+                                                {
+                                                    <button type="button"
+                                                            class="letter-opt @(c == 'A' ? "selected" : "")"
+                                                            data-letter="@c">
+                                                        @c
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <select id="segLetter" style="display:none;">
+                                        @foreach (var c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+                                        {
+                                            <option value="@c">@c</option>
+                                        }
+                                    </select>
+                                </div>
+
+
+                                <div class="seg-sep">–</div>
+
+
+                                <!-- PISO -->
+                                <div class="seg-wrap">
+                                    <span class="seg-label">Piso</span>
+
+                                    <input type="number"
+                                           id="segFloor"
+                                           class="seg-number"
+                                           min="1"
+                                           max="99"
+                                           placeholder="03"
+                                           autocomplete="off" />
+                                </div>
+
+
+                                <div class="seg-sep">–</div>
+
+
+                                <!-- APARTAMENTO -->
+                                <div class="seg-wrap" style="flex:1;">
+                                    <span class="seg-label">Apartamento</span>
+
+                                    <input type="number"
+                                           id="segNumber"
+                                           class="seg-number"
+                                           min="1"
+                                           max="999"
+                                           placeholder="12"
+                                           autocomplete="off" />
+                                </div>
+
+                            </div>
+
+
+                            <!-- Vista previa -->
+                            <div class="unit-preview">
+                                <span class="preview-label">Vista previa:</span>
+
+                                <span class="preview-chip empty" id="previewChip">
+                                    Pendiente
+                                </span>
+                            </div>
+
+
+                            <!-- Valor real que se guarda en Numero -->
+                            <input asp-for="Numero" type="hidden" id="Numero" />
+
+                        </div>
+                    </div>
+
+                    <!-- ── IMAGEN ── -->
+                    <div class="mb-2">
+                        <div class="field-label">
+                            <i class="bi bi-image"></i>
+                            Imagen de la nueva unidad
+                            <span style="font-size:.65rem;color:var(--accent-2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">opcional</span>
+                        </div>
+
+                        <div class="upload-zone" id="uploadZone">
+                            <input asp-for="ImageFile"
+                                   type="file"
+                                   id="imageInput"
+                                   accept="image/png,image/jpeg,image/webp"
+                                   tabindex="0">
+                            <div class="upload-icon-wrap">
+                                <i class="bi bi-cloud-arrow-up-fill"></i>
+                            </div>
+                            <div class="upload-title">Arrastra una imagen o haz clic aquí</div>
+                            <div class="upload-sub">PNG, JPG o WEBP · Máximo 5 MB</div>
+                        </div>
+
+                        <!-- Thumbnail preview -->
+                        <div class="img-preview-wrap" id="imgPreview">
+                            <img id="imgThumb" src="#" alt="Preview">
+                            <div class="img-preview-info">
+                                <div class="img-preview-name" id="imgName">—</div>
+                                <div class="img-preview-size" id="imgSize">—</div>
+                            </div>
+                            <button type="button" class="img-remove" id="imgRemove" title="Quitar imagen">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+
+                        <span asp-validation-for="ImageFile" class="val-error mt-1"></span>
+                    </div>
+
+                    <hr class="dup-divider">
+
+                    <!-- Actions -->
+                    <div class="action-row">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="bi bi-copy"></i>
+                            Duplicar unidad
+                        </button>
+                        <a asp-action="Index" class="btn-cancel">
+                            <i class="bi bi-x"></i>
+                            Cancelar
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        (function () {
+
+            const letterSel = document.getElementById('segLetter');
+            const floorInp = document.getElementById('segFloor');
+            const numberInp = document.getElementById('segNumber');
+            const hiddenInp = document.getElementById('Numero');
+            const preview = document.getElementById('previewChip');
+
+            const numError = document.getElementById('numError');
+            const numErrTxt = document.getElementById('numErrorText');
+
+
+            /* ── Construir número completo ── */
+            function buildValue() {
+
+                const letter = letterSel.value;
+                const floor = floorInp.value.trim();
+                const number = numberInp.value.trim();
+
+
+                if (!floor || !number || parseInt(number, 10) < 1) {
+
+                    hiddenInp.value = '';
+
+                    preview.textContent = 'Pendiente';
+                    preview.classList.add('empty');
+
+                    return;
+                }
+
+
+                const val =
+                    `${letter}-${floor.padStart(2, '0')}-${number.padStart(2, '0')}`;
+
+
+                hiddenInp.value = val;
+
+                preview.textContent = val;
+                preview.classList.remove('empty');
+            }
+
+
+
+            /* ── Selector de letra ── */
+
+            const trigger = document.getElementById('letterTrigger');
+            const dropdown = document.getElementById('letterDropdown');
+            const display = document.getElementById('letterDisplay');
+            const opts = document.querySelectorAll('.letter-opt');
+
+
+            function openPicker() {
+
+                trigger.classList.add('open');
+                dropdown.classList.add('open');
+                trigger.setAttribute('aria-expanded', 'true');
+
+            }
+
+
+            function closePicker() {
+
+                trigger.classList.remove('open');
+                dropdown.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+
+            }
+
+
+
+            trigger.addEventListener('click', () => {
+
+                dropdown.classList.contains('open')
+                    ? closePicker()
+                    : openPicker();
+
+            });
+
+
+
+            opts.forEach(btn => {
+
+                btn.addEventListener('click', () => {
+
+                    const letter = btn.dataset.letter;
+
+
+                    letterSel.value = letter;
+
+                    display.textContent = letter;
+
+
+                    opts.forEach(b =>
+                        b.classList.remove('selected')
+                    );
+
+
+                    btn.classList.add('selected');
+
+
+                    closePicker();
+
+                    buildValue();
+
+                });
+
+            });
+
+
+
+            document.addEventListener('click', e => {
+
+                if (!trigger.contains(e.target) &&
+                    !dropdown.contains(e.target)) {
+
+                    closePicker();
+
+                }
+
+            });
+
+
+
+            /* ── Cambios en piso ── */
+
+            floorInp.addEventListener('input', function () {
+
+                this.value = this.value.replace(/\D/g, '');
+
+
+                if (parseInt(this.value, 10) > 99) {
+                    this.value = '99';
+                }
+
+
+                buildValue();
+
+            });
+
+
+
+            /* ── Cambios en apartamento ── */
+
+            numberInp.addEventListener('input', function () {
+
+                this.value = this.value.replace(/\D/g, '');
+
+
+                if (parseInt(this.value, 10) > 999) {
+                    this.value = '999';
+                }
+
+
+                buildValue();
+
+                clearError();
+
+            });
+
+
+
+            /* ── Cargar valor existente en Edit ── */
+
+            const existing = hiddenInp.value;
+
+
+            if (existing) {
+
+                const parts = existing.split('-');
+
+
+                if (parts.length === 3) {
+
+                    letterSel.value = parts[0];
+
+                    display.textContent = parts[0];
+
+
+                    floorInp.value = parseInt(parts[1], 10);
+
+
+                    numberInp.value = parseInt(parts[2], 10);
+
+
+                    buildValue();
+
+                }
+
+            }
+
+
+
+            /* ── Validación antes de guardar ── */
+
+            function clearError() {
+
+                if(numError)
+                    numError.classList.add('hidden');
+
+            }
+
+
+
+            const form = document.getElementById('dupForm');
+
+
+            if(form){
+
+                form.addEventListener('submit', function(e){
+
+
+                    const floor = parseInt(floorInp.value,10);
+                    const num = parseInt(numberInp.value,10);
+
+
+
+                    if(!floor || floor < 1){
+
+                        e.preventDefault();
+
+
+                        numError.classList.remove('hidden');
+
+                        numErrTxt.textContent =
+                            'Debes ingresar el piso de la unidad.';
+
+
+                        floorInp.focus();
+
+                        return;
+
+                    }
+
+
+
+                    if(!num || num < 1){
+
+                        e.preventDefault();
+
+
+                        numError.classList.remove('hidden');
+
+                        numErrTxt.textContent =
+                            'Debes ingresar el número del apartamento.';
+
+
+                        numberInp.focus();
+
+                        return;
+
+                    }
+
+
+
+                });
+
+            }
+
+
+
+            /* ── Imagen ── */
+
+            const zone = document.getElementById('uploadZone');
+            const imageInp = document.getElementById('imageInput');
+            const imgPreview = document.getElementById('imgPreview');
+            const imgThumb = document.getElementById('imgThumb');
+            const imgName = document.getElementById('imgName');
+            const imgSize = document.getElementById('imgSize');
+            const imgRemove = document.getElementById('imgRemove');
+
+
+
+            if(zone){
+
+                zone.addEventListener('dragover', e => {
+
+                    e.preventDefault();
+
+                    zone.classList.add('dragover');
+
+                });
+
+
+
+                zone.addEventListener('dragleave', () => {
+
+                    zone.classList.remove('dragover');
+
+                });
+
+
+
+                zone.addEventListener('drop', e => {
+
+                    e.preventDefault();
+
+                    zone.classList.remove('dragover');
+
+
+                    if(e.dataTransfer.files.length){
+
+                        imageInp.files = e.dataTransfer.files;
+
+                        handleFile(e.dataTransfer.files[0]);
+
+                    }
+
+                });
+
+
+            }
+
+
+
+            if(imageInp){
+
+                imageInp.addEventListener('change',function(){
+
+                    if(this.files.length)
+                        handleFile(this.files[0]);
+
+                });
+
+            }
+
+
+
+            function handleFile(file){
+
+                const reader = new FileReader();
+
+
+                reader.onload = e => {
+
+                    imgThumb.src = e.target.result;
+
+                };
+
+
+                reader.readAsDataURL(file);
+
+
+                imgName.textContent = file.name;
+
+                imgSize.textContent = formatBytes(file.size);
+
+
+                imgPreview.classList.add('show');
+
+                zone.style.display='none';
+
+            }
+
+
+
+            if(imgRemove){
+
+                imgRemove.addEventListener('click',function(){
+
+                    imageInp.value='';
+
+                    imgPreview.classList.remove('show');
+
+                    zone.style.display='';
+
+                    imgThumb.src='#';
+
+                });
+
+            }
+
+
+
+            function formatBytes(bytes){
+
+                if(bytes < 1024)
+                    return bytes+' B';
+
+
+                if(bytes < 1048576)
+                    return (bytes/1024).toFixed(1)+' KB';
+
+
+                return (bytes/1048576).toFixed(1)+' MB';
+
+            }
+
+
+        })();
+
+    </script>
+}

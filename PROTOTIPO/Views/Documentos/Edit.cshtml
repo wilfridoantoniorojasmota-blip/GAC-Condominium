@@ -1,0 +1,389 @@
+﻿@model PROTOTIPO.Models.Documento
+
+@{
+    ViewData["Title"] = "Editar Documento";
+}
+
+<div class="mnt-page">
+    <div class="container-fluid py-4 px-3 px-md-4" style="max-width: 800px;">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h3><i class="bi bi-pencil-square me-2"></i>Editar Documento</h3>
+                <p>Modifica los datos del documento o reemplaza el archivo actual</p>
+            </div>
+
+            <a asp-action="Index" class="btn-gac btn-gac-secondary-header">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+            </a>
+        </div>
+
+        <!-- FORM CONTAINER -->
+        <div class="form-container">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data" class="modern-form">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="IdDocumento" />
+
+                <!-- Nombre -->
+                <div class="form-group mb-4">
+                    <label asp-for="Nombre" class="form-label-gac">Nombre del documento</label>
+                    <input asp-for="Nombre" class="form-control-gac" placeholder="Ej: Contrato de alquiler" />
+                    <span asp-validation-for="Nombre" class="text-danger-gac"></span>
+                </div>
+
+                <!-- Tipo -->
+                <div class="form-group mb-4">
+                    <label asp-for="Tipo" class="form-label-gac">Tipo de documento</label>
+                    <select asp-for="Tipo" class="form-select-gac">
+                        <option value="">Seleccionar tipo</option>
+                        <option value="Contrato">Contrato</option>
+                        <option value="Reglamento">Reglamento</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Financiero">Financiero</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                    </select>
+                    <span asp-validation-for="Tipo" class="text-danger-gac"></span>
+                </div>
+
+                <!-- Relación: Condominio y Unidad -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="IdCondominio" class="form-label-gac">Condominio</label>
+                        <select asp-for="IdCondominio" class="form-select-gac" asp-items="ViewBag.IdCondominio">
+                            <option value="">Seleccionar condominio</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="IdUnidad" class="form-label-gac">Unidad Habitacional</label>
+                        <select asp-for="IdUnidad" class="form-select-gac" asp-items="ViewBag.IdUnidad">
+                            <option value="">Seleccionar unidad</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Archivo Actual -->
+                @if (!string.IsNullOrEmpty(Model.Archivo))
+                {
+                    <div class="form-group mb-4">
+                        <label class="form-label-gac">Archivo actual</label>
+                        <div class="current-file-chip">
+                            <div class="file-icon"><i class="bi bi-file-earmark-check"></i></div>
+                            <div class="file-details">
+                                <span class="file-name">Documento almacenado</span>
+                            </div>
+                            <a href="@Model.Archivo" target="_blank" class="btn-tbl btn-tbl-info" style="margin-left: auto;">
+                                <i class="bi bi-eye"></i> Ver archivo
+                            </a>
+                        </div>
+                    </div>
+                }
+
+                <!-- Reemplazar Archivo -->
+                <div class="form-group mb-5">
+                    <label class="form-label-gac">Reemplazar archivo <small class="text-muted">(Opcional)</small></label>
+                    <div class="upload-zone">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                        <p class="upload-title">Arrastra el nuevo archivo aquí o haz clic para buscar</p>
+                        <p class="upload-subtitle">Deja vacío para conservar el documento actual (PDF, Word o imágenes)</p>
+                        <input type="file" name="archivoSubido" id="archivoSubido" class="upload-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                    </div>
+                </div>
+
+                <!-- ACCIONES -->
+                <div class="form-actions">
+                    <a asp-action="Index" class="btn-gac btn-gac-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver
+                    </a>
+
+                    <button type="submit" class="btn-gac btn-gac-primary">
+                        <i class="bi bi-save"></i>
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .mnt-page {
+        background: var(--gac-surface);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(15,22,35,.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.6);
+            margin: 0;
+            font-size: .875rem;
+        }
+
+    /* ── BUTTONS ── */
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.4rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        cursor: pointer;
+    }
+
+    .btn-gac-primary {
+        background: var(--gac-primary);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-gac-primary:hover {
+            background: var(--gac-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,140,251,.35);
+        }
+
+    .btn-gac-secondary-header {
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+    }
+
+        .btn-gac-secondary-header:hover {
+            background: rgba(255,255,255,.2);
+            color: #fff;
+        }
+
+    .btn-gac-secondary {
+        background: var(--gac-surface);
+        border: 1.5px solid var(--gac-border);
+        color: #64748b;
+    }
+
+        .btn-gac-secondary:hover {
+            background: #eef1f6;
+            color: var(--gac-navy);
+        }
+
+    /* ── FORM CONTAINER ── */
+    .form-container {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(15,22,35,.03);
+    }
+
+    /* ── FORM CONTROLS ── */
+    .form-label-gac {
+        display: block;
+        font-size: .85rem;
+        font-weight: 600;
+        color: var(--gac-navy);
+        margin-bottom: .5rem;
+    }
+
+    .form-control-gac,
+    .form-select-gac {
+        width: 100%;
+        border-radius: 10px;
+        border: 1.5px solid var(--gac-border);
+        padding: .75rem 1rem;
+        font-size: .9rem;
+        color: var(--gac-navy);
+        background-color: #fff;
+        transition: all .15s ease;
+        outline: none;
+    }
+
+        .form-control-gac:focus,
+        .form-select-gac:focus {
+            border-color: var(--gac-primary);
+            box-shadow: 0 0 0 4px rgba(37,140,251,.1);
+        }
+
+    .text-danger-gac {
+        display: block;
+        font-size: .78rem;
+        color: var(--gac-danger);
+        margin-top: .4rem;
+        font-weight: 500;
+    }
+
+    /* ── CURRENT FILE CHIP ── */
+    .current-file-chip {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: .85rem 1.2rem;
+        background: #fafbfe;
+        border: 1.5px solid var(--gac-border);
+        border-radius: 12px;
+        margin-top: .4rem;
+    }
+
+        .current-file-chip .file-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(34,197,94,.1);
+            color: var(--gac-success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .current-file-chip .file-name {
+            font-weight: 600;
+            font-size: .85rem;
+            color: var(--gac-navy);
+        }
+
+    .btn-tbl {
+        border-radius: 8px;
+        font-size: .78rem;
+        font-weight: 700;
+        padding: .4rem .75rem;
+        transition: all .15s ease;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-width: 34px;
+        line-height: 1;
+    }
+
+    .btn-tbl-info {
+        border: 1.5px solid var(--gac-primary);
+        color: var(--gac-primary);
+        background: rgba(37,140,251,.1);
+    }
+
+        .btn-tbl-info:hover {
+            background: var(--gac-primary);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(37,140,251,.35);
+        }
+
+    /* ── FILE UPLOAD ZONE ── */
+    .upload-zone {
+        position: relative;
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        background: #fafbfe;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+        .upload-zone:hover {
+            border-color: var(--gac-primary);
+            background: rgba(37,140,251,.02);
+        }
+
+        .upload-zone i {
+            font-size: 2.4rem;
+            color: var(--gac-primary);
+            margin-bottom: .75rem;
+            display: block;
+            transition: transform .2s ease;
+        }
+
+        .upload-zone:hover i {
+            transform: translateY(-3px);
+        }
+
+    .upload-title {
+        font-weight: 600;
+        color: var(--gac-navy);
+        margin-bottom: .25rem;
+        font-size: .9rem;
+    }
+
+    .upload-subtitle {
+        color: #64748b;
+        font-size: .78rem;
+        margin: 0;
+    }
+
+    .upload-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* ── ACTIONS ── */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--gac-border);
+        padding-top: 1.75rem;
+    }
+</style>
+
+<script>
+    document.getElementById('archivoSubido').addEventListener('change', function(e) {
+        var fileName = e.target.files[0] ? e.target.files[0].name : "Arrastra el nuevo archivo aquí o haz clic para buscar";
+        var titleEl = this.closest('.upload-zone').querySelector('.upload-title');
+        titleEl.textContent = fileName;
+
+        if (e.target.files[0]) {
+            this.closest('.upload-zone').style.borderColor = 'var(--gac-success)';
+            this.closest('.upload-zone').style.background = 'rgba(34,197,94,.02)';
+            this.closest('.upload-zone').querySelector('i').style.color = 'var(--gac-success)';
+        } else {
+            this.closest('.upload-zone').style.borderColor = '#cbd5e1';
+            this.closest('.upload-zone').style.background = '#fafbfe';
+            this.closest('.upload-zone').querySelector('i').style.color = 'var(--gac-primary)';
+        }
+    });
+</script>

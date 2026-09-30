@@ -1,0 +1,1252 @@
+﻿@model List<PROTOTIPO.Models.SolicitudIngreso>
+
+@{
+    ViewData["Title"] = "Solicitudes de Ingreso";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var totalSolicitudes = ViewBag.TotalSolicitudes;
+    var pendientes = ViewBag.Pendientes;
+    var aprobadas = ViewBag.Aprobadas;
+    var rechazadas = ViewBag.Rechazadas;
+
+    var currentEstado = Context.Request.Query["estado"].ToString();
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+    :root {
+        --gac-primary: #258cfb;
+        --gac-primary-dark: #1a6fd1;
+        --gac-navy: #0f1623;
+        --gac-success: #22c55e;
+        --gac-warning: #f59e0b;
+        --gac-danger: #ef4444;
+        --gac-border: #eef1f6;
+        --gac-surface: #f4f6fb;
+    }
+
+    .solicitudes-page {
+        background: var(--gac-surface);
+        min-height: 100%;
+        padding-bottom: 2rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(15, 22, 35, .15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,.65);
+            margin: .25rem 0 0;
+            font-size: .875rem;
+        }
+
+    .btn-gac {
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .55rem 1.1rem;
+        font-size: .875rem;
+        transition: all .2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-gac-outline {
+        border: 1.5px solid rgba(255,255,255,.3);
+        background: rgba(255,255,255,.08);
+        color: #fff;
+    }
+
+        .btn-gac-outline:hover {
+            background: rgba(255,255,255,.15);
+            color: #fff;
+            border-color: rgba(255,255,255,.5);
+        }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.4rem;
+        height: 100%;
+        transition: transform .2s ease, box-shadow .2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gac-primary);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .stat-card.stat-warning::after {
+            background: var(--gac-warning);
+        }
+
+        .stat-card.stat-success::after {
+            background: var(--gac-success);
+        }
+
+        .stat-card.stat-danger::after {
+            background: var(--gac-danger);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15,22,35,.06);
+        }
+
+    .sc-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        margin-bottom: .85rem;
+    }
+
+    .sc-blue {
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+    }
+
+    .sc-green {
+        background: rgba(34,197,94,.1);
+        color: #16a34a;
+    }
+
+    .sc-amber {
+        background: rgba(245,158,11,.1);
+        color: #d97706;
+    }
+
+    .sc-red {
+        background: rgba(239,68,68,.1);
+        color: #dc2626;
+    }
+
+    .sc-label {
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .sc-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--gac-navy);
+        line-height: 1.1;
+    }
+
+    .filter-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-pills {
+        display: flex;
+        gap: .5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-pill {
+        border: 1.5px solid #e2e8f0;
+        background: #fff;
+        color: #64748b;
+        border-radius: 50px;
+        padding: .5rem .9rem;
+        font-size: .82rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        transition: all .2s ease;
+        white-space: nowrap;
+    }
+
+        .filter-pill:hover {
+            border-color: var(--gac-primary);
+            color: var(--gac-primary);
+            background: rgba(37,140,251,.06);
+        }
+
+        .filter-pill.active {
+            background: var(--gac-primary);
+            border-color: var(--gac-primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37,140,251,.25);
+        }
+
+        .filter-pill.warning.active {
+            background: var(--gac-warning);
+            border-color: var(--gac-warning);
+            box-shadow: 0 4px 12px rgba(245,158,11,.25);
+        }
+
+        .filter-pill.success.active {
+            background: var(--gac-success);
+            border-color: var(--gac-success);
+            box-shadow: 0 4px 12px rgba(34,197,94,.25);
+        }
+
+        .filter-pill.danger.active {
+            background: var(--gac-danger);
+            border-color: var(--gac-danger);
+            box-shadow: 0 4px 12px rgba(239,68,68,.25);
+        }
+
+    .search-box {
+        position: relative;
+        min-width: 260px;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: .9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            font-size: .9rem;
+            padding: .55rem .85rem .55rem 2.35rem;
+            width: 100%;
+            outline: none;
+        }
+
+            .search-box input:focus {
+                border-color: var(--gac-primary);
+                box-shadow: 0 0 0 3px rgba(37,140,251,.12);
+            }
+
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--gac-border);
+        overflow: hidden;
+    }
+
+        .table-card table {
+            margin-bottom: 0;
+        }
+
+        .table-card thead {
+            background: linear-gradient(135deg, var(--gac-navy) 0%, #1a2436 100%);
+        }
+
+            .table-card thead th {
+                font-size: .75rem;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: #000; /* cabeceras en negro para legibilidad */
+                font-weight: 700;
+                padding: 1rem 1.1rem;
+                border: none;
+                white-space: nowrap;
+            }
+
+        .table-card tbody td {
+            padding: .95rem 1.1rem;
+            color: #334155;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f4f9;
+            font-size: .9rem;
+        }
+
+        .table-card tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-card tbody tr {
+            transition: background .15s ease;
+        }
+
+            .table-card tbody tr:hover {
+                background: #fafcff;
+            }
+
+    .solicitante-cell {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+    }
+
+    .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(37,140,251,.1);
+        color: var(--gac-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .solicitante-name {
+        font-weight: 700;
+        color: var(--gac-navy);
+        line-height: 1.2;
+    }
+
+    .solicitante-type {
+        font-size: .78rem;
+        color: #94a3b8;
+        margin-top: .15rem;
+    }
+
+    .contact-cell,
+    .date-cell {
+        color: #64748b;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .unit-badge {
+        font-size: .75rem;
+        font-weight: 700;
+        padding: .35rem .8rem;
+        border-radius: 50px;
+        background: rgba(15,22,35,.06);
+        color: var(--gac-navy);
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .badge-estado {
+        font-weight: 700;
+        font-size: .75rem;
+        padding: .38rem .85rem;
+        border-radius: 50px;
+        letter-spacing: .02em;
+        white-space: nowrap;
+        text-transform: capitalize;
+    }
+
+    .badge-pendiente {
+        background: rgba(245,158,11,.12);
+        color: #b45309;
+    }
+
+    .badge-aprobada {
+        background: rgba(34,197,94,.12);
+        color: #15803d;
+    }
+
+    .badge-rechazada {
+        background: rgba(239,68,68,.12);
+        color: #b91c1c;
+    }
+
+    .badge-otro {
+        background: rgba(15,22,35,.08);
+        color: var(--gac-navy);
+    }
+
+    .btn-tbl {
+        border-radius: 8px;
+        font-size: .8rem;
+        font-weight: 600;
+        padding: .38rem .75rem;
+        transition: all .15s ease;
+        white-space: nowrap;
+    }
+
+    .btn-tbl-primary {
+        border: 1.5px solid var(--gac-primary);
+        color: var(--gac-primary);
+        background: transparent;
+    }
+
+        .btn-tbl-primary:hover {
+            background: var(--gac-primary);
+            color: #fff;
+        }
+
+    .btn-tbl-success {
+        border: 1.5px solid var(--gac-success);
+        color: #16a34a;
+        background: transparent;
+    }
+
+        .btn-tbl-success:hover {
+            background: var(--gac-success);
+            color: #fff;
+        }
+
+    .btn-tbl-danger {
+        border: 1.5px solid var(--gac-danger);
+        color: #dc2626;
+        background: transparent;
+    }
+
+        .btn-tbl-danger:hover {
+            background: var(--gac-danger);
+            color: #fff;
+        }
+
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: .75rem;
+            opacity: .5;
+        }
+
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+    }
+
+    .modal-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+        .modal-icon.success {
+            background: rgba(34,197,94,.12);
+            color: #16a34a;
+        }
+
+        .modal-icon.danger {
+            background: rgba(239,68,68,.12);
+            color: #dc2626;
+        }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 1.4rem;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+
+        .hide-mobile {
+            display: none;
+        }
+    }
+</style>
+
+
+
+
+<div class="solicitudes-page">
+    <div class="container py-4">
+
+        @Html.AntiForgeryToken()
+
+        <!-- ============================================
+             HEADER
+        ============================================= -->
+        <div class="page-header">
+            <div>
+                <h3>Solicitudes de Ingreso</h3>
+                <p>
+                    Gestión y seguimiento de solicitudes de acceso al condominio
+                </p>
+            </div>
+
+            <div>
+                <a href="?" class="btn btn-gac btn-gac-outline">
+                    <i class="bi bi-arrow-clockwise me-2"></i>
+                    Actualizar vista
+                </a>
+            </div>
+        </div>
+
+
+        <!-- ============================================
+             ESTADÍSTICAS GLOBALES
+        ============================================= -->
+        <div class="row g-3 mb-4">
+
+            <!-- TOTAL -->
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="sc-icon sc-blue">
+                        <i class="bi bi-clipboard2-data-fill"></i>
+                    </div>
+
+                    <div class="sc-label">
+                        Total solicitudes
+                    </div>
+
+                    <div class="sc-value">
+                        @totalSolicitudes
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- PENDIENTES -->
+            <div class="col-6 col-lg-3">
+                <div class="stat-card stat-warning">
+
+                    <div class="sc-icon sc-amber">
+                        <i class="bi bi-clock-fill"></i>
+                    </div>
+
+                    <div class="sc-label">
+                        Pendientes
+                    </div>
+
+                    <div class="sc-value">
+                        @pendientes
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- APROBADAS -->
+            <div class="col-6 col-lg-3">
+                <div class="stat-card stat-success">
+
+                    <div class="sc-icon sc-green">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+
+                    <div class="sc-label">
+                        Aprobadas
+                    </div>
+
+                    <div class="sc-value">
+                        @aprobadas
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- RECHAZADAS -->
+            <div class="col-6 col-lg-3">
+                <div class="stat-card stat-danger">
+
+                    <div class="sc-icon sc-red">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </div>
+
+                    <div class="sc-label">
+                        Rechazadas
+                    </div>
+
+                    <div class="sc-value">
+                        @rechazadas
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ============================================
+             FILTROS
+        ============================================= -->
+        <div class="filter-card">
+
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+
+                <div class="filter-pills">
+
+                    <!-- TODAS -->
+                    <a href="?"
+                       class="filter-pill @(string.IsNullOrEmpty(currentEstado) ? "active" : "")">
+
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+
+                        Todas
+
+                        <span>
+                            @totalSolicitudes
+                        </span>
+
+                    </a>
+
+
+                    <!-- PENDIENTES -->
+                    <a href="?estado=pendiente"
+                       class="filter-pill warning @(currentEstado == "pendiente" ? "active" : "")">
+
+                        <i class="bi bi-clock-fill"></i>
+
+                        Pendientes
+
+                        <span>
+                            @pendientes
+                        </span>
+
+                    </a>
+
+
+                    <!-- APROBADAS -->
+                    <a href="?estado=aprobada"
+                       class="filter-pill success @(currentEstado == "aprobada" ? "active" : "")">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Aprobadas
+
+                        <span>
+                            @aprobadas
+                        </span>
+
+                    </a>
+
+
+                    <!-- RECHAZADAS -->
+                    <a href="?estado=rechazada"
+                       class="filter-pill danger @(currentEstado == "rechazada" ? "active" : "")">
+
+                        <i class="bi bi-x-circle-fill"></i>
+
+                        Rechazadas
+
+                        <span>
+                            @rechazadas
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <!-- BUSCADOR -->
+                <div class="search-box">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="searchInput"
+                           placeholder="Buscar solicitante..."
+                           autocomplete="off">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================================
+             TABLA
+        ============================================= -->
+        <div class="table-card">
+
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+
+                    <i class="bi bi-inbox d-block"></i>
+
+                    No hay solicitudes registradas con los filtros actuales.
+
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table align-middle"
+                           id="solicitudesTable">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Solicitante
+                                </th>
+
+                                <th class="hide-mobile">
+                                    Contacto
+                                </th>
+
+                                <th class="hide-mobile">
+                                    Unidad
+                                </th>
+
+                                <th>
+                                    Estado
+                                </th>
+
+                                <th class="hide-mobile">
+                                    Fecha
+                                </th>
+
+                                <th class="text-end">
+                                    Acciones
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach (var s in Model)
+                            {
+                                var estado = (s.Estado ?? "").ToLower();
+
+                                var initials = string.Join(
+                                    "",
+                                    (s.NombreSolicitante ?? "?")
+                                        .Split(
+                                            ' ',
+                                            StringSplitOptions.RemoveEmptyEntries
+                                        )
+                                        .Take(2)
+                                        .Select(w => w[0].ToString().ToUpper())
+                                );
+
+
+                                <tr class="solicitud-row"
+                                    data-search="@($"{s.NombreSolicitante} {s.Contacto} {s.TipoSolicitud} {s.Estado}".ToLower())">
+
+
+                                    <!-- SOLICITANTE -->
+                                    <td>
+
+                                        <div class="solicitante-cell">
+
+                                            <div class="avatar">
+                                                @initials
+                                            </div>
+
+                                            <div>
+
+                                                <div class="solicitante-name">
+                                                    @s.NombreSolicitante
+                                                </div>
+
+                                                <div class="solicitante-type">
+                                                    @s.TipoSolicitud
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- CONTACTO -->
+                                    <td class="hide-mobile">
+
+                                        <span class="contact-cell">
+
+                                            <i class="bi bi-telephone"></i>
+
+                                            @s.Contacto
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- UNIDAD -->
+                                    <td class="hide-mobile">
+
+                                        @if (s.IdUnidadNavigation != null)
+                                        {
+                                            <span class="unit-badge">
+
+                                                <i class="bi bi-door-open"></i>
+
+                                                @s.IdUnidadNavigation.Numero
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                No asignada
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ESTADO -->
+                                    <td>
+
+                                        @if (estado == "pendiente")
+                                        {
+                                            <span class="badge-estado badge-pendiente">
+                                                Pendiente
+                                            </span>
+                                        }
+                                        else if (estado == "aprobada" ||
+                                                 estado == "procesada")
+                                        {
+                                            <span class="badge-estado badge-aprobada">
+                                                Aprobada
+                                            </span>
+                                        }
+                                        else if (estado == "rechazada")
+                                        {
+                                            <span class="badge-estado badge-rechazada">
+                                                Rechazada
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-estado badge-otro">
+                                                @s.Estado
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- FECHA -->
+                                    <td class="hide-mobile">
+
+                                        <span class="date-cell">
+
+                                            <i class="bi bi-calendar3"></i>
+
+                                            @s.Fecha?.ToString("dd/MM/yyyy HH:mm")
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- ACCIONES -->
+                                    <td>
+
+                                        <div class="d-flex gap-1 justify-content-end flex-wrap">
+
+
+                                            <!-- VER -->
+                                            <a asp-action="Details"
+                                               asp-route-id="@s.IdSolicitud"
+                                               class="btn btn-tbl btn-tbl-primary">
+
+                                                <i class="bi bi-eye me-1"></i>
+
+                                                Ver
+
+                                            </a>
+
+
+                                            <!-- ELIMINAR -->
+                                            <button type="button"
+                                                    class="btn btn-tbl btn-tbl-danger js-delete"
+                                                    data-id="@s.IdSolicitud">
+
+                                                <i class="bi bi-trash me-1"></i>
+
+                                                Eliminar
+
+                                            </button>
+
+
+                                            <!-- ACCIONES PARA PENDIENTES -->
+                                            @if (estado == "pendiente")
+                                            {
+                                                <!-- APROBAR -->
+                                                <button type="button"
+                                                        class="btn btn-tbl btn-tbl-success js-action"
+                                                        data-id="@s.IdSolicitud"
+                                                        data-name="@s.NombreSolicitante"
+                                                        data-action="approve">
+
+                                                    <i class="bi bi-check-lg me-1"></i>
+
+                                                    Aprobar
+
+                                                </button>
+
+
+                                                <!-- RECHAZAR -->
+                                                <button type="button"
+                                                        class="btn btn-tbl btn-tbl-danger js-action"
+                                                        data-id="@s.IdSolicitud"
+                                                        data-name="@s.NombreSolicitante"
+                                                        data-action="reject">
+
+                                                    <i class="bi bi-x-lg me-1"></i>
+
+                                                    Rechazar
+
+                                                </button>
+                                            }
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+
+                    <!-- ============================================
+                         PAGINACIÓN
+                    ============================================= -->
+                    @if (ViewBag.TotalPages > 1)
+                    {
+                        int currentPage = ViewBag.CurrentPage;
+                        int totalPages = ViewBag.TotalPages;
+
+                        string estadoActual = ViewBag.EstadoActual;
+
+
+                        <nav aria-label="Navegación de solicitudes"
+                             class="d-flex justify-content-center mt-4">
+
+                            <ul class="pagination pagination-md">
+
+
+                                <!-- ANTERIOR -->
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+
+                                    <a class="page-link"
+                                       href="@Url.Action("Index", new
+                                       {
+                                           estado = estadoActual,
+                                           page = currentPage - 1
+                                       })"
+                                       aria-label="Anterior">
+
+                                        <span aria-hidden="true">
+                                            &laquo;
+                                        </span>
+
+                                    </a>
+
+                                </li>
+
+
+                                <!-- NÚMEROS -->
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+
+                                        <a class="page-link"
+                                           href="@Url.Action("Index", new
+                                           {
+                                               estado = estadoActual,
+                                               page = i
+                                           })">
+
+                                            @i
+
+                                        </a>
+
+                                    </li>
+                                }
+
+
+                                <!-- SIGUIENTE -->
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+
+                                    <a class="page-link"
+                                       href="@Url.Action("Index", new
+                                       {
+                                           estado = estadoActual,
+                                           page = currentPage + 1
+                                       })"
+                                       aria-label="Siguiente">
+
+                                        <span aria-hidden="true">
+                                            &raquo;
+                                        </span>
+
+                                    </a>
+
+                                </li>
+
+                            </ul>
+
+                        </nav>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ============================================
+     MODAL DE CONFIRMACIÓN
+============================================= -->
+<div class="modal fade"
+     id="confirmModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content shadow">
+
+            <div class="modal-body p-4">
+
+                <div id="modalIcon"
+                     class="modal-icon">
+                </div>
+
+
+                <h5 class="fw-bold mb-2"
+                    id="modalTitle">
+                </h5>
+
+
+                <p class="text-muted mb-4"
+                   id="modalText">
+                </p>
+
+
+                <div class="d-flex gap-2">
+
+                    <button type="button"
+                            class="btn btn-light border w-100 rounded-3"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="button"
+                            class="btn w-100 rounded-3 text-white fw-bold"
+                            id="confirmBtn">
+
+                        Confirmar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================
+     TOAST
+============================================= -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+    <div id="resultToast"
+         class="toast border-0 shadow"
+         role="alert"
+         aria-live="assertive"
+         aria-atomic="true">
+
+        <div class="toast-body text-white fw-semibold"
+             id="toastBody">
+        </div>
+
+    </div>
+
+</div>
+ 
+
+<script>
+    document.getElementById('searchInput')?.addEventListener('input', function () {
+        const query = this.value.toLowerCase().trim();
+
+        document.querySelectorAll('.solicitud-row').forEach(row => {
+            const value = row.dataset.search || '';
+            row.style.display = value.includes(query) ? '' : 'none';
+        });
+    });
+
+    let selectedId = null;
+    let selectedAction = null;
+
+    const modalElement = document.getElementById('confirmModal');
+    const confirmModal = new bootstrap.Modal(modalElement);
+    const modalIcon = document.getElementById('modalIcon');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const confirmBtn = document.getElementById('confirmBtn');
+
+    document.querySelectorAll('.js-action').forEach(button => {
+        button.addEventListener('click', function () {
+            selectedId = this.dataset.id;
+            selectedAction = this.dataset.action;
+
+            const name = this.dataset.name || 'este solicitante';
+            const isApprove = selectedAction === 'approve';
+
+            modalIcon.className = isApprove ? 'modal-icon success' : 'modal-icon danger';
+            modalIcon.innerHTML = isApprove
+                ? '<i class="bi bi-check-circle-fill"></i>'
+                : '<i class="bi bi-x-circle-fill"></i>';
+
+            modalTitle.textContent = isApprove ? 'Aprobar solicitud' : 'Rechazar solicitud';
+            modalText.textContent = isApprove
+                ? `¿Deseas aprobar la solicitud de ${name}?`
+                : `¿Deseas rechazar la solicitud de ${name}?`;
+
+            confirmBtn.className = isApprove
+                ? 'btn btn-success w-100 rounded-3 text-white fw-bold'
+                : 'btn btn-danger w-100 rounded-3 text-white fw-bold';
+
+            confirmBtn.textContent = isApprove ? 'Aprobar' : 'Rechazar';
+
+            confirmModal.show();
+        });
+    });
+
+    // Manejo de eliminación desde tabla
+    document.querySelectorAll('.js-delete').forEach(btn => {
+        btn.addEventListener('click', function () {
+            selectedId = this.dataset.id;
+            selectedAction = 'delete';
+
+            modalIcon.className = 'modal-icon danger';
+            modalIcon.innerHTML = '<i class="bi bi-trash"></i>';
+            modalTitle.textContent = 'Eliminar solicitud';
+            modalText.textContent = '¿Deseas eliminar esta solicitud? Esta acción no se puede deshacer.';
+            confirmBtn.className = 'btn btn-danger w-100 rounded-3 text-white fw-bold';
+            confirmBtn.textContent = 'Eliminar';
+
+            confirmModal.show();
+        });
+    });
+
+    confirmBtn.addEventListener('click', function () {
+        if (!selectedId || !selectedAction) return;
+
+        if (selectedAction === 'delete') {
+            const endpoint = '@Url.Action("Delete", "SolicitudesIngreso")';
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token || '',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `id=${encodeURIComponent(selectedId)}`
+            })
+            .then(r => r.json())
+            .then(json => {
+                confirmModal.hide();
+                if (json && json.success) {
+                    showToast('Solicitud eliminada.', '#dc2626');
+                    setTimeout(() => location.reload(), 700);
+                } else {
+                    showToast(json?.message || 'No se pudo eliminar', '#b45309');
+                }
+            })
+            .catch(() => { confirmModal.hide(); showToast('Error de conexión', '#b45309'); });
+
+            return;
+        }
+
+        const endpoint = selectedAction === 'approve'
+            ? '@Url.Action("Aprobar", "SolicitudesIngreso")'
+            : '@Url.Action("Rechazar", "SolicitudesIngreso")';
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': token || '',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `id=${encodeURIComponent(selectedId)}`
+        })
+        .then(response => response.json())
+        .then(json => {
+            confirmModal.hide();
+
+            if (json && json.success) {
+                showToast(
+                    selectedAction === 'approve'
+                        ? 'Solicitud aprobada correctamente.'
+                        : 'Solicitud rechazada correctamente.',
+                    selectedAction === 'approve' ? '#16a34a' : '#dc2626'
+                );
+
+                setTimeout(() => location.reload(), 900);
+            } else {
+                showToast(json?.message || 'No se pudo procesar la solicitud.', '#b45309');
+            }
+        })
+        .catch(() => {
+            confirmModal.hide();
+            showToast('Error de conexión. Intenta nuevamente.', '#b45309');
+        });
+    });
+
+    function showToast(message, background) {
+        const toastElement = document.getElementById('resultToast');
+        const toastBody = document.getElementById('toastBody');
+
+        toastBody.textContent = message;
+        toastElement.style.background = background;
+
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    }
+</script>
